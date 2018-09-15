@@ -3,10 +3,7 @@ var util = require('util')
 var path = require('path')
 
 const {
-  TO,
-  RESPONSE_EVENTS,
-  REQUEST_EVENTS,
-  BUSINESS_EVENTS
+  EVENTS
 } = require(path.join(config.get('property'), 'property'))
 const EventHandler = require(path.join(config.get('manager'), 'EventHandler'))
 const RequestInfo = require(path.join(config.get('manager'), 'RequestInfo'))
@@ -17,7 +14,7 @@ function LogoutEventHandler () {
   this.name = arguments.callee.name
 }
 
-LogoutEventHandler.prototype.eventName = REQUEST_EVENTS.LOGOUT
+LogoutEventHandler.prototype.eventName = EVENTS.LOGOUT
 
 LogoutEventHandler.prototype.handle = function (requestInfo) {
 

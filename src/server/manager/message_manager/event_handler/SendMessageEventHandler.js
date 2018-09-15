@@ -4,10 +4,7 @@ var path = require('path')
 const _ = require('lodash')
 
 const {
-  TO,
-  EVENTS,
-  REQUEST_EVENTS,
-  BUSINESS_EVENTS
+  EVENTS
 } = require(path.join(config.get('property'), 'property'))
 const EventHandler = require(path.join(config.get('manager'), 'EventHandler'))
 

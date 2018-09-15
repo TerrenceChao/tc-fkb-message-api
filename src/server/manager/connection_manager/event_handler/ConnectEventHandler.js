@@ -3,9 +3,7 @@ var util = require('util')
 var path = require('path')
 
 const {
-  EVENTS,
-  REQUEST_EVENTS,
-  BUSINESS_EVENTS
+  EVENTS
 } = require(path.join(config.get('property'), 'property'))
 const EventHandler = require(path.join(config.get('manager'), 'EventHandler'))
 
@@ -15,7 +13,7 @@ function ConnectEventHandler () {
   this.name = arguments.callee.name
 }
 
-ConnectEventHandler.prototype.eventName = REQUEST_EVENTS.CONNECT
+ConnectEventHandler.prototype.eventName = EVENTS.CONNECT
 
 ConnectEventHandler.prototype.handle = function (requestInfo) {
 

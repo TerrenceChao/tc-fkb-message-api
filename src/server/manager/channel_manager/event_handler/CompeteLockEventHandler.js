@@ -3,17 +3,17 @@ var util = require('util')
 var path = require('path')
 
 const {
-  REQUEST_EVENTS
+  EVENTS
 } = require(path.join(config.get('property'), 'property'))
 const EventHandler = require(path.join(config.get('manager'), 'EventHandler'))
 
 util.inherits(CompeteLockEventHandler, EventHandler)
 
-function CompeteLockEventHandler() {
+function CompeteLockEventHandler () {
   this.name = arguments.callee.name
 }
 
-CompeteLockEventHandler.prototype.eventName = REQUEST_EVENTS.COMPETE_LOCK
+CompeteLockEventHandler.prototype.eventName = EVENTS.COMPETE_LOCK
 
 CompeteLockEventHandler.prototype.handle = function (requestInfo) {
 

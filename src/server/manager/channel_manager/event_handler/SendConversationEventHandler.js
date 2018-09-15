@@ -3,8 +3,7 @@ var util = require('util')
 var path = require('path')
 
 const {
-  REQUEST_EVENTS,
-  BUSINESS_EVENTS
+  EVENTS
 } = require(path.join(config.get('property'), 'property'))
 const EventHandler = require(path.join(config.get('manager'), 'EventHandler'))
 
@@ -14,7 +13,7 @@ function SendConversationEventHandler () {
   this.name = arguments.callee.name
 }
 
-SendConversationEventHandler.prototype.eventName = REQUEST_EVENTS.SEND_CONVERSATION
+SendConversationEventHandler.prototype.eventName = EVENTS.SEND_CONVERSATION
 
 SendConversationEventHandler.prototype.handle = async function (requestInfo) {
 
