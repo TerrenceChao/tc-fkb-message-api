@@ -1,0 +1,6 @@
+{
+    "editor.find.autoFindInSelection": true,
+    "editor.formatOnType": true,
+    "eslint.autoFixOnSave": true,
+    "standard.autoFixOnSave": true
+}
