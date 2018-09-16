@@ -12,7 +12,7 @@ const EventHandler = require(path.join(config.get('manager'), 'EventHandler'))
 
 util.inherits(SendMessageEventHandler, EventHandler)
 
-function SendMessageEventHandler() {
+function SendMessageEventHandler () {
   this.name = arguments.callee.name
 }
 
