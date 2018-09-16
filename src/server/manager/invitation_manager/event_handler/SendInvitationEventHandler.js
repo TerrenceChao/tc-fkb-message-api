@@ -10,7 +10,7 @@ const EventHandler = require(path.join(config.get('manager'), 'EventHandler'))
 util.inherits(SendInvitationEventHandler, EventHandler)
 
 function SendInvitationEventHandler () {
-
+  this.name = arguments.callee.name
 }
 
 SendInvitationEventHandler.prototype.eventName = EVENTS.SEND_INVITATION

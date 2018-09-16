@@ -10,7 +10,7 @@ const EventHandler = require(path.join(config.get('manager'), 'EventHandler'))
 util.inherits(DealWithInvitationEventHandler, EventHandler)
 
 function DealWithInvitationEventHandler () {
-
+  this.name = arguments.callee.name
 }
 
 DealWithInvitationEventHandler.prototype.eventName = EVENTS.DEAL_WITH_INVITATION
