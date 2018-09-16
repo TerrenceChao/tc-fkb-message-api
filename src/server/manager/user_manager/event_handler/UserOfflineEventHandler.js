@@ -29,7 +29,7 @@ UserOfflineEventHandler.prototype.handle = async function (requestInfo) {
   var uid = packet.uid
 
   var storageService = this.globalContext['storageService']
-  var channelIds = await storageService.getChannelInfoIds()
+  var channelIds = await storageService.getChannelInfoIds(uid)
 
   var businessEvent = this.globalContext['businessEvent']
 

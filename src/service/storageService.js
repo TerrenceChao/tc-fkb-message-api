@@ -6,9 +6,9 @@ const {
   repository
 } = require(path.join(config.get('database'), 'repository'))
 
-function StorageService () {}
+function StorageService() {}
 
-StorageService.prototype.getChannelInfoIds = async function (limit, skip = 0) {
+StorageService.prototype.getChannelInfoIds = async function (uid, limit = 'all', skip = 0) {
   return ['chPub', 'chGasStation', 'chHospital']
 }
 
