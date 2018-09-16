@@ -23,15 +23,15 @@ function startUp (httpServer) {
   let messageManager = new MessageManager().init(globalContext)
 
   socketServer.sockets.on('connection', function (socket) {
-    var requestInfo = {
+    var protocol = {
       socket
     }
-    connectionManager.startListen(requestInfo)
-    authenticationManager.startListen(requestInfo)
-    channelManager.startListen(requestInfo)
-    invitationManager.startListen(requestInfo)
-    userManager.startListen(requestInfo)
-    messageManager.startListen(requestInfo)
+    connectionManager.startListen(protocol)
+    authenticationManager.startListen(protocol)
+    channelManager.startListen(protocol)
+    invitationManager.startListen(protocol)
+    userManager.startListen(protocol)
+    messageManager.startListen(protocol)
   })
 }
 

@@ -16,7 +16,7 @@ function AuthenticateEventHandler () {
 AuthenticateEventHandler.prototype.eventName = EVENTS.AUTHENTICATE
 
 AuthenticateEventHandler.prototype.handle = function (requestInfo) {
-  console.log(`Authenticate EventHandler: ${JSON.stringify(requestInfo.packetContent)}`)
+  console.log(`Authenticate EventHandler: ${JSON.stringify(requestInfo.packet)}`)
 }
 
 module.exports = {

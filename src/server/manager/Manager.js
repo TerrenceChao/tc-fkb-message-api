@@ -56,14 +56,14 @@ Manager.prototype.listenRequestEvent = function (protocol, handler) {
   } = protocol
   let requestInfo = new RequestInfo()
 
-  if (socket != undefined) {
-    socket.on(handler.eventName, (packetContent) => {
+  if (socket !== undefined) {
+    socket.on(handler.eventName, (packet) => {
       requestInfo.socket = socket
-      requestInfo.packetContent = packetContent
+      requestInfo.packet = packet
       handler.handle(requestInfo)
       self.receiveAlert(handler.eventName, requestInfo)
     })
-  } else if (req != undefined && res != undefined) {
+  } else if (req !== undefined && res !== undefined) {
     requestInfo.req = req
     requestInfo.res = res
     handler.handle(requestInfo)

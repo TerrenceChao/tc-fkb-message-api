@@ -8,6 +8,10 @@ const {
 
 function StorageService () {}
 
+StorageService.prototype.getChannelInfoIds = async function (skip = 0, limit) {
+  return ['chPub', 'chGasStation', 'chHospital']
+}
+
 StorageService.prototype.refSocketServer = function (socketServer) {
   this.socketServer = socketServer
   return this
