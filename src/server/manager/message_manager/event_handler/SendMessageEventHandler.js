@@ -12,7 +12,7 @@ const EventHandler = require(path.join(config.get('manager'), 'EventHandler'))
 
 util.inherits(SendMessageEventHandler, EventHandler)
 
-function SendMessageEventHandler () {
+function SendMessageEventHandler() {
   this.name = arguments.callee.name
 }
 
@@ -99,8 +99,8 @@ SendMessageEventHandler.prototype.emitInChannel = function (channel, responseEve
 SendMessageEventHandler.prototype.isValid = function (responseInfo) {
   return responseInfo instanceof ResponseInfo &&
     responseInfo.header != null &&
-    responseInfo.header.protocol != null &&
-    responseInfo.header.to != null &&
+    typeof responseInfo.header.protocol === 'string' &&
+    typeof responseInfo.header.to === 'string' &&
     (typeof responseInfo.header.receiver === 'string' || Array.isArray(responseInfo.header.receiver)) &&
     (typeof responseInfo.header.responseEvent === 'string' || Array.isArray(responseInfo.header.responseEvent))
 }
