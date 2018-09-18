@@ -7,7 +7,7 @@ const {
 } = require(path.join(config.get('property'), 'property'))
 const RequestInfo = require('./RequestInfo.js')
 
-function Manager() {}
+function Manager () {}
 
 Manager.prototype.init = function (globalContext) {
   this.globalContext = globalContext

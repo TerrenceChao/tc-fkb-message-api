@@ -8,16 +8,13 @@ const {
   TO,
   EVENTS,
   RESPONSE_EVENTS
-} = require(path.join(
-  config.get('property'),
-  'property'
-))
+} = require(path.join(config.get('property'), 'property'))
 const ResponseInfo = require(path.join(config.get('manager'), 'ResponseInfo'))
 const EventHandler = require(path.join(config.get('manager'), 'EventHandler'))
 
 util.inherits(SendInvitationEventHandler, EventHandler)
 
-function SendInvitationEventHandler() {
+function SendInvitationEventHandler () {
   this.name = arguments.callee.name
 }
 

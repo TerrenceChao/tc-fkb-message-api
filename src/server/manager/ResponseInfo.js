@@ -5,7 +5,7 @@ const {
   PROTOCOL
 } = require(path.join(config.get('property'), 'property'))
 
-function ResponseInfo() {
+function ResponseInfo () {
   this.req = null
   this.res = null
   this.socket = null
