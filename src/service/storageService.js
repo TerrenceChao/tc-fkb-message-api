@@ -6,7 +6,7 @@ const {
   repository
 } = require(path.join(config.get('database'), 'repository'))
 
-function StorageService() {}
+function StorageService () {}
 
 StorageService.prototype.getChannelInfoIds = async function (uid, limit = 'all', skip = 0) {
   return ['chPub', 'chGasStation', 'chHospital']
@@ -18,27 +18,34 @@ StorageService.prototype.getChannelInfoId = async function (channelName) {
 
 StorageService.prototype.getReceivedInvitationList = async function (uid, limit = 'all', skip) {
   return [{
-      apple: 'an apple a day keeps the doctor away'
-    },
-    {
-      inviteType: 'received invitations from others'
-    },
-    {}
+    apple: 'an apple a day keeps the doctor away'
+  },
+  {
+    inviteType: 'received invitations from others'
+  },
+  {}
   ]
 }
 
 StorageService.prototype.getSentInvitationList = async function (uid, limit = 'all', skip) {
   return [{
-      banana: 'a banana give you power!'
-    },
-    {
-      inviteType: 'sent invitation by me'
-    },
-    {}
+    banana: 'a banana give you power!'
+  },
+  {
+    inviteType: 'sent invitation by me'
+  },
+  {}
   ]
 }
 
 StorageService.prototype.invitationCreated = function (inviter, invitee, header, content, sensitive = null) {
+  /**
+   * VERY IMPORTANT !!!
+   * VERY IMPORTANT !!!
+   * VERY IMPORTANT !!!
+   * check it first!
+   * Don't create over & over again if you have created.
+   */
   return {
     iid: 'mbnht594EokdMvfht54elwTsd98',
     inviter,
