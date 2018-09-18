@@ -5,7 +5,7 @@ const {
   PROTOCOL
 } = require(path.join(config.get('property'), 'property'))
 
-function ResponseInfo () {
+function ResponseInfo() {
   this.req = null
   this.res = null
   this.socket = null
@@ -40,6 +40,12 @@ ResponseInfo.prototype.setHeader = function (header) {
   this.header.to = to || this.header.to
   this.header.receiver = receiver || this.header.receiver
   this.header.responseEvent = responseEvent || this.header.responseEvent
+
+  return this
+}
+
+ResponseInfo.prototype.setPacket = function (packet) {
+  this.packet = packet
 
   return this
 }

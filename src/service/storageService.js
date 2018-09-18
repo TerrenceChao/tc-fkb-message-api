@@ -12,6 +12,44 @@ StorageService.prototype.getChannelInfoIds = async function (uid, limit = 'all',
   return ['chPub', 'chGasStation', 'chHospital']
 }
 
+StorageService.prototype.getChannelInfoId = async function (channelName) {
+  return 'ciid:ansvbvghtrj54mekw&GBNKNde$3@'
+}
+
+StorageService.prototype.getReceivedInvitationList = async function (uid, limit = 'all', skip) {
+  return [{
+      apple: 'an apple a day keeps the doctor away'
+    },
+    {
+      inviteType: 'received invitations from others'
+    },
+    {}
+  ]
+}
+
+StorageService.prototype.getSentInvitationList = async function (uid, limit = 'all', skip) {
+  return [{
+      banana: 'a banana give you power!'
+    },
+    {
+      inviteType: 'sent invitation by me'
+    },
+    {}
+  ]
+}
+
+StorageService.prototype.invitationCreated = function (inviter, invitee, header, content, sensitive = null) {
+  return {
+    iid: 'mbnht594EokdMvfht54elwTsd98',
+    inviter,
+    invitee,
+    header,
+    content,
+    sensitive,
+    create_at: Date.now()
+  }
+}
+
 StorageService.prototype.refSocketServer = function (socketServer) {
   this.socketServer = socketServer
   return this
@@ -34,10 +72,6 @@ StorageService.prototype.removeUser = function (uid, options) {
   if (!this.socketServer) {
 
   }
-}
-
-StorageService.prototype.getInvitation = function (uid, type) {
-
 }
 
 // // for posts
