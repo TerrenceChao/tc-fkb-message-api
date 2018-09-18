@@ -33,13 +33,11 @@ const EVENTS = {
   GET_CONVERSATION: 'req_channel_get_conversation',
 
   // InvitationManager
-  GET_INVITATION_LIST: 'req_channel_get_invitation_list',
-  SEND_INVITATION: 'req_channel_send_invitation',
-  DEAL_WITH_INVITATION: 'req_channel_deal_with_invitation',
+  GET_INVITATION_LIST: 'req_invitation_get_invitation_list',
+  SEND_INVITATION: 'req_invitation_send_invitation',
+  DEAL_WITH_INVITATION: 'req_invitation_deal_with_invitation',
 
   // UserManager
-  USER_ONLINE: 'req_user_user_online',
-  USER_OFFLINE: 'req_user_user_offline',
 
   // MessageManager
   SERVER_PUSH: 'req_message_server_push',
@@ -72,6 +70,8 @@ const REQUEST_EVENTS = {
   DEAL_WITH_INVITATION: EVENTS.DEAL_WITH_INVITATION,
 
   // UserManager
+  USER_ONLINE: EVENTS.USER_ONLINE,
+  USER_OFFLINE: EVENTS.USER_OFFLINE,
 
   // MessageManager
   SEND_MESSAGE: EVENTS.SEND_MESSAGE
@@ -116,7 +116,7 @@ const RESPONSE_EVENTS = {
 
   // Channel
   INVITATION_LIST_FROM_CHANNEL: 'invitation_list_from_channel',
-  // INVITATION_FROM_CHANNEL_TO_: `invitation_from_channel_to_${uid}`,
+  INVITATION_FROM_CHANNEL_TO_ME: `invitation_from_channel_to_me`,
   CONVERSATION_FROM_CHANNEL: 'conversation_from_channel'
 }
 
