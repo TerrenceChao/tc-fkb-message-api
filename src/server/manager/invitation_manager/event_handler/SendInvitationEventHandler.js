@@ -4,7 +4,6 @@ var path = require('path')
 var _ = require('lodash')
 
 const {
-  PROTOCOL,
   TO,
   EVENTS,
   RESPONSE_EVENTS
@@ -27,12 +26,8 @@ SendInvitationEventHandler.prototype.handle = async function (requestInfo) {
   }
 
   var packet = requestInfo.packet
-  var {
-    inviter,
-    invitee,
-    channelName,
-    content
-  } = packet
+  var invitee = packet.invitee
+  var channelName = packet.channelName
 
   var ciid = await this.globalContext['storageService'].getChannelInfoId(channelName)
   var sensitive = {
@@ -41,7 +36,7 @@ SendInvitationEventHandler.prototype.handle = async function (requestInfo) {
 
   var businessEvent = this.globalContext['businessEvent']
   if (typeof invitee === 'string') {
-    var resInfo = await this.pack(inviter, invitee, content, sensitive)
+    var resInfo = await this.pack(invitee, packet, sensitive)
     businessEvent.emit(
       EVENTS.SEND_MESSAGE,
       resInfo.assignProtocol(requestInfo)
@@ -49,7 +44,7 @@ SendInvitationEventHandler.prototype.handle = async function (requestInfo) {
   } else if (Array.isArray(invitee)) {
     var self = this
     Promise.all(
-      invitee.map(invi => self.pack(inviter, invi, content, sensitive))
+      invitee.map(invi => self.pack(invi, packet, sensitive))
     ).then(resInfoList =>
       resInfoList.map(resInfo => {
         resInfo.assignProtocol(requestInfo)
@@ -59,12 +54,18 @@ SendInvitationEventHandler.prototype.handle = async function (requestInfo) {
   }
 }
 
-SendInvitationEventHandler.prototype.pack = async function (inviter, invitee, content, sensitive) {
+SendInvitationEventHandler.prototype.pack = async function (invitee, packet, sensitive) {
+  var {
+    inviter,
+    channelName,
+    content
+  } = packet
+
   var headerForInvitee = {
-    protocol: PROTOCOL.SOCKET,
-    to: TO.USER,
-    receiver: invitee,
-    requestEvent: EVENTS.DEAL_WITH_INVITATION
+    requestEvent: EVENTS.DEAL_WITH_INVITATION,
+    data: {
+      channelName
+    }
   }
 
   var invitation = await this.globalContext['storageService']
