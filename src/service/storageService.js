@@ -38,7 +38,7 @@ StorageService.prototype.getSentInvitationList = async function (uid, limit = 'a
   ]
 }
 
-StorageService.prototype.invitationCreated = function (inviter, invitee, header, content, sensitive = null) {
+StorageService.prototype.invitationCreated = async function (inviter, invitee, header, content, sensitive = null) {
   /**
    * VERY IMPORTANT !!!
    * VERY IMPORTANT !!!
@@ -55,6 +55,10 @@ StorageService.prototype.invitationCreated = function (inviter, invitee, header,
     sensitive,
     create_at: Date.now()
   }
+}
+
+StorageService.prototype.invitationRemoved = async function (iid) {
+  return true
 }
 
 StorageService.prototype.refSocketServer = function (socketServer) {
