@@ -13,7 +13,7 @@ const EventHandler = require(path.join(config.get('manager'), 'EventHandler'))
 
 util.inherits(DealWithInvitationEventHandler, EventHandler)
 
-function DealWithInvitationEventHandler() {
+function DealWithInvitationEventHandler () {
   this.name = arguments.callee.name
 }
 
