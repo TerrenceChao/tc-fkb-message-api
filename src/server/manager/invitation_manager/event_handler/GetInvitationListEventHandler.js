@@ -38,10 +38,6 @@ GetInvitationListEventHandler.prototype.handle = async function (requestInfo) {
     invitationList = await storageService.getSentInvitationList(uid, limit, skip)
   }
 
-  if (invitationList.length === 0) {
-    return
-  }
-
   var businessEvent = this.globalContext['businessEvent']
   var resInfo = new ResponseInfo()
     .assignProtocol(requestInfo)
