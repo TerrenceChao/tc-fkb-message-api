@@ -67,13 +67,8 @@ SendInvitationEventHandler.prototype.pack = async function (inviter, invitee, co
     requestEvent: EVENTS.DEAL_WITH_INVITATION
   }
 
-  var invitation = await this.globalContext['storageService'].invitationCreated(
-    inviter,
-    invitee,
-    headerForInvitee,
-    content,
-    sensitive
-  )
+  var invitation = await this.globalContext['storageService']
+    .invitationCreated(inviter, invitee, headerForInvitee, content, sensitive)
 
   _.unset(invitation, 'sensitive')
 
