@@ -28,21 +28,21 @@ DealWithInvitationEventHandler.prototype.handle = async function (requestInfo) {
   var packet = requestInfo.packet
   var {
     uid,
-    channelName,
+    chid,
     dealwith,
     iid
   } = packet
 
   var businessEvent = this.globalContext['businessEvent']
   var storageService = this.globalContext['storageService']
-  var msgCode = `You have canceled to join channel ${channelName}`
+  var msgCode = `You have canceled to join channel ${chid}`
 
   if (dealwith === 'y') {
-    msgCode = `You have joined into channel ${channelName}`
-    var ciid = await storageService.getChannelInfoId(channelName)
+    msgCode = `You have joined into channel ${chid}`
+    var invitation = await storageService.getInvitationThenRemoved(iid)
     requestInfo.packet = {
       uid,
-      ciid
+      ciid: invitation.sensitive.ciid
     }
     businessEvent.emit(BUSINESS_EVENTS.JOIN_CHANNEL, requestInfo)
   }
@@ -58,8 +58,6 @@ DealWithInvitationEventHandler.prototype.handle = async function (requestInfo) {
       msgCode
     })
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
-
-  storageService.invitationRemoved(iid)
 }
 
 DealWithInvitationEventHandler.prototype.isValid = function (requestInfo) {
@@ -67,7 +65,7 @@ DealWithInvitationEventHandler.prototype.isValid = function (requestInfo) {
   return packet !== undefined &&
     packet.iid != null &&
     typeof packet.uid === 'string' &&
-    typeof packet.channelName === 'string' &&
+    typeof packet.chid === 'string' &&
     packet.dealwith != null
 }
 

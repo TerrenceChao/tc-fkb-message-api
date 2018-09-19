@@ -12,8 +12,14 @@ StorageService.prototype.getChannelInfoIds = async function (uid, limit = 'all',
   return ['chPub', 'chGasStation', 'chHospital']
 }
 
-StorageService.prototype.getChannelInfoId = async function (channelName) {
-  return 'ciid:ansvbvghtrj54mekw&GBNKNde$3@'
+StorageService.prototype.getChannelInfo = async function (queryCondition) {
+  return {
+    ciid: 'ciid:ansvbvghtrj54mekw&GBNKNde$3@FIT*IoiTGBK#$%^YHBN',
+    creator: 'someone',
+    chid: 'chid:l4ehfuvljifgbudvzsugkurliLO4U*T&IYEOW*UGY',
+    name: 'Room 18',
+    members: ['uidA', 'uidB', 'uidC']
+  }
 }
 
 StorageService.prototype.getReceivedInvitationList = async function (uid, limit = 'all', skip) {
@@ -46,6 +52,12 @@ StorageService.prototype.invitationCreated = async function (inviter, invitee, h
    * check it first!
    * Don't create over & over again if you have created.
    */
+
+  /**
+   * Database:
+   * 1. craete InvitationOfChannel(schema)
+   * 2. insert in UserInChannel.sent_invitations(schema)
+   */
   return {
     iid: 'mbnht594EokdMvfht54elwTsd98',
     inviter,
@@ -58,7 +70,33 @@ StorageService.prototype.invitationCreated = async function (inviter, invitee, h
 }
 
 StorageService.prototype.invitationRemoved = async function (iid) {
+  /**
+   * Database:
+   * 1. remove InvitationOfChannel(schema)
+   * 2. pull element in UserInChannel.sent_invitations(schema)
+   */
   return true
+}
+
+StorageService.prototype.getInvitationThenRemoved = async function (iid) {
+  /**
+   * Database:
+   * 1. query and get (copied obj)
+   * 2. remove InvitationOfChannel(schema)
+   * 3. pull element in UserInChannel.sent_invitations(schema)
+   * 4. return (copied obj)
+   */
+  return {
+    iid: 'mbnht594EokdMvfht54elwTsd98',
+    inviter: 'inviter?',
+    invitee: 'invitee?',
+    header: {},
+    content: 'HTML string',
+    sensitive: {
+      ciid: 'jiodhdgnj4*&^fyguihnkr4elwsdy'
+    },
+    create_at: Date.now()
+  } || null
 }
 
 StorageService.prototype.refSocketServer = function (socketServer) {

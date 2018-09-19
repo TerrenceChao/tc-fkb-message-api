@@ -13,7 +13,7 @@ const EventHandler = require(path.join(config.get('manager'), 'EventHandler'))
 
 util.inherits(SendInvitationEventHandler, EventHandler)
 
-function SendInvitationEventHandler () {
+function SendInvitationEventHandler() {
   this.name = arguments.callee.name
 }
 
@@ -27,12 +27,16 @@ SendInvitationEventHandler.prototype.handle = async function (requestInfo) {
 
   var packet = requestInfo.packet
   var invitee = packet.invitee
-  var channelName = packet.channelName
+  var chid = packet.chid
 
-  var ciid = await this.globalContext['storageService'].getChannelInfoId(channelName)
-  var sensitive = {
-    ciid
+  var query = {
+    chid
   }
+  var channelInfo = await this.globalContext['storageService'].getChannelInfo(query)
+  var sensitive = {
+    ciid: channelInfo.ciid
+  }
+  packet.channelName = channelInfo.name
 
   var businessEvent = this.globalContext['businessEvent']
   if (typeof invitee === 'string') {
@@ -57,6 +61,7 @@ SendInvitationEventHandler.prototype.handle = async function (requestInfo) {
 SendInvitationEventHandler.prototype.pack = async function (invitee, packet, sensitive) {
   var {
     inviter,
+    chid,
     channelName,
     content
   } = packet
@@ -64,6 +69,7 @@ SendInvitationEventHandler.prototype.pack = async function (invitee, packet, sen
   var headerForInvitee = {
     requestEvent: EVENTS.DEAL_WITH_INVITATION,
     data: {
+      chid,
       channelName
     }
   }
@@ -90,7 +96,7 @@ SendInvitationEventHandler.prototype.isValid = function (requestInfo) {
     requestInfo.packet != null &&
     requestInfo.packet.inviter != null &&
     (typeof requestInfo.packet.invitee === 'string' || Array.isArray(requestInfo.packet.invitee)) &&
-    typeof requestInfo.packet.channelName === 'string' &&
+    typeof requestInfo.packet.chid === 'string' &&
     requestInfo.packet.content != null
   )
 }
