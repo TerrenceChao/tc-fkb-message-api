@@ -55,18 +55,44 @@ StorageService.prototype.invitationCreated = async function (inviter, invitee, h
 
   /**
    * Database:
-   * 1. craete InvitationOfChannel(schema)
+   *    1. craete InvitationOfChannel(schema)
+   *    2. insert in UserInChannel.sent_invitations(schema)
+   */
+  var invitations = []
+  if (typeof invitee === 'string') {
+    invitations.push({
+      // Avoid creating repeat items
+      iid: `hashed_or_encoded(${header.data.chid}, ${inviter}, ${invitee}, secret)`,
+      inviter,
+      invitee,
+      header,
+      content,
+      sensitive,
+      create_at: Date.now()
+    })
+  } else if (Array.isArray(invitee)) {
+    invitations = invitee.map(invi => {
+      return {
+        // Avoid creating repeat items
+        iid: `hashed_or_encoded(header.data.chid, inviter, ${invitee}, secret)`,
+        inviter,
+        invi,
+        header,
+        content,
+        sensitive,
+        create_at: Date.now()
+      }
+    })
+  }
+
+  /**
+   * DB insert multiple rows using self-defiend iid (invitation ID)
+   * 1. craete InvitationOfChannel(schema):
+   *      Model.insertMany(invitations)
    * 2. insert in UserInChannel.sent_invitations(schema)
    */
-  return {
-    iid: 'mbnht594EokdMvfht54elwTsd98',
-    inviter,
-    invitee,
-    header,
-    content,
-    sensitive,
-    create_at: Date.now()
-  }
+
+  return invitations
 }
 
 StorageService.prototype.invitationRemoved = async function (iid) {

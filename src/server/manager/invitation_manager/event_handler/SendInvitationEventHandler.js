@@ -13,7 +13,7 @@ const EventHandler = require(path.join(config.get('manager'), 'EventHandler'))
 
 util.inherits(SendInvitationEventHandler, EventHandler)
 
-function SendInvitationEventHandler() {
+function SendInvitationEventHandler () {
   this.name = arguments.callee.name
 }
 
@@ -32,30 +32,20 @@ SendInvitationEventHandler.prototype.handle = async function (requestInfo) {
   var query = {
     chid
   }
-  var channelInfo = await this.globalContext['storageService'].getChannelInfo(query)
+  var storageService = this.globalContext['storageService']
+  var channelInfo = await storageService.getChannelInfo(query)
   var sensitive = {
     ciid: channelInfo.ciid
   }
   packet.channelName = channelInfo.name
 
   var businessEvent = this.globalContext['businessEvent']
-  if (typeof invitee === 'string') {
-    var resInfo = await this.pack(invitee, packet, sensitive)
-    businessEvent.emit(
-      EVENTS.SEND_MESSAGE,
-      resInfo.assignProtocol(requestInfo)
-    )
-  } else if (Array.isArray(invitee)) {
-    var self = this
-    Promise.all(
-      invitee.map(invi => self.pack(invi, packet, sensitive))
-    ).then(resInfoList =>
+  Promise.resolve(this.pack(invitee, packet, sensitive))
+    .then(resInfoList =>
       resInfoList.map(resInfo => {
         resInfo.assignProtocol(requestInfo)
         businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
-      })
-    )
-  }
+      }))
 }
 
 SendInvitationEventHandler.prototype.pack = async function (invitee, packet, sensitive) {
@@ -74,21 +64,23 @@ SendInvitationEventHandler.prototype.pack = async function (invitee, packet, sen
     }
   }
 
-  var invitation = await this.globalContext['storageService']
+  var invitations = await this.globalContext['storageService']
     .invitationCreated(inviter, invitee, headerForInvitee, content, sensitive)
 
-  _.unset(invitation, 'sensitive')
+  return invitations.map(invite => {
+    _.unset(invite, 'sensitive')
 
-  return new ResponseInfo()
-    .setHeader({
-      to: TO.USER,
-      receiver: invitee,
-      responseEvent: RESPONSE_EVENTS.INVITATION_FROM_CHANNEL_TO_ME // to invitee
-    })
-    .setPacket({
-      msgCode: 'you got an invitation',
-      data: invitation
-    })
+    return new ResponseInfo()
+      .setHeader({
+        to: TO.USER,
+        receiver: invite.invitee,
+        responseEvent: RESPONSE_EVENTS.INVITATION_FROM_CHANNEL_TO_ME // to individual invitee
+      })
+      .setPacket({
+        msgCode: 'you got an invitation',
+        data: invite
+      })
+  })
 }
 
 SendInvitationEventHandler.prototype.isValid = function (requestInfo) {

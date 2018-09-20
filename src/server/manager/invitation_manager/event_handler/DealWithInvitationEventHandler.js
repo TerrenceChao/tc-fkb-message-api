@@ -39,6 +39,11 @@ DealWithInvitationEventHandler.prototype.handle = async function (requestInfo) {
 
   if (dealwith === 'y') {
     msgCode = `You have joined into channel ${chid}`
+    /**
+     * 如果你這次沒加入到房間(exe fail)  這次邀請就沒用了！！！要再邀請一次！！
+     * 如果你這次沒加入到房間(exe fail)  這次邀請就沒用了！！！要再邀請一次！！
+     * 如果你這次沒加入到房間(exe fail)  這次邀請就沒用了！！！要再邀請一次！！
+     */
     var invitation = await storageService.getInvitationThenRemoved(iid)
     requestInfo.packet = {
       uid,
