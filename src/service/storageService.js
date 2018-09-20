@@ -90,6 +90,7 @@ StorageService.prototype.invitationCreated = async function (inviter, invitee, h
    * 1. craete InvitationOfChannel(schema):
    *      Model.insertMany(invitations)
    * 2. insert in UserInChannel.sent_invitations(schema)
+   *      Model.update(...)
    */
 
   return invitations
