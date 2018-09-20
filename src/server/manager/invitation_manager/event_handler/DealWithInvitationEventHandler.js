@@ -43,8 +43,8 @@ DealWithInvitationEventHandler.prototype.handle = async function (requestInfo) {
     return
   }
 
-  var msgCode = `You have canceled to join channel ${channelName}`
-  var reqEvent = RESPONSE_EVENTS.INVITATION_FROM_CHANNEL_TO_ME // push again
+  var msgCode
+  var reqEvent
 
   if (dealwith === 'y') {
     var invitation = await storageService.getInvitation(iid)
@@ -54,6 +54,8 @@ DealWithInvitationEventHandler.prototype.handle = async function (requestInfo) {
       reqEvent = RESPONSE_EVENTS.EXCEPTION_ALERT
     } else {
       msgCode = `You have joined into channel ${channelName}`
+      reqEvent = RESPONSE_EVENTS.INVITATION_FROM_CHANNEL_TO_ME // push again
+
       businessEvent.emit(
         BUSINESS_EVENTS.JOIN_CHANNEL,
         requestInfo.setPacket({
@@ -61,6 +63,10 @@ DealWithInvitationEventHandler.prototype.handle = async function (requestInfo) {
           ciid: invitation.sensitive.ciid
         }))
     }
+  } else {
+    msgCode = `You have canceled to join channel ${channelName}`
+    reqEvent = RESPONSE_EVENTS.INVITATION_FROM_CHANNEL_TO_ME // push again
+    storageService.invitationRemoved(iid)
   }
 
   var resInfo = new ResponseInfo()

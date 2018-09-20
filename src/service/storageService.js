@@ -21,7 +21,7 @@ StorageService.prototype.getChannelInfo = async function (queryCondition) {
     chid: 'chid:l4ehfuvljifgbudvzsugkurliLO4U*T&IYEOW*UGY',
     name: 'Room 18',
     members: ['uidA', 'uidB', 'uidC']
-  }
+  } || null
 }
 
 StorageService.prototype.getReceivedInvitationList = async function (uid, limit = 'all', skip) {
