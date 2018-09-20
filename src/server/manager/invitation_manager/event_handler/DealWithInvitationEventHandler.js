@@ -13,7 +13,7 @@ const EventHandler = require(path.join(config.get('manager'), 'EventHandler'))
 
 util.inherits(DealWithInvitationEventHandler, EventHandler)
 
-function DealWithInvitationEventHandler () {
+function DealWithInvitationEventHandler() {
   this.name = arguments.callee.name
 }
 
@@ -28,28 +28,39 @@ DealWithInvitationEventHandler.prototype.handle = async function (requestInfo) {
   var packet = requestInfo.packet
   var {
     uid,
-    chid,
+    iid,
+    channelName,
     dealwith,
-    iid
+    removingIid
   } = packet
 
   var businessEvent = this.globalContext['businessEvent']
   var storageService = this.globalContext['storageService']
-  var msgCode = `You have canceled to join channel ${chid}`
+
+  // callback from BUSINESS_EVENTS.JOIN_CHANNEL
+  if (iid === removingIid) {
+    storageService.invitationRemoved(removingIid)
+    return
+  }
+
+  var msgCode = `You have canceled to join channel ${channelName}`
+  var reqEvent = RESPONSE_EVENTS.INVITATION_FROM_CHANNEL_TO_ME // push again
 
   if (dealwith === 'y') {
-    msgCode = `You have joined into channel ${chid}`
-    /**
-     * 如果你這次沒加入到房間(exe fail)  這次邀請就沒用了！！！要再邀請一次！！
-     * 如果你這次沒加入到房間(exe fail)  這次邀請就沒用了！！！要再邀請一次！！
-     * 如果你這次沒加入到房間(exe fail)  這次邀請就沒用了！！！要再邀請一次！！
-     */
-    var invitation = await storageService.getInvitationThenRemoved(iid)
-    requestInfo.packet = {
-      uid,
-      ciid: invitation.sensitive.ciid
+    var invitation = await storageService.getInvitation(iid)
+
+    if (invitation == null) {
+      msgCode = `invitation id is invalid.`
+      reqEvent = RESPONSE_EVENTS.EXCEPTION_ALERT
+    } else {
+      msgCode = `You have joined into channel ${channelName}`
+      businessEvent.emit(
+        BUSINESS_EVENTS.JOIN_CHANNEL,
+        requestInfo.setPacket({
+          uid,
+          ciid: invitation.sensitive.ciid
+        }))
     }
-    businessEvent.emit(BUSINESS_EVENTS.JOIN_CHANNEL, requestInfo)
   }
 
   var resInfo = new ResponseInfo()
@@ -57,7 +68,7 @@ DealWithInvitationEventHandler.prototype.handle = async function (requestInfo) {
     .setHeader({
       to: TO.USER,
       receiver: uid,
-      responseEvent: RESPONSE_EVENTS.INVITATION_FROM_CHANNEL_TO_ME // push again
+      responseEvent: reqEvent
     })
     .setPacket({
       msgCode
@@ -70,7 +81,6 @@ DealWithInvitationEventHandler.prototype.isValid = function (requestInfo) {
   return packet !== undefined &&
     packet.iid != null &&
     typeof packet.uid === 'string' &&
-    typeof packet.chid === 'string' &&
     packet.dealwith != null
 }
 

@@ -117,7 +117,10 @@ const RESPONSE_EVENTS = {
   // Channel
   INVITATION_LIST_FROM_CHANNEL: 'invitation_list_from_channel',
   INVITATION_FROM_CHANNEL_TO_ME: `invitation_from_channel_to_me`,
-  CONVERSATION_FROM_CHANNEL: 'conversation_from_channel'
+  CONVERSATION_FROM_CHANNEL: 'conversation_from_channel',
+
+  // Exception
+  EXCEPTION_ALERT: 'exception_alert'
 }
 
 module.exports = {

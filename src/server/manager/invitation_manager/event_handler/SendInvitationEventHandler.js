@@ -34,7 +34,14 @@ SendInvitationEventHandler.prototype.handle = async function (requestInfo) {
   }
   var storageService = this.globalContext['storageService']
   var channelInfo = await storageService.getChannelInfo(query)
+
+  if (channelInfo == null) {
+    this.packException(packet, requestInfo)
+    return
+  }
+
   var sensitive = {
+    chid: channelInfo.chid,
     ciid: channelInfo.ciid
   }
   packet.channelName = channelInfo.name
@@ -51,7 +58,6 @@ SendInvitationEventHandler.prototype.handle = async function (requestInfo) {
 SendInvitationEventHandler.prototype.pack = async function (invitee, packet, sensitive) {
   var {
     inviter,
-    chid,
     channelName,
     content
   } = packet
@@ -59,13 +65,13 @@ SendInvitationEventHandler.prototype.pack = async function (invitee, packet, sen
   var headerForInvitee = {
     requestEvent: EVENTS.DEAL_WITH_INVITATION,
     data: {
-      chid,
       channelName
     }
   }
 
-  var invitations = await this.globalContext['storageService']
-    .invitationCreated(inviter, invitee, headerForInvitee, content, sensitive)
+  var storageService = this.globalContext['storageService']
+  var invitations = await storageService
+    .invitationMultiCreated(inviter, invitee, headerForInvitee, content, sensitive)
 
   return invitations.map(invite => {
     _.unset(invite, 'sensitive')
@@ -81,6 +87,20 @@ SendInvitationEventHandler.prototype.pack = async function (invitee, packet, sen
         data: invite
       })
   })
+}
+
+SendInvitationEventHandler.prototype.packException = function (packet, requestInfo) {
+  var businessEvent = this.globalContext['businessEvent']
+  var resInfo = new ResponseInfo().assignProtocol(requestInfo)
+    .setHeader({
+      to: TO.USER,
+      receiver: packet.inviter,
+      responseEvent: RESPONSE_EVENTS.EXCEPTION_ALERT // back to inviter
+    })
+    .setPacket({
+      msgCode: `couldn't get channel info with chid:${packet.chid}`
+    })
+  businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 }
 
 SendInvitationEventHandler.prototype.isValid = function (requestInfo) {

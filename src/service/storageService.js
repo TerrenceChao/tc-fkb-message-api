@@ -1,5 +1,6 @@
 var config = require('config')
 var path = require('path')
+var _ = require('lodash')
 
 // const { cache } = require(path.join(config.get('cache'), 'cache'));
 const {
@@ -8,8 +9,9 @@ const {
 
 function StorageService () {}
 
-StorageService.prototype.getChannelInfoIds = async function (uid, limit = 'all', skip = 0) {
-  return ['chPub', 'chGasStation', 'chHospital']
+StorageService.prototype.getChannelIds = async function (uid, limit = 'all', skip = 0) {
+  // return chid, not ciid !!! (return ciid is forbidden)
+  return ['chPub', 'chGasStation', 'chHospital'] || []
 }
 
 StorageService.prototype.getChannelInfo = async function (queryCondition) {
@@ -44,7 +46,7 @@ StorageService.prototype.getSentInvitationList = async function (uid, limit = 'a
   ]
 }
 
-StorageService.prototype.invitationCreated = async function (inviter, invitee, header, content, sensitive = null) {
+StorageService.prototype.invitationMultiCreated = async function (inviter, invitee, header, content, sensitive = {}) {
   /**
    * VERY IMPORTANT !!!
    * VERY IMPORTANT !!!
@@ -52,6 +54,11 @@ StorageService.prototype.invitationCreated = async function (inviter, invitee, h
    * check it first!
    * Don't create over & over again if you have created.
    */
+
+  // get & remove chid from sensitive,
+  // sensitive only has ciid.
+  var chid = sensitive.chid
+  _.unset(sensitive, 'chid')
 
   /**
    * Database:
@@ -62,7 +69,7 @@ StorageService.prototype.invitationCreated = async function (inviter, invitee, h
   if (typeof invitee === 'string') {
     invitations.push({
       // Avoid creating repeat items
-      iid: `hashed_or_encoded(${header.data.chid}, ${inviter}, ${invitee}, secret)`,
+      iid: `${invitee}.encrypt(${chid}, ${inviter}, ${invitee}, secret?)`,
       inviter,
       invitee,
       header,
@@ -74,7 +81,7 @@ StorageService.prototype.invitationCreated = async function (inviter, invitee, h
     invitations = invitee.map(invi => {
       return {
         // Avoid creating repeat items
-        iid: `hashed_or_encoded(header.data.chid, inviter, ${invitee}, secret)`,
+        iid: `${invitee}.encrypt(chid, inviter, invitee, secret?)`,
         inviter,
         invi,
         header,
@@ -86,23 +93,30 @@ StorageService.prototype.invitationCreated = async function (inviter, invitee, h
   }
 
   /**
-   * DB insert multiple rows using self-defiend iid (invitation ID)
+   * DB insert multiple rows using self-defiend iid (invitation ID):
+   *      e.g. bcrypt
    * 1. craete InvitationOfChannel(schema):
    *      Model.insertMany(invitations)
-   * 2. insert in UserInChannel.sent_invitations(schema)
+   * 2. insert in UserInChannel.sent_invitations(schema):
    *      Model.update(...)
+   * 3. note: what if failed ?
    */
 
-  return invitations
+  return invitations || []
 }
 
-StorageService.prototype.invitationRemoved = async function (iid) {
-  /**
-   * Database:
-   * 1. remove InvitationOfChannel(schema)
-   * 2. pull element in UserInChannel.sent_invitations(schema)
-   */
-  return true
+StorageService.prototype.getInvitation = async function (iid) {
+  return {
+    iid: 'mbnht594EokdMvfht54elwTsd98',
+    inviter: 'inviter?',
+    invitee: 'invitee?',
+    header: {},
+    content: 'HTML string',
+    sensitive: {
+      ciid: 'jiodhdgnj4*&^fyguihnkr4elwsdy'
+    },
+    create_at: Date.now()
+  } || null
 }
 
 StorageService.prototype.getInvitationThenRemoved = async function (iid) {
@@ -124,6 +138,15 @@ StorageService.prototype.getInvitationThenRemoved = async function (iid) {
     },
     create_at: Date.now()
   } || null
+}
+
+StorageService.prototype.invitationRemoved = async function (iid) {
+  /**
+   * Database:
+   * 1. remove InvitationOfChannel(schema)
+   * 2. pull element in UserInChannel.sent_invitations(schema)
+   */
+  return true
 }
 
 StorageService.prototype.refSocketServer = function (socketServer) {
