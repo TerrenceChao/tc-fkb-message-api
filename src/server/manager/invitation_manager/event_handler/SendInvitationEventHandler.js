@@ -3,11 +3,10 @@ var util = require('util')
 var path = require('path')
 var _ = require('lodash')
 
-const {
-  TO,
-  EVENTS,
-  RESPONSE_EVENTS
-} = require(path.join(config.get('property'), 'property'))
+const { TO, EVENTS, RESPONSE_EVENTS } = require(path.join(
+  config.get('property'),
+  'property'
+))
 const ResponseInfo = require(path.join(config.get('manager'), 'ResponseInfo'))
 const EventHandler = require(path.join(config.get('manager'), 'EventHandler'))
 
@@ -29,12 +28,14 @@ SendInvitationEventHandler.prototype.handle = async function (requestInfo) {
   var invitee = packet.invitee
   var chid = packet.chid
 
+  var storageService = this.globalContext['storageService']
+  var invitedInvitees = await storageService.getInviteesHadBeenInvited(chid, invitee)
+  invitee = _.pullAll(invitee, invitedInvitees)
+
   var query = {
     chid
   }
-  var storageService = this.globalContext['storageService']
   var channelInfo = await storageService.getChannelInfo(query)
-
   if (channelInfo == null) {
     this.packException(packet, requestInfo)
     return
@@ -47,20 +48,20 @@ SendInvitationEventHandler.prototype.handle = async function (requestInfo) {
   packet.channelName = channelInfo.name
 
   var businessEvent = this.globalContext['businessEvent']
-  Promise.resolve(this.pack(invitee, packet, sensitive))
-    .then(resInfoList =>
-      resInfoList.map(resInfo => {
-        resInfo.assignProtocol(requestInfo)
-        businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
-      }))
+  Promise.resolve(this.pack(invitee, packet, sensitive)).then(resInfoList =>
+    resInfoList.map(resInfo => {
+      resInfo.assignProtocol(requestInfo)
+      businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
+    })
+  )
 }
 
-SendInvitationEventHandler.prototype.pack = async function (invitee, packet, sensitive) {
-  var {
-    inviter,
-    channelName,
-    content
-  } = packet
+SendInvitationEventHandler.prototype.pack = async function (
+  invitee,
+  packet,
+  sensitive
+) {
+  var { inviter, channelName, content } = packet
 
   var headerForInvitee = {
     requestEvent: EVENTS.DEAL_WITH_INVITATION,
@@ -70,28 +71,37 @@ SendInvitationEventHandler.prototype.pack = async function (invitee, packet, sen
   }
 
   var storageService = this.globalContext['storageService']
-  var invitations = await storageService
-    .invitationMultiCreated(inviter, invitee, headerForInvitee, content, sensitive)
+  var invitations = await storageService.invitationMultiCreated(
+    inviter,
+    invitee,
+    headerForInvitee,
+    content,
+    sensitive
+  )
 
-  return invitations.map(invite => {
-    _.unset(invite, 'sensitive')
+  return invitations.map(invitation => {
+    _.unset(invitation, 'sensitive')
 
     return new ResponseInfo()
       .setHeader({
         to: TO.USER,
-        receiver: invite.invitee,
+        receiver: invitation.invitee,
         responseEvent: RESPONSE_EVENTS.INVITATION_FROM_CHANNEL_TO_ME // to individual invitee
       })
       .setPacket({
         msgCode: 'you got an invitation',
-        data: invite
+        data: invitation
       })
   })
 }
 
-SendInvitationEventHandler.prototype.packException = function (packet, requestInfo) {
+SendInvitationEventHandler.prototype.packException = function (
+  packet,
+  requestInfo
+) {
   var businessEvent = this.globalContext['businessEvent']
-  var resInfo = new ResponseInfo().assignProtocol(requestInfo)
+  var resInfo = new ResponseInfo()
+    .assignProtocol(requestInfo)
     .setHeader({
       to: TO.USER,
       receiver: packet.inviter,
@@ -107,7 +117,7 @@ SendInvitationEventHandler.prototype.isValid = function (requestInfo) {
   return (
     requestInfo.packet != null &&
     requestInfo.packet.inviter != null &&
-    (typeof requestInfo.packet.invitee === 'string' || Array.isArray(requestInfo.packet.invitee)) &&
+    Array.isArray(requestInfo.packet.invitee) &&
     typeof requestInfo.packet.chid === 'string' &&
     requestInfo.packet.content != null
   )
