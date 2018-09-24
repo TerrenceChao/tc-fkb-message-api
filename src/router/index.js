@@ -33,8 +33,8 @@ routeIndex.post(`/${BUSINESS_EVENTS.AUTHENTICATE}`, (req, res, next) => {
   let requestInfo = new RequestInfo()
   requestInfo.req = req
   requestInfo.res = res
-  requestInfo.packetContent = req.body
-  console.log(`requestInfo.packetContent: ${JSON.stringify(requestInfo.packetContent)}`)
+  requestInfo.packet = req.body
+  console.log(`requestInfo.packet: ${JSON.stringify(requestInfo.packet)}`)
 
   businessEvent.emit(BUSINESS_EVENTS.AUTHENTICATE, requestInfo)
 })
@@ -59,8 +59,8 @@ routeIndex.post(`/${BUSINESS_EVENTS.SERVER_PUSH}`, (req, res, next) => {
   let requestInfo = new RequestInfo()
   requestInfo.req = req
   requestInfo.res = res
-  requestInfo.packetContent = req.body
-  console.log(`requestInfo.packetContent: ${JSON.stringify(requestInfo.packetContent)}`)
+  requestInfo.packet = req.body
+  console.log(`requestInfo.packet: ${JSON.stringify(requestInfo.packet)}`)
 
   businessEvent.emit(BUSINESS_EVENTS.SERVER_PUSH, requestInfo)
 })

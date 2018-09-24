@@ -44,4 +44,10 @@ ResponseInfo.prototype.setHeader = function (header) {
   return this
 }
 
+ResponseInfo.prototype.setPacket = function (packet) {
+  this.packet = packet
+
+  return this
+}
+
 module.exports = ResponseInfo

@@ -25,12 +25,12 @@ Manager.prototype.init = function (globalContext) {
 Manager.prototype.listenBusinessEvent = function (handler) {
   handler.globalContext = this.globalContext
   const businessEvent = this.globalContext['businessEvent']
-  const self = this
+  const thisManager = this
 
   businessEvent.on(handler.eventName, (requestInfo) => {
     // console.log(` => listenBusinessEvent: handler is ${JSON.stringify(handler, null, 2)}`)
     handler.handle(requestInfo)
-    self.receiveAlert(handler.eventName, requestInfo)
+    thisManager.receiveAlert(handler.eventName, requestInfo)
   })
 }
 
@@ -47,7 +47,7 @@ Manager.prototype.startListen = function (protocol) {
 
 Manager.prototype.listenRequestEvent = function (protocol, handler) {
   handler.globalContext = this.globalContext
-  const self = this
+  const thisManager = this
 
   const {
     req,
@@ -61,13 +61,13 @@ Manager.prototype.listenRequestEvent = function (protocol, handler) {
       requestInfo.socket = socket
       requestInfo.packet = packet
       handler.handle(requestInfo)
-      self.receiveAlert(handler.eventName, requestInfo)
+      thisManager.receiveAlert(handler.eventName, requestInfo)
     })
   } else if (req !== undefined && res !== undefined) {
     requestInfo.req = req
     requestInfo.res = res
     handler.handle(requestInfo)
-    self.receiveAlert(handler.eventName, requestInfo)
+    thisManager.receiveAlert(handler.eventName, requestInfo)
   }
 }
 

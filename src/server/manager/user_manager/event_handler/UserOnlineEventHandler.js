@@ -31,7 +31,7 @@ UserOnlineEventHandler.prototype.handle = async function (requestInfo) {
   socket.join(uid)
 
   var storageService = this.globalContext['storageService']
-  var channelIds = await storageService.getChannelInfoIds(uid)
+  var channelIds = await storageService.getChannelIds(uid)
   channelIds.forEach(ciid => {
     socket.join(ciid)
   })

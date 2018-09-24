@@ -12,7 +12,6 @@ var MessageManager = require(path.join(config.get('message.manager'), 'MessageMa
 
 function startUp (httpServer) {
   var socketServer = socketIo.listen(httpServer)
-  globalContext.storageService.refSocketServer(socketServer)
   globalContext.socketServer = socketServer
 
   let connectionManager = new ConnectionManager().init(globalContext)

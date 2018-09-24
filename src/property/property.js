@@ -33,9 +33,9 @@ const EVENTS = {
   GET_CONVERSATION: 'req_channel_get_conversation',
 
   // InvitationManager
-  GET_INVITATION_LIST: 'req_channel_get_invitation_list',
-  SEND_INVITATION: 'req_channel_send_invitation',
-  DEAL_WITH_INVITATION: 'req_channel_deal_with_invitation',
+  GET_INVITATION_LIST: 'req_invitation_get_invitation_list',
+  SEND_INVITATION: 'req_invitation_send_invitation',
+  DEAL_WITH_INVITATION: 'req_invitation_deal_with_invitation',
 
   // UserManager
   USER_ONLINE: 'req_user_user_online',
@@ -61,7 +61,6 @@ const REQUEST_EVENTS = {
   COMPETE_LOCK: EVENTS.COMPETE_LOCK,
   RELEASE_LOCK: EVENTS.RELEASE_LOCK,
   CREATE_CHANNEL: EVENTS.CREATE_CHANNEL,
-  JOIN_CHANNEL: EVENTS.JOIN_CHANNEL,
   LEAVE_CHANNEL: EVENTS.LEAVE_CHANNEL,
   SEND_CONVERSATION: EVENTS.SEND_CONVERSATION,
   GET_CONVERSATION: EVENTS.GET_CONVERSATION,
@@ -87,6 +86,7 @@ const BUSINESS_EVENTS = {
 
   // ChannelManager
   RELEASE_LOCK: EVENTS.RELEASE_LOCK,
+  JOIN_CHANNEL: EVENTS.JOIN_CHANNEL,
   REMOVE_CHANNEL: EVENTS.REMOVE_CHANNEL,
   SEND_CONVERSATION: EVENTS.SEND_CONVERSATION,
   GET_CONVERSATION: EVENTS.GET_CONVERSATION,
@@ -116,8 +116,11 @@ const RESPONSE_EVENTS = {
 
   // Channel
   INVITATION_LIST_FROM_CHANNEL: 'invitation_list_from_channel',
-  // INVITATION_FROM_CHANNEL_TO_: `invitation_from_channel_to_${uid}`,
-  CONVERSATION_FROM_CHANNEL: 'conversation_from_channel'
+  INVITATION_FROM_CHANNEL_TO_ME: `invitation_from_channel_to_me`,
+  CONVERSATION_FROM_CHANNEL: 'conversation_from_channel',
+
+  // Exception
+  EXCEPTION_ALERT: 'exception_alert'
 }
 
 module.exports = {
