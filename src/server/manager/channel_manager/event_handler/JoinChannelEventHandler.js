@@ -12,7 +12,7 @@ const EventHandler = require(path.join(config.get('manager'), 'EventHandler'))
 
 util.inherits(JoinChannelEventHandler, EventHandler)
 
-function JoinChannelEventHandler() {
+function JoinChannelEventHandler () {
   this.name = arguments.callee.name
 }
 
