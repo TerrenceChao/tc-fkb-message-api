@@ -135,6 +135,7 @@ StorageService.prototype.invitationRemoved = async function (iid) {
 // for channel
 // 'return null' if channelInfo had has been created.
 StorageService.prototype.channelInfoCreated = async function (uid, channelName) {
+  // ciid saved in local storage (for frontend)
   return {
     ciid: 'ciid:ansvbvghtrj54mekw&GBNKNde$3@FIT*IoiTGBK#$%^YHBN',
     creator: uid,

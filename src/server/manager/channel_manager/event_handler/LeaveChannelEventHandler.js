@@ -64,7 +64,10 @@ LeaveChannelEventHandler.prototype.pack = function (ciid, uid, requestInfo) {
     })
     .setPacket({
       msgCode: `${uid} is leaved`,
-      data: [uid] // delete uid from channel.members(array) for "each member" in localStorage (frontend)
+      data: {
+        uid,
+        ciid
+      } // delete uid from channel.members(array) for "each member" in localStorage (frontend)
     })
 }
 

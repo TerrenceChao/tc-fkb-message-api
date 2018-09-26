@@ -1,7 +1,6 @@
 var config = require('config')
 var util = require('util')
 var path = require('path')
-var _ = require('lodash')
 
 const {
   TO,
@@ -13,7 +12,7 @@ const EventHandler = require(path.join(config.get('manager'), 'EventHandler'))
 
 util.inherits(CreateChannelEventHandler, EventHandler)
 
-function CreateChannelEventHandler() {
+function CreateChannelEventHandler () {
   this.name = arguments.callee.name
 }
 
@@ -50,8 +49,6 @@ CreateChannelEventHandler.prototype.handle = async function (requestInfo) {
       data: false
     })
   } else {
-    delete channelInfo.ciid
-
     resInfo.setPacket({
       msgCode: `channel: ${channelName} is created`,
       data: channelInfo

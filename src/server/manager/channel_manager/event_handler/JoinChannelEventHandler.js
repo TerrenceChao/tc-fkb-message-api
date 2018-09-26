@@ -12,7 +12,7 @@ const EventHandler = require(path.join(config.get('manager'), 'EventHandler'))
 
 util.inherits(JoinChannelEventHandler, EventHandler)
 
-function JoinChannelEventHandler () {
+function JoinChannelEventHandler() {
   this.name = arguments.callee.name
 }
 
@@ -45,7 +45,10 @@ JoinChannelEventHandler.prototype.handle = async function (requestInfo) {
       })
       .setPacket({
         msgCode: `${uid} is joined`,
-        data: [uid] // add uid to channel.members(array) for "each member" in localStorage (frontend)
+        data: {
+          uid,
+          ciid
+        } // add uid to channel.members(array) for "each member" in localStorage (frontend)
       })
     businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 
