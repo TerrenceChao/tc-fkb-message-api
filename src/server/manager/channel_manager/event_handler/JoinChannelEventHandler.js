@@ -45,7 +45,7 @@ JoinChannelEventHandler.prototype.handle = async function (requestInfo) {
       })
       .setPacket({
         msgCode: `${uid} is joined`,
-        data: [uid] // add uid into localStorage (frontend)
+        data: [uid] // add uid to channel.members(array) for "each member" in localStorage (frontend)
       })
     businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 

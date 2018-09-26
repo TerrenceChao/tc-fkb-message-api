@@ -1,4 +1,4 @@
-function StorageService() {}
+function StorageService () {}
 
 // for invitation
 StorageService.prototype.invitationMultiCreated = async function (inviter, invitee, header, content, sensitive = {}) {
@@ -71,23 +71,23 @@ StorageService.prototype.getInvitation = async function (iid) {
 
 StorageService.prototype.getReceivedInvitationList = async function (uid, limit = 'all', skip) {
   return [{
-      apple: 'an apple a day keeps the doctor away'
-    },
-    {
-      inviteType: 'received invitations from others'
-    },
-    {}
+    apple: 'an apple a day keeps the doctor away'
+  },
+  {
+    inviteType: 'received invitations from others'
+  },
+  {}
   ]
 }
 
 StorageService.prototype.getSentInvitationList = async function (uid, limit = 'all', skip) {
   return [{
-      banana: 'a banana give you power!'
-    },
-    {
-      inviteType: 'sent invitation by me'
-    },
-    {}
+    banana: 'a banana give you power!'
+  },
+  {
+    inviteType: 'sent invitation by me'
+  },
+  {}
   ]
 }
 
@@ -145,9 +145,9 @@ StorageService.prototype.channelInfoCreated = async function (uid, channelName) 
   } || null
 }
 
-StorageService.prototype.getChannelIds = async function (uid, limit = 'all', skip = 0) {
-  // return chid, not ciid !!! (return ciid is forbidden)
-  return ['chid:chPub', 'chid:chGasStation', 'chid:chHospital'] || []
+StorageService.prototype.getAllChannelIds = async function (uid) {
+  // return ciid !!! (for internal)
+  return ['ciid:chPub', 'ciid:chGasStation', 'ciid:chHospital', 'ciid:ansvbvghtrj54mekw&GBNKNde$3@FIT*IoiTGBK#$%^YHBN'] || []
 }
 
 StorageService.prototype.getChannelInfo = async function (queryCondition) {
@@ -161,11 +161,36 @@ StorageService.prototype.getChannelInfo = async function (queryCondition) {
   } || null
 }
 
+StorageService.prototype.getUserChannelInfo = async function (uid) {
+  /**
+   * remove 'ciid' if you want to export to frontend
+   * remove 'ciid' if you want to export to frontend
+   * remove 'ciid' if you want to export to frontend
+   */
+  return [{
+    ciid: 'ciid:ansvbvghtrj54mekw&GBNKNde$3@FIT*IoiTGBK#$%^YHBN',
+    creator: 'someone',
+    chid: 'chid:l4ehfuvljifgbudvzsugkurliLO4U*T&IYEOW*UGY',
+    name: 'Room 18',
+    invitee: [],
+    members: ['uidA', 'uidB', 'uidC']
+  }, {
+    ciid: 'ciid:nhjyutrifdfl,mgtyk65lr9e8ds7*(PO:l.MK5AEou(ytg',
+    creator: 'WHO?',
+    chid: 'chid:ijmlYIOUYGVUYBK>DFRUTYIHUJNJKTSARFDCVSBUN',
+    name: 'Night Bar',
+    invitee: [],
+    members: ['uidE', 'uidF']
+  }] || []
+}
+
 StorageService.prototype.channelJoined = async function (uid, chid) {
   return true || false
 }
 
-StorageService.prototype.channelLeaved = async function () {}
+StorageService.prototype.channelLeaved = async function (uid, chid) {
+  return true || false
+}
 
 StorageService.prototype.channelInfoRemoved = async function (uid, chid) {
   return true || false
