@@ -63,7 +63,7 @@ StorageService.prototype.getInvitation = async function (iid) {
     content: 'HTML string',
     sensitive: {
       chid: 'chid: aert5hewinaslgsi584waesr',
-      ciid: 'ciid: jiodhdgnj4*&^fyguihnkr4elwsdy'
+      ciid: 'ciid:ansvbvghtrj54mekw&GBNKNde$3@FIT*IoiTGBK#$%^YHBN'
     },
     create_at: Date.now()
   } || null
@@ -114,7 +114,7 @@ StorageService.prototype.getInvitationThenRemoved = async function (iid) {
     content: 'HTML string',
     sensitive: {
       chid: 'chid: aert5hewinaslgsi584waesr',
-      ciid: 'ciid: jiodhdgnj4*&^fyguihnkr4elwsdy'
+      ciid: 'ciid:ansvbvghtrj54mekw&GBNKNde$3@FIT*IoiTGBK#$%^YHBN'
     },
     create_at: Date.now()
   } || false
