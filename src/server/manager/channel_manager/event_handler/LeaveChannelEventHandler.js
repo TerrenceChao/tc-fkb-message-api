@@ -5,6 +5,7 @@ var path = require('path')
 const {
   TO,
   EVENTS,
+  BUSINESS_EVENTS,
   RESPONSE_EVENTS
 } = require(path.join(config.get('property'), 'property'))
 const ResponseInfo = require(path.join(config.get('manager'), 'ResponseInfo'))
@@ -32,26 +33,54 @@ LeaveChannelEventHandler.prototype.handle = async function (requestInfo) {
   var storageService = this.globalContext['storageService']
 
   if (await storageService.channelLeaved(uid, chid)) {
-    var channelInfo = await storageService.getChannelInfo({
+    var query = {
       chid
-    })
-    var ciid = channelInfo.ciid
+    }
+    var channelInfo = await storageService.getChannelInfo(query)
+    if (channelInfo == null) {
+      this.packException(packet, requestInfo)
+      return
+    }
 
-    var resInfo = new ResponseInfo()
-      .assignProtocol(requestInfo)
-      .setHeader({
-        to: TO.CHANNEL,
-        receiver: ciid,
-        responseEvent: RESPONSE_EVENTS.CONVERSATION_FROM_CHANNEL
-      })
-      .setPacket({
-        msgCode: `${uid} is leaved`,
-        data: [uid] // delete uid from channel.members(array) for "each member" in localStorage (frontend)
-      })
+    var ciid = channelInfo.ciid
+    var resInfo = this.pack(ciid, uid, requestInfo)
     businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
+
+    if (channelInfo.members.length === 0) {
+      businessEvent.emit(BUSINESS_EVENTS.REMOVE_CHANNEL, requestInfo)
+    }
 
     requestInfo.socket.leave(ciid)
   }
+}
+
+LeaveChannelEventHandler.prototype.pack = function (ciid, uid, requestInfo) {
+  return new ResponseInfo()
+    .assignProtocol(requestInfo)
+    .setHeader({
+      to: TO.CHANNEL,
+      receiver: ciid,
+      responseEvent: RESPONSE_EVENTS.CONVERSATION_FROM_CHANNEL
+    })
+    .setPacket({
+      msgCode: `${uid} is leaved`,
+      data: [uid] // delete uid from channel.members(array) for "each member" in localStorage (frontend)
+    })
+}
+
+LeaveChannelEventHandler.prototype.packException = function (packet, requestInfo) {
+  var businessEvent = this.globalContext['businessEvent']
+  var resInfo = new ResponseInfo()
+    .assignProtocol(requestInfo)
+    .setHeader({
+      to: TO.USER,
+      receiver: packet.uid,
+      responseEvent: RESPONSE_EVENTS.EXCEPTION_ALERT // back to user
+    })
+    .setPacket({
+      msgCode: `couldn't get channel info with chid:${packet.chid}`
+    })
+  businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 }
 
 LeaveChannelEventHandler.prototype.isValid = function (requestInfo) {

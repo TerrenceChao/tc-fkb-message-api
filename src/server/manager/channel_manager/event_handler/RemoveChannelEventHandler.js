@@ -37,10 +37,13 @@ RemoveChannelEventHandler.prototype.handle = async function (requestInfo) {
       responseEvent: RESPONSE_EVENTS.CHANNEL_REMOVED
     })
 
-  var storageService = this.globalContext['storageService']
   var businessEvent = this.globalContext['businessEvent']
+  var storageService = this.globalContext['storageService']
+  var query = {
+    chid
+  }
 
-  if (await storageService.channelInfoRemoved(uid, chid) === true) {
+  if (await storageService.channelInfoRemoved(query) === true) {
     resInfo.setPacket({
       msgCode: `channel: ${channelName} is removed`,
       data: true

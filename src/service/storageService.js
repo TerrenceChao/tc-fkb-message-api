@@ -69,7 +69,7 @@ StorageService.prototype.getInvitation = async function (iid) {
   } || null
 }
 
-StorageService.prototype.getReceivedInvitationList = async function (uid, limit = 'all', skip) {
+StorageService.prototype.getReceivedInvitationList = async function (uid, limit = 'all', skip = 0) {
   return [{
     apple: 'an apple a day keeps the doctor away'
   },
@@ -77,10 +77,10 @@ StorageService.prototype.getReceivedInvitationList = async function (uid, limit 
     inviteType: 'received invitations from others'
   },
   {}
-  ]
+  ] || []
 }
 
-StorageService.prototype.getSentInvitationList = async function (uid, limit = 'all', skip) {
+StorageService.prototype.getSentInvitationList = async function (uid, limit = 'all', skip = 0) {
   return [{
     banana: 'a banana give you power!'
   },
@@ -88,7 +88,7 @@ StorageService.prototype.getSentInvitationList = async function (uid, limit = 'a
     inviteType: 'sent invitation by me'
   },
   {}
-  ]
+  ] || []
 }
 
 StorageService.prototype.getInviteesHadBeenInvited = function (chid, invitee) {
@@ -151,6 +151,7 @@ StorageService.prototype.getAllChannelIds = async function (uid) {
 }
 
 StorageService.prototype.getChannelInfo = async function (queryCondition) {
+  // ciid saved in local storage (for frontend)
   return {
     ciid: 'ciid:ansvbvghtrj54mekw&GBNKNde$3@FIT*IoiTGBK#$%^YHBN',
     creator: 'someone',
@@ -162,11 +163,6 @@ StorageService.prototype.getChannelInfo = async function (queryCondition) {
 }
 
 StorageService.prototype.getUserChannelInfo = async function (uid) {
-  /**
-   * remove 'ciid' if you want to export to frontend
-   * remove 'ciid' if you want to export to frontend
-   * remove 'ciid' if you want to export to frontend
-   */
   return [{
     ciid: 'ciid:ansvbvghtrj54mekw&GBNKNde$3@FIT*IoiTGBK#$%^YHBN',
     creator: 'someone',
@@ -192,14 +188,20 @@ StorageService.prototype.channelLeaved = async function (uid, chid) {
   return true || false
 }
 
-StorageService.prototype.channelInfoRemoved = async function (uid, chid) {
+StorageService.prototype.channelInfoRemoved = async function (queryCondition) {
   return true || false
 }
 
 // for channel => conversations
-StorageService.prototype.conversationCreated = function () {}
+StorageService.prototype.conversationCreated = function (ciid, uid, conversation, type, datetime) {
+  return true || false
+}
 
-StorageService.prototype.getConversation = async function () {}
+StorageService.prototype.getConversationList = async function (ciid, limit = 10, skip = 0) {
+  return [
+
+  ] || []
+}
 
 /**
  * ===================================================
