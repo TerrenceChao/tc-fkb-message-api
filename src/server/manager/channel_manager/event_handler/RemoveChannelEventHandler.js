@@ -12,7 +12,7 @@ const EventHandler = require(path.join(config.get('manager'), 'EventHandler'))
 
 util.inherits(RemoveChannelEventHandler, EventHandler)
 
-function RemoveChannelEventHandler() {
+function RemoveChannelEventHandler () {
   this.name = arguments.callee.name
 }
 
