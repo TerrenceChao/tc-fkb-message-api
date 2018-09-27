@@ -44,7 +44,6 @@ const EVENTS = {
   // MessageManager
   SERVER_PUSH: 'req_message_server_push',
   SEND_MESSAGE: 'req_message_send_message'
-
 }
 
 const REQUEST_EVENTS = {
@@ -74,7 +73,6 @@ const REQUEST_EVENTS = {
 
   // MessageManager
   SEND_MESSAGE: EVENTS.SEND_MESSAGE
-
 }
 
 const BUSINESS_EVENTS = {
@@ -91,6 +89,9 @@ const BUSINESS_EVENTS = {
   SEND_CONVERSATION: EVENTS.SEND_CONVERSATION,
   GET_CONVERSATION: EVENTS.GET_CONVERSATION,
 
+  // InvitationManager
+  DEAL_WITH_INVITATION: EVENTS.DEAL_WITH_INVITATION,
+
   // UserManager
   USER_ONLINE: EVENTS.USER_ONLINE,
   USER_OFFLINE: EVENTS.USER_OFFLINE,
@@ -98,7 +99,6 @@ const BUSINESS_EVENTS = {
   // MessageManager
   SERVER_PUSH: EVENTS.SERVER_PUSH,
   SEND_MESSAGE: EVENTS.SEND_MESSAGE
-
 }
 
 const RESPONSE_EVENTS = {
@@ -111,12 +111,12 @@ const RESPONSE_EVENTS = {
   // Channel
   CHANNEL_LIST: 'channel_list',
   CHANNEL_CREATED: 'channel_created',
-  CHANNEL_LEAVED: 'channel_leaved',
   CHANNEL_REMOVED: 'channel_removed',
 
   // Channel
   INVITATION_LIST_FROM_CHANNEL: 'invitation_list_from_channel',
   INVITATION_FROM_CHANNEL_TO_ME: `invitation_from_channel_to_me`,
+  CONVERSATION_LIST: `conversation_list`,
   CONVERSATION_FROM_CHANNEL: 'conversation_from_channel',
 
   // Exception

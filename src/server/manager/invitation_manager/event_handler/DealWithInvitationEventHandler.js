@@ -13,7 +13,7 @@ const EventHandler = require(path.join(config.get('manager'), 'EventHandler'))
 
 util.inherits(DealWithInvitationEventHandler, EventHandler)
 
-function DealWithInvitationEventHandler() {
+function DealWithInvitationEventHandler () {
   this.name = arguments.callee.name
 }
 
@@ -60,7 +60,10 @@ DealWithInvitationEventHandler.prototype.handle = async function (requestInfo) {
         BUSINESS_EVENTS.JOIN_CHANNEL,
         requestInfo.setPacket({
           uid,
-          ciid: invitation.sensitive.ciid
+          iid,
+          chid: invitation.sensitive.chid,
+          ciid: invitation.sensitive.ciid,
+          dealwith
         }))
     }
   } else {

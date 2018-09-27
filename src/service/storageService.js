@@ -1,77 +1,7 @@
-var config = require('config')
-var path = require('path')
-var _ = require('lodash')
-
-// const { cache } = require(path.join(config.get('cache'), 'cache'));
-// const {
-//   repository
-// } = require(path.join(config.get('database'), 'repository'))
-
 function StorageService () {}
 
-StorageService.prototype.getChannelIds = async function (
-  uid,
-  limit = 'all',
-  skip = 0
-) {
-  // return chid, not ciid !!! (return ciid is forbidden)
-  return ['chPub', 'chGasStation', 'chHospital'] || []
-}
-
-StorageService.prototype.getChannelInfo = async function (queryCondition) {
-  return {
-      ciid: 'ciid:ansvbvghtrj54mekw&GBNKNde$3@FIT*IoiTGBK#$%^YHBN',
-      creator: 'someone',
-      chid: 'chid:l4ehfuvljifgbudvzsugkurliLO4U*T&IYEOW*UGY',
-      name: 'Room 18',
-      members: ['uidA', 'uidB', 'uidC']
-  } || null
-}
-
-StorageService.prototype.getReceivedInvitationList = async function (
-  uid,
-  limit = 'all',
-  skip
-) {
-  return [
-    {
-      apple: 'an apple a day keeps the doctor away'
-    },
-    {
-      inviteType: 'received invitations from others'
-    },
-    {}
-  ]
-}
-
-StorageService.prototype.getSentInvitationList = async function (
-  uid,
-  limit = 'all',
-  skip
-) {
-  return [
-    {
-      banana: 'a banana give you power!'
-    },
-    {
-      inviteType: 'sent invitation by me'
-    },
-    {}
-  ]
-}
-
-StorageService.prototype.getInviteesHadBeenInvited = function (chid, invitee) {
-  var invitedInvitees = ['Rose']
-  return invitedInvitees || []
-}
-
-StorageService.prototype.invitationMultiCreated = async function (
-  inviter,
-  invitee,
-  header,
-  content,
-  sensitive = {}
-) {
+// for invitation
+StorageService.prototype.invitationMultiCreated = async function (inviter, invitee, header, content, sensitive = {}) {
   /**
    * VERY IMPORTANT !!!
    * VERY IMPORTANT !!!
@@ -126,16 +56,44 @@ StorageService.prototype.invitationMultiCreated = async function (
 
 StorageService.prototype.getInvitation = async function (iid) {
   return {
-      iid: 'mbnht594EokdMvfht54elwTsd98',
-      inviter: 'inviter?',
-      invitee: 'invitee?',
-      header: {},
-      content: 'HTML string',
-      sensitive: {
-      ciid: 'jiodhdgnj4*&^fyguihnkr4elwsdy'
+    iid: 'mbnht594EokdMvfht54elwTsd98',
+    inviter: 'inviter?',
+    invitee: 'invitee?',
+    header: {},
+    content: 'HTML string',
+    sensitive: {
+      chid: 'chid: aert5hewinaslgsi584waesr',
+      ciid: 'ciid:ansvbvghtrj54mekw&GBNKNde$3@FIT*IoiTGBK#$%^YHBN'
     },
-      create_at: Date.now()
+    create_at: Date.now()
   } || null
+}
+
+StorageService.prototype.getReceivedInvitationList = async function (uid, limit = 'all', skip = 0) {
+  return [{
+    apple: 'an apple a day keeps the doctor away'
+  },
+  {
+    inviteType: 'received invitations from others'
+  },
+  {}
+  ] || []
+}
+
+StorageService.prototype.getSentInvitationList = async function (uid, limit = 'all', skip = 0) {
+  return [{
+    banana: 'a banana give you power!'
+  },
+  {
+    inviteType: 'sent invitation by me'
+  },
+  {}
+  ] || []
+}
+
+StorageService.prototype.getInviteesHadBeenInvited = function (chid, invitee) {
+  var invitedInvitees = ['Rose']
+  return invitedInvitees || []
 }
 
 StorageService.prototype.getInvitationThenRemoved = async function (iid) {
@@ -144,21 +102,22 @@ StorageService.prototype.getInvitationThenRemoved = async function (iid) {
    * 1. query and get (copied obj)
    * 2. for 'inviter': pull element(iid) from UserInChannel.sent_invitations(schema)
    * 3. for 'invitee': pull element(iid) from UserInChannel.received_invitations(schema)
-   * 4. for 'channelInfo': pull element(uid) from ChannelInfo.invitee(schema) 
+   * 4. for 'channelInfo': pull element(uid) from ChannelInfo.invitee(schema)
    * 5. remove InvitationOfChannel(schema)
    * 6. return (copied obj)
    */
   return {
-      iid: 'mbnht594EokdMvfht54elwTsd98',
-      inviter: 'inviter?',
-      invitee: 'invitee?',
-      header: {},
-      content: 'HTML string',
-      sensitive: {
-      ciid: 'jiodhdgnj4*&^fyguihnkr4elwsdy'
+    iid: 'mbnht594EokdMvfht54elwTsd98',
+    inviter: 'inviter?',
+    invitee: 'invitee?',
+    header: {},
+    content: 'HTML string',
+    sensitive: {
+      chid: 'chid: aert5hewinaslgsi584waesr',
+      ciid: 'ciid:ansvbvghtrj54mekw&GBNKNde$3@FIT*IoiTGBK#$%^YHBN'
     },
-      create_at: Date.now()
-  } || null
+    create_at: Date.now()
+  } || false
 }
 
 StorageService.prototype.invitationRemoved = async function (iid) {
@@ -167,52 +126,83 @@ StorageService.prototype.invitationRemoved = async function (iid) {
    * 1. query and get (copied obj)
    * 2. for 'inviter': pull element(iid) from UserInChannel.sent_invitations(schema)
    * 3. for 'invitee': pull element(iid) from UserInChannel.received_invitations(schema)
-   * 4. for 'channelInfo': pull element(uid) from ChannelInfo.invitee(schema) 
+   * 4. for 'channelInfo': pull element(uid) from ChannelInfo.invitee(schema)
    * 5. remove InvitationOfChannel(schema)
    */
   return true
 }
 
-// for user
-StorageService.prototype.addUser = function (uid, options) {
-  if (!this.socketServer) {
-  }
-}
-
-StorageService.prototype.getUser = async function (uid, options) {
-  if (!this.socketServer) {
-  }
-}
-
-StorageService.prototype.removeUser = function (uid, options) {
-  if (!this.socketServer) {
-  }
-}
-
-// // for posts
-// /**
-//  * when you click likes, leave comments,
-//  * the post state will be changed.
-//  */
-// StorageService.prototype.postUpdated = function() {
-//     return /**/;
-// }
-
 // for channel
-StorageService.prototype.channelCreated = async function () {}
+// 'return null' if channelInfo had has been created.
+StorageService.prototype.channelInfoCreated = async function (uid, channelName) {
+  // ciid saved in local storage (for frontend)
+  return {
+    ciid: 'ciid:ansvbvghtrj54mekw&GBNKNde$3@FIT*IoiTGBK#$%^YHBN',
+    creator: uid,
+    chid: 'chid:l4ehfuvljifgbudvzsugkurliLO4U*T&IYEOW*UGY',
+    name: 'Room 18',
+    invitee: [],
+    members: [uid]
+  } || null
+}
 
-StorageService.prototype.getChannel = async function (uid, type, chKey) {}
+StorageService.prototype.getAllChannelIds = async function (uid) {
+  // return ciid !!! (for internal)
+  return ['ciid:chPub', 'ciid:chGasStation', 'ciid:chHospital', 'ciid:ansvbvghtrj54mekw&GBNKNde$3@FIT*IoiTGBK#$%^YHBN'] || []
+}
 
-StorageService.prototype.channelRemoved = async function () {}
+StorageService.prototype.getChannelInfo = async function (queryCondition) {
+  // ciid saved in local storage (for frontend)
+  return {
+    ciid: 'ciid:ansvbvghtrj54mekw&GBNKNde$3@FIT*IoiTGBK#$%^YHBN',
+    creator: 'someone',
+    chid: 'chid:l4ehfuvljifgbudvzsugkurliLO4U*T&IYEOW*UGY',
+    name: 'Room 18',
+    invitee: [],
+    members: ['uidA', 'uidB', 'uidC']
+  } || null
+}
 
-StorageService.prototype.channelJoined = async function () {}
+StorageService.prototype.getUserChannelInfo = async function (uid) {
+  return [{
+    ciid: 'ciid:ansvbvghtrj54mekw&GBNKNde$3@FIT*IoiTGBK#$%^YHBN',
+    creator: 'someone',
+    chid: 'chid:l4ehfuvljifgbudvzsugkurliLO4U*T&IYEOW*UGY',
+    name: 'Room 18',
+    invitee: [],
+    members: ['uidA', 'uidB', 'uidC']
+  }, {
+    ciid: 'ciid:nhjyutrifdfl,mgtyk65lr9e8ds7*(PO:l.MK5AEou(ytg',
+    creator: 'WHO?',
+    chid: 'chid:ijmlYIOUYGVUYBK>DFRUTYIHUJNJKTSARFDCVSBUN',
+    name: 'Night Bar',
+    invitee: [],
+    members: ['uidE', 'uidF']
+  }] || []
+}
 
-StorageService.prototype.channelLeaved = async function () {}
+StorageService.prototype.channelJoined = async function (uid, chid) {
+  return true || false
+}
+
+StorageService.prototype.channelLeaved = async function (uid, chid) {
+  return true || false
+}
+
+StorageService.prototype.channelInfoRemoved = async function (queryCondition) {
+  return true || false
+}
 
 // for channel => conversations
-StorageService.prototype.conversationCreated = function () {}
+StorageService.prototype.conversationCreated = function (ciid, uid, conversation, type, datetime) {
+  return true || false
+}
 
-StorageService.prototype.getConversation = async function () {}
+StorageService.prototype.getConversationList = async function (ciid, limit = 10, skip = 0) {
+  return [
+
+  ] || []
+}
 
 /**
  * ===================================================

@@ -3,10 +3,11 @@ var util = require('util')
 var path = require('path')
 var _ = require('lodash')
 
-const { TO, EVENTS, RESPONSE_EVENTS } = require(path.join(
-  config.get('property'),
-  'property'
-))
+const {
+  TO,
+  EVENTS,
+  RESPONSE_EVENTS
+} = require(path.join(config.get('property'), 'property'))
 const ResponseInfo = require(path.join(config.get('manager'), 'ResponseInfo'))
 const EventHandler = require(path.join(config.get('manager'), 'EventHandler'))
 
@@ -61,7 +62,11 @@ SendInvitationEventHandler.prototype.pack = async function (
   packet,
   sensitive
 ) {
-  var { inviter, channelName, content } = packet
+  var {
+    inviter,
+    channelName,
+    content
+  } = packet
 
   var headerForInvitee = {
     requestEvent: EVENTS.DEAL_WITH_INVITATION,
