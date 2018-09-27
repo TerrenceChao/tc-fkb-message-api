@@ -29,6 +29,7 @@ LoginEventHandler.prototype.handle = async function (requestInfo) {
   var authService = this.globalContext['authService']
   if (!await authService.authorized(packet)) {
     socket.disconnect(true)
+    return
   }
 
   var businessEvent = this.globalContext['businessEvent']
