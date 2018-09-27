@@ -200,7 +200,9 @@ StorageService.prototype.conversationCreated = function (ciid, uid, conversation
 
 StorageService.prototype.getConversationList = async function (ciid, limit = 10, skip = 0) {
   return [
-
+    'this is a messaging service',
+    'Today is a sunny day',
+    'Hello world'
   ] || []
 }
 

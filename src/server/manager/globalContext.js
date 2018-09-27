@@ -1,11 +1,15 @@
 const EventEmitter = require('events').EventEmitter
 var config = require('config')
 var path = require('path')
-const { authenticateService } = require(path.join(
+const {
+  authService
+} = require(path.join(
   config.get('service'),
-  'authenticateService'
+  'authService'
 ))
-const { storageService } = require(path.join(
+const {
+  storageService
+} = require(path.join(
   config.get('service'),
   'storageService'
 ))
@@ -13,6 +17,6 @@ const { storageService } = require(path.join(
 module.exports = {
   businessEvent: new EventEmitter(),
   socketServer: undefined,
-  authenticateService,
+  authService,
   storageService
 }

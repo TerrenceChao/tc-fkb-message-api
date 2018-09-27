@@ -37,29 +37,17 @@ UserOnlineEventHandler.prototype.handle = async function (requestInfo) {
   })
 
   var businessEvent = this.globalContext['businessEvent']
-  var resInfo = new ResponseInfo().assignProtocol(requestInfo)
-  this.pack(resInfo, requestInfo)
-
-  resInfo.setHeader({
-    to: TO.USER,
-    receiver: uid,
-    responseEvent: RESPONSE_EVENTS.USER_LOGIN
-  })
+  var resInfo = new ResponseInfo()
+    .assignProtocol(requestInfo)
+    .setHeader({
+      to: TO.CHANNEL,
+      receiver: channelIds,
+      responseEvent: RESPONSE_EVENTS.CONVERSATION_FROM_CHANNEL
+    })
+    .setPacket({
+      msgCode: `user: ${uid} is online`
+    })
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
-
-  resInfo.setHeader({
-    to: TO.CHANNEL,
-    receiver: channelIds,
-    responseEvent: RESPONSE_EVENTS.CONVERSATION_FROM_CHANNEL
-  })
-  businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
-}
-
-UserOnlineEventHandler.prototype.pack = function (responseInfo, requestInfo) {
-  var uid = requestInfo.packet.uid
-  responseInfo.packet = {
-    msgCode: `user: ${uid} is online`
-  }
 }
 
 UserOnlineEventHandler.prototype.isValid = function (requestInfo) {
