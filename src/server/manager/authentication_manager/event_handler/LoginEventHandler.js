@@ -54,8 +54,27 @@ LoginEventHandler.prototype.handle = async function (requestInfo) {
           responseEvent: RESPONSE_EVENTS.USER_LOGIN
         })
         .setPacket({
-          msgCode: `personal data`,
+          msgCode: `channel list and conversations`,
           data: packet
+        })
+      businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
+    })
+
+  var limit = packet.limit
+  var skip = packet.skip
+  Promise
+    .resolve(storageService.getReceivedInvitationList(uid, limit, skip))
+    .then(invitationList => {
+      var resInfo = new ResponseInfo()
+        .assignProtocol(requestInfo)
+        .setHeader({
+          to: TO.USER,
+          receiver: uid,
+          responseEvent: RESPONSE_EVENTS.INVITATION_LIST_FROM_CHANNEL
+        })
+        .setPacket({
+          msgCode: `invitation list`,
+          data: invitationList
         })
       businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
     })
@@ -73,7 +92,9 @@ LoginEventHandler.prototype.isValid = function (requestInfo) {
   return packet !== undefined &&
     typeof packet.sessionId === 'string' &&
     typeof packet.msToken === 'string' &&
-    typeof packet.uid === 'string'
+    typeof packet.uid === 'string' &&
+    packet.limit != null &&
+    packet.skip != null
 }
 
 module.exports = {
