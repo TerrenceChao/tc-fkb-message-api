@@ -12,7 +12,7 @@ const EventHandler = require(path.join(config.get('manager'), 'EventHandler'))
 
 util.inherits(LoginEventHandler, EventHandler)
 
-function LoginEventHandler() {
+function LoginEventHandler () {
   this.name = arguments.callee.name
 }
 
