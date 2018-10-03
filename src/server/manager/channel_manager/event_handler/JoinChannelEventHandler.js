@@ -60,7 +60,7 @@ JoinChannelEventHandler.prototype.handle = async function (requestInfo) {
 
 JoinChannelEventHandler.prototype.isValid = function (requestInfo) {
   var packet = requestInfo.packet
-  return packet !== undefined &&
+  return packet !== undefined && this.isAuthenticated(packet) &&
     typeof packet.uid === 'string' &&
     packet.iid != null &&
     packet.chid != null &&

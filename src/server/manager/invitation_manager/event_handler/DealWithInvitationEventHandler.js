@@ -87,7 +87,7 @@ DealWithInvitationEventHandler.prototype.handle = async function (requestInfo) {
 
 DealWithInvitationEventHandler.prototype.isValid = function (requestInfo) {
   var packet = requestInfo.packet
-  return packet !== undefined &&
+  return packet !== undefined && this.isAuthenticated(packet) &&
     packet.iid != null &&
     typeof packet.uid === 'string' &&
     packet.dealwith != null

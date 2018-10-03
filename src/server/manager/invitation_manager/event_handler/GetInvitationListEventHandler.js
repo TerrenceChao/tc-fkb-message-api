@@ -6,7 +6,10 @@ const {
   TO,
   EVENTS,
   RESPONSE_EVENTS
-} = require(path.join(config.get('property'), 'property'))
+} = require(path.join(
+  config.get('property'),
+  'property'
+))
 const ResponseInfo = require(path.join(config.get('manager'), 'ResponseInfo'))
 const EventHandler = require(path.join(config.get('manager'), 'EventHandler'))
 
@@ -33,24 +36,34 @@ GetInvitationListEventHandler.prototype.handle = async function (requestInfo) {
   var storageService = this.globalContext['storageService']
   var invitationList = []
   if (inviteType === 'received') {
-    invitationList = await storageService.getReceivedInvitationList(uid, limit, skip)
+    invitationList = await storageService.getReceivedInvitationList(
+      uid,
+      limit,
+      skip
+    )
   } else if (inviteType === 'sent') {
-    invitationList = await storageService.getSentInvitationList(uid, limit, skip)
+    invitationList = await storageService.getSentInvitationList(
+      uid,
+      limit,
+      skip
+    )
   }
 
   var businessEvent = this.globalContext['businessEvent']
-  var resInfo = new ResponseInfo()
-    .assignProtocol(requestInfo)
-    .setHeader({
-      to: TO.USER,
-      receiver: uid,
-      responseEvent: RESPONSE_EVENTS.INVITATION_LIST_FROM_CHANNEL
-    })
+  var resInfo = new ResponseInfo().assignProtocol(requestInfo).setHeader({
+    to: TO.USER,
+    receiver: uid,
+    responseEvent: RESPONSE_EVENTS.INVITATION_LIST_FROM_CHANNEL
+  })
   this.pack(resInfo, invitationList, inviteType)
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 }
 
-GetInvitationListEventHandler.prototype.pack = function (responseInfo, packet, inviteType) {
+GetInvitationListEventHandler.prototype.pack = function (
+  responseInfo,
+  packet,
+  inviteType
+) {
   responseInfo.packet = {
     msgCode: `get ${inviteType} invitation list`,
     data: packet
@@ -58,7 +71,7 @@ GetInvitationListEventHandler.prototype.pack = function (responseInfo, packet, i
 }
 
 GetInvitationListEventHandler.prototype.isValid = function (requestInfo) {
-  return requestInfo.packet != null &&
+  return requestInfo.packet != null && this.isAuthenticated(requestInfo.packet) &&
     requestInfo.packet.uid != null &&
     requestInfo.packet.inviteType != null &&
     requestInfo.packet.limit != null
