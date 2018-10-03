@@ -104,10 +104,6 @@ const BUSINESS_EVENTS = {
 const RESPONSE_EVENTS = {
   // client side (respose to client's event):
 
-  // Authentication
-  USER_LOGIN: 'user_login',
-  USER_LOGOUT: 'user_logout',
-
   // Channel
   CHANNEL_LIST: 'channel_list',
   CHANNEL_CREATED: 'channel_created',

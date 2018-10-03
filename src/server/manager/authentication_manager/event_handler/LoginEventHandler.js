@@ -12,7 +12,7 @@ const EventHandler = require(path.join(config.get('manager'), 'EventHandler'))
 
 util.inherits(LoginEventHandler, EventHandler)
 
-function LoginEventHandler () {
+function LoginEventHandler() {
   this.name = arguments.callee.name
 }
 
@@ -51,7 +51,7 @@ LoginEventHandler.prototype.handle = async function (requestInfo) {
         .setHeader({
           to: TO.USER,
           receiver: uid,
-          responseEvent: RESPONSE_EVENTS.USER_LOGIN
+          responseEvent: RESPONSE_EVENTS.CHANNEL_LIST
         })
         .setPacket({
           msgCode: `channel list and conversations`,
