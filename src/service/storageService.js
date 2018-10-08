@@ -63,7 +63,7 @@ StorageService.prototype.getInvitation = async function (iid) {
     content: 'HTML string',
     sensitive: {
       chid: 'chid: aert5hewinaslgsi584waesr',
-      ciid: 'ciid:ansvbvghtrj54mekw&GBNKNde$3@FIT*IoiTGBK#$%^YHBN'
+      ciid: 'ciid B'
     },
     create_at: Date.now()
   } || null
@@ -114,7 +114,7 @@ StorageService.prototype.getInvitationThenRemoved = async function (iid) {
     content: 'HTML string',
     sensitive: {
       chid: 'chid: aert5hewinaslgsi584waesr',
-      ciid: 'ciid:ansvbvghtrj54mekw&GBNKNde$3@FIT*IoiTGBK#$%^YHBN'
+      ciid: 'ciid B'
     },
     create_at: Date.now()
   } || false
@@ -137,7 +137,7 @@ StorageService.prototype.invitationRemoved = async function (iid) {
 StorageService.prototype.channelInfoCreated = async function (uid, channelName) {
   // ciid saved in local storage (for frontend)
   return {
-    ciid: 'ciid:ansvbvghtrj54mekw&GBNKNde$3@FIT*IoiTGBK#$%^YHBN',
+    ciid: 'ciid B',
     creator: uid,
     chid: 'chid:l4ehfuvljifgbudvzsugkurliLO4U*T&IYEOW*UGY',
     name: 'Room 18',
@@ -148,13 +148,13 @@ StorageService.prototype.channelInfoCreated = async function (uid, channelName) 
 
 StorageService.prototype.getAllChannelIds = async function (uid) {
   // return ciid !!! (for internal)
-  return ['ciid:chPub', 'ciid:chGasStation', 'ciid:chHospital', 'ciid:ansvbvghtrj54mekw&GBNKNde$3@FIT*IoiTGBK#$%^YHBN'] || []
+  return ['ciid chPub', 'ciid chGasStation', 'ciid chHospital', 'ciid B'] || []
 }
 
 StorageService.prototype.getChannelInfo = async function (queryCondition) {
   // ciid saved in local storage (for frontend)
   return {
-    ciid: 'ciid:ansvbvghtrj54mekw&GBNKNde$3@FIT*IoiTGBK#$%^YHBN',
+    ciid: 'ciid B',
     creator: 'someone',
     chid: 'chid:l4ehfuvljifgbudvzsugkurliLO4U*T&IYEOW*UGY',
     name: 'Room 18',
@@ -165,14 +165,14 @@ StorageService.prototype.getChannelInfo = async function (queryCondition) {
 
 StorageService.prototype.getUserChannelInfo = async function (uid) {
   return [{
-    ciid: 'ciid:ansvbvghtrj54mekw&GBNKNde$3@FIT*IoiTGBK#$%^YHBN',
+    ciid: 'ciid B',
     creator: 'someone',
     chid: 'chid:l4ehfuvljifgbudvzsugkurliLO4U*T&IYEOW*UGY',
     name: 'Room 18',
     invitee: [],
     members: ['uidA', 'uidB', 'uidC']
   }, {
-    ciid: 'ciid:nhjyutrifdfl,mgtyk65lr9e8ds7*(PO:l.MK5AEou(ytg',
+    ciid: 'ciid A',
     creator: 'WHO?',
     chid: 'chid:ijmlYIOUYGVUYBK>DFRUTYIHUJNJKTSARFDCVSBUN',
     name: 'Night Bar',
