@@ -45,7 +45,7 @@ GetConversationEventHandler.prototype.handle = async function (requestInfo) {
     })
     .setPacket({
       msgCode: `get conversations from ${skip} to ${skip + limit}`,
-      data: conversations
+      data: [{ciid: conversations}]
     })
 
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
