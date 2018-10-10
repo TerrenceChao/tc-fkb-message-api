@@ -194,15 +194,33 @@ StorageService.prototype.channelInfoRemoved = async function (queryCondition) {
 }
 
 // for channel => conversations
-StorageService.prototype.conversationCreated = function (ciid, uid, conversation, type, datetime) {
+StorageService.prototype.conversationCreated = function (ciid, uid, content, type, datetime) {
   return true || false
 }
 
 StorageService.prototype.getConversationList = async function (ciid, limit = 10, skip = 0) {
   return [
-    'this is a messaging service',
-    'Today is a sunny day',
-    'Hello world'
+    {
+      ciid: 'ciid B',
+      sender: 'Eason',
+      content: 'this is a messaging service',
+      type: 'text',
+      created_at: Date.now()
+    },
+    {
+      ciid: 'ciid B',
+      sender: 'Billy',
+      content: 'Today is a sunny day',
+      type: 'text',
+      created_at: Date.now()
+    },
+    {
+      ciid: 'ciid B',
+      sender: 'Jessica',
+      content: 'Hello world',
+      type: 'text',
+      created_at: Date.now()
+    }
   ] || []
 }
 
