@@ -46,6 +46,7 @@ SendConversationEventHandler.prototype.handle = function (requestInfo) {
     .setPacket({
       msgCode: `convType: ${convType}`,
       data: {
+        uid,
         conversation,
         datetime
       }
