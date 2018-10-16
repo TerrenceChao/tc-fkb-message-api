@@ -54,7 +54,7 @@ UserOfflineEventHandler.prototype.handle = async function (requestInfo) {
 }
 
 UserOfflineEventHandler.prototype.isValid = function (requestInfo) {
-  return requestInfo.packet != null &&
+  return requestInfo.packet != null && this.isAuthenticated(requestInfo.packet) &&
     requestInfo.packet.uid != null
 }
 

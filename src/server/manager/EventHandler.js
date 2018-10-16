@@ -1,11 +1,14 @@
+function EventHandler () {}
 
-function EventHandler() {}
+EventHandler.prototype.eventName = 'eventName is undefined'
 
-EventHandler.prototype.eventName = "eventName is undefined";
-
-EventHandler.prototype.handle = function(requestInfo) {
-    throw new Error(`[EventHandler]: You should implement 'handle'.`);
+EventHandler.prototype.handle = function (requestInfo) {
+  throw new Error(`[EventHandler]: You should implement 'handle'.`)
 }
 
-module.exports = EventHandler;
+EventHandler.prototype.isAuthenticated = function (packet) {
+  var authService = this.globalContext['authService']
+  return authService.isAuthenticated(packet)
+}
 
+module.exports = EventHandler

@@ -64,7 +64,7 @@ AuthService.prototype.authorized = function (packet) {
 // for auth
 AuthService.prototype.obtainAuthorization = function (userPayload) {
   if (!hasProperty(userPayload)) {
-    return 'invalid payload'
+    return false
   }
 
   const msgToken = jwt.sign(

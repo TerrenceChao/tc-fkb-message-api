@@ -45,7 +45,7 @@ GetConversationEventHandler.prototype.handle = async function (requestInfo) {
     })
     .setPacket({
       msgCode: `get conversations from ${skip} to ${skip + limit}`,
-      data: conversations
+      data: [{ciid: conversations}]
     })
 
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
@@ -53,7 +53,7 @@ GetConversationEventHandler.prototype.handle = async function (requestInfo) {
 
 GetConversationEventHandler.prototype.isValid = function (requestInfo) {
   var packet = requestInfo.packet
-  return packet !== undefined &&
+  return packet !== undefined && this.isAuthenticated(packet) &&
     typeof packet.uid === 'string' &&
     packet.ciid != null &&
     packet.limit != null &&

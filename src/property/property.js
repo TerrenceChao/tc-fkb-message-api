@@ -60,6 +60,10 @@ const REQUEST_EVENTS = {
   COMPETE_LOCK: EVENTS.COMPETE_LOCK,
   RELEASE_LOCK: EVENTS.RELEASE_LOCK,
   CREATE_CHANNEL: EVENTS.CREATE_CHANNEL,
+
+  // for testing (will be removed)
+  JOIN_CHANNEL: EVENTS.JOIN_CHANNEL,
+
   LEAVE_CHANNEL: EVENTS.LEAVE_CHANNEL,
   SEND_CONVERSATION: EVENTS.SEND_CONVERSATION,
   GET_CONVERSATION: EVENTS.GET_CONVERSATION,
@@ -103,10 +107,6 @@ const BUSINESS_EVENTS = {
 
 const RESPONSE_EVENTS = {
   // client side (respose to client's event):
-
-  // Authentication
-  USER_LOGIN: 'user_login',
-  USER_LOGOUT: 'user_logout',
 
   // Channel
   CHANNEL_LIST: 'channel_list',

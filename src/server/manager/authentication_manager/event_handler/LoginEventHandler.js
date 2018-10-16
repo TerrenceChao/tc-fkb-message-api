@@ -51,7 +51,7 @@ LoginEventHandler.prototype.handle = async function (requestInfo) {
         .setHeader({
           to: TO.USER,
           receiver: uid,
-          responseEvent: RESPONSE_EVENTS.USER_LOGIN
+          responseEvent: RESPONSE_EVENTS.CHANNEL_LIST
         })
         .setPacket({
           msgCode: `channel list and conversations`,
@@ -89,9 +89,9 @@ LoginEventHandler.prototype.pack = function (userChannelInfo, conversations) {
 
 LoginEventHandler.prototype.isValid = function (requestInfo) {
   var packet = requestInfo.packet
-  return packet !== undefined &&
+  return packet !== undefined && this.isAuthenticated(packet) &&
     typeof packet.sessionId === 'string' &&
-    typeof packet.msToken === 'string' &&
+    typeof packet.msgToken === 'string' &&
     typeof packet.uid === 'string' &&
     packet.limit != null &&
     packet.skip != null

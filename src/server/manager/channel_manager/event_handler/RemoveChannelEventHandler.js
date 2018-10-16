@@ -62,7 +62,7 @@ RemoveChannelEventHandler.prototype.handle = async function (requestInfo) {
 
 RemoveChannelEventHandler.prototype.isValid = function (requestInfo) {
   var packet = requestInfo.packet
-  return packet !== undefined &&
+  return packet !== undefined && this.isAuthenticated(packet) &&
     typeof packet.uid === 'string' &&
     packet.chid != null
 }

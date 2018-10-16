@@ -46,6 +46,7 @@ SendConversationEventHandler.prototype.handle = function (requestInfo) {
     .setPacket({
       msgCode: `convType: ${convType}`,
       data: {
+        uid,
         conversation,
         datetime
       }
@@ -55,7 +56,7 @@ SendConversationEventHandler.prototype.handle = function (requestInfo) {
 
 SendConversationEventHandler.prototype.isValid = function (requestInfo) {
   var packet = requestInfo.packet
-  return packet !== undefined &&
+  return packet !== undefined && this.isAuthenticated(packet) &&
     typeof packet.uid === 'string' &&
     packet.ciid != null &&
     packet.convType != null &&
