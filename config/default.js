@@ -85,6 +85,8 @@ module.exports = {
   MONGODB_HOST: process.env.MONGODB_HOST,
   MONGODB_POOL_SIZE: process.env.MONGODB_POOL_SIZE,
   JWT_SECRET: process.env.JWT_SECRET,
+  ADAPTOR_HOST: process.env.ADAPTOR_HOST,
+  ADAPTOR_PORT: process.env.ADAPTOR_PORT,
 
   // src
   handler,
