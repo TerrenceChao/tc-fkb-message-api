@@ -45,11 +45,12 @@ UserOfflineEventHandler.prototype.handle = async function (requestInfo) {
     })
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 
+  var socketServer = this.globalContext['socketServer']
   channelIds.forEach(ciid => {
-    socket.leave(ciid)
+    socketServer.of('/').adapter.remoteLeave(socket.id, ciid)
   })
 
-  socket.leave(uid)
+  socketServer.of('/').adapter.remoteLeave(socket.id, uid)
   socket.disconnect(true)
 }
 
