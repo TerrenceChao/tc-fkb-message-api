@@ -28,12 +28,13 @@ UserOnlineEventHandler.prototype.handle = async function (requestInfo) {
   var packet = requestInfo.packet
   var uid = packet.uid
 
-  socket.join(uid)
+  var socketServer = this.globalContext['socketServer']
+  socketServer.of('/').adapter.remoteJoin(socket.id, uid)
 
   var storageService = this.globalContext['storageService']
   var channelIds = await storageService.getAllChannelIds(uid)
   channelIds.forEach(ciid => {
-    socket.join(ciid)
+    socketServer.of('/').adapter.remoteJoin(socket.id, ciid)
   })
 
   var businessEvent = this.globalContext['businessEvent']

@@ -1,6 +1,9 @@
 var path = require('path')
 var config = require('config')
 var socketIo = require('socket.io')
+var {
+  adaptor
+} = require('./Adapter')
 
 let globalContext = require(path.join(config.get('manager'), 'globalContext'))
 var ConnectionManager = require(path.join(config.get('connection.manager'), 'ConnectionManager'))
@@ -12,6 +15,8 @@ var MessageManager = require(path.join(config.get('message.manager'), 'MessageMa
 
 function startUp (httpServer) {
   var socketServer = socketIo.listen(httpServer)
+  adaptor(socketServer)
+
   globalContext.socketServer = socketServer
 
   let connectionManager = new ConnectionManager().init(globalContext)
