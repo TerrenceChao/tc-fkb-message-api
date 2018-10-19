@@ -13,7 +13,7 @@ const EventHandler = require(path.join(config.get('manager'), 'EventHandler'))
 
 util.inherits(LeaveChannelEventHandler, EventHandler)
 
-function LeaveChannelEventHandler () {
+function LeaveChannelEventHandler() {
   this.name = arguments.callee.name
 }
 
@@ -50,7 +50,8 @@ LeaveChannelEventHandler.prototype.handle = async function (requestInfo) {
       businessEvent.emit(BUSINESS_EVENTS.REMOVE_CHANNEL, requestInfo)
     }
 
-    requestInfo.socket.leave(ciid)
+    var socketServer = this.globalContext['socketServer']
+    socketServer.of('/').adapter.remoteLeave(requestInfo.socket.id, ciid)
   }
 }
 

@@ -25,12 +25,14 @@ CreateChannelEventHandler.prototype.handle = async function (requestInfo) {
   }
 
   var packet = requestInfo.packet
+  var socket = requestInfo.socket
   var uid = packet.uid
   var channelName = packet.channelName
 
   var resInfo = new ResponseInfo()
     .assignProtocol(requestInfo)
 
+  var socketServer = this.globalContext['socketServer']
   var storageService = this.globalContext['storageService']
   var businessEvent = this.globalContext['businessEvent']
 
@@ -40,7 +42,7 @@ CreateChannelEventHandler.prototype.handle = async function (requestInfo) {
     resInfo = this.packException(packet, resInfo)
   } else {
     resInfo = this.pack(channelInfo, resInfo)
-    requestInfo.socket.join(channelInfo.ciid)
+    socketServer.of('/').adapter.remoteJoin(socket.id, channelInfo.ciid)
   }
 
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
