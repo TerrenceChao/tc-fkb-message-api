@@ -25,16 +25,18 @@ JoinChannelEventHandler.prototype.handle = async function (requestInfo) {
   }
 
   var packet = requestInfo.packet
+  var socket = requestInfo.socket
   var uid = packet.uid
   var iid = packet.iid
   var chid = packet.chid
   var ciid = packet.ciid
 
+  var socketServer = this.globalContext['socketServer']
   var businessEvent = this.globalContext['businessEvent']
   var storageService = this.globalContext['storageService']
 
   if (await storageService.channelJoined(uid, chid)) {
-    requestInfo.socket.join(ciid)
+    socketServer.of('/').adapter.remoteJoin(socket.id, ciid)
 
     var resInfo = new ResponseInfo()
       .assignProtocol(requestInfo)
