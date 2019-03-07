@@ -1,27 +1,12 @@
+var config = require('config')
+var path = require('path')
+
+// const { cache } = require(path.join(config.get('cache'), 'cache'));
+const {
+  repository
+} = require(path.join(config.get('database'), 'repository'))
+
 function StorageService () {}
-
-// for invitation
-StorageService.prototype.invitationMultiCreated = async function (inviter, invitee, header, content, sensitive = {}) {
-  /**
-   * VERY IMPORTANT !!!
-   * VERY IMPORTANT !!!
-   * VERY IMPORTANT !!!
-   * check it first!
-   * Don't create over & over again if you have created.
-   */
-
-  var chid = sensitive.chid
-
-  /**
-   * Database:
-   *    1. craete InvitationOfChannel(schema)
-   *    2. for 'channelInfo': insert invitee = 'uid' (type string or Array) into channelInfo(schema)
-   *    3. for 'invitee': insert 'iid' into UserInChannel.received_invitations(schema)
-   *    4. for 'inviter': insert 'iid' into UserInChannel.sent_invitations(schema)
-   */
-  if (typeof invitee === 'string') {
-    invitee = [invitee]
-  }
 
   var invitations = []
   invitations = invitee.map(invi => {
