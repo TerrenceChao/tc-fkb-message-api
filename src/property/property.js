@@ -115,8 +115,8 @@ const RESPONSE_EVENTS = {
 
   // Channel
   INVITATION_LIST_FROM_CHANNEL: 'invitation_list_from_channel',
-  INVITATION_FROM_CHANNEL_TO_ME: `invitation_from_channel_to_me`,
-  CONVERSATION_LIST: `conversation_list`,
+  INVITATION_FROM_CHANNEL_TO_ME: 'invitation_from_channel_to_me',
+  CONVERSATION_LIST: 'conversation_list',
   CONVERSATION_FROM_CHANNEL: 'conversation_from_channel',
 
   // Exception
