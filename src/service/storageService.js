@@ -2,42 +2,42 @@ var config = require('config')
 var path = require('path')
 
 // const { cache } = require(path.join(config.get('cache'), 'cache'));
-const {
-  repository
-} = require(path.join(config.get('database'), 'repository'))
+// const {
+//   repository
+// } = require(path.join(config.get('database'), 'repository'))
 
 function StorageService () {}
 
-  var invitations = []
-  invitations = invitee.map(invi => {
-    return {
-      // Avoid creating repeat items
-      iid: `${invi}.encrypt(${chid}, ${invi}, secret?)`,
-      inviter,
-      invitee: invi,
-      header,
-      content,
-      sensitive,
-      create_at: Date.now()
-    }
-  })
+//   var invitations = []
+//   invitations = invitee.map(invi => {
+//     return {
+//       // Avoid creating repeat items
+//       iid: `${invi}.encrypt(${chid}, ${invi}, secret?)`,
+//       inviter,
+//       invitee: invi,
+//       header,
+//       content,
+//       sensitive,
+//       create_at: Date.now()
+//     }
+//   })
 
-  /**
-   * DB insert multiple rows using self-defiend iid (invitation ID):
-   *      e.g. bcrypt
-   * 1. craete InvitationOfChannel(schema):
-   *      Model.insertMany(invitations)
-   * 2. for 'channelInfo': insert invitee = 'uid' (type string or Array) into channelInfo(schema)
-   *      Model.update(...)
-   * 3. for 'invitee': insert 'iid' into UserInChannel.received_invitations(schema)
-   *      Model.update(...)
-   * 4. for 'inviter': insert 'iid' into UserInChannel.sent_invitations(schema):
-   *      Model.update(...)
-   * 5. note: what if failed ?
-   */
+//   /**
+//    * DB insert multiple rows using self-defiend iid (invitation ID):
+//    *      e.g. bcrypt
+//    * 1. craete InvitationOfChannel(schema):
+//    *      Model.insertMany(invitations)
+//    * 2. for 'channelInfo': insert invitee = 'uid' (type string or Array) into channelInfo(schema)
+//    *      Model.update(...)
+//    * 3. for 'invitee': insert 'iid' into UserInChannel.received_invitations(schema)
+//    *      Model.update(...)
+//    * 4. for 'inviter': insert 'iid' into UserInChannel.sent_invitations(schema):
+//    *      Model.update(...)
+//    * 5. note: what if failed ?
+//    */
 
-  return invitations || []
-}
+//   return invitations || []
+// }
 
 StorageService.prototype.getInvitation = async function (iid) {
   return {
