@@ -1,47 +1,66 @@
 'use strict'
 
-var config = require('config')
-var path = require('path')
-var express = require('express')
-var logger = require('morgan')
-var cookieParser = require('cookie-parser')
-var bodyParser = require('body-parser')
+var cluster = require('cluster')
+var os = require('os')
 
-var routeIndex = require(path.join(config.get('router'), 'index'))
-var {
-  startUp
-} = require(path.join(config.get('server'), 'MessageServer'))
+if (cluster.isMaster) {
+  for (var i = 0; i < os.cpus().length; i++) {
+    cluster.fork().on('listening', function (address) {
+      console.log(`worker is listening on port: ${address.port}`)
+    })
+  }
 
-var PORT = config.get('PORT')
+  cluster.on('exit', function (worker, code, signal) {
+    console.log(`worker ${worker.process.pid} died`)
+  })
+}
 
-var app = express()
+if (cluster.isWorker) {
+  var config = require('config')
+  var path = require('path')
+  var express = require('express')
+  var logger = require('morgan')
+  var cookieParser = require('cookie-parser')
+  var bodyParser = require('body-parser')
 
-app.use(logger('dev'))
-app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({
-  extended: false
-}))
-app.use(cookieParser())
+  var routeIndex = require(path.join(config.get('router'), 'index'))
+  var {
+    startUp
+  } = require(path.join(config.get('server'), 'MessageServer'))
 
-app.use((req, res, next) => {
-  // Website you wish to allow to connect
-  res.setHeader('Access-Control-Allow-Origin', '*')
+  var app = express()
 
-  // Request methods you wish to allow
-  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS')
+  app.use(logger('dev'))
+  app.use(bodyParser.json())
+  app.use(bodyParser.urlencoded({
+    extended: false
+  }))
+  app.use(cookieParser())
 
-  // Request headers you wish to allow
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
+  app.use((req, res, next) => {
+    // Website you wish to allow to connect
+    res.setHeader('Access-Control-Allow-Origin', '*')
 
-  // // Set to true if you need the website to include cookies in the requests sent
-  // // to the API (e.g. in case you use sessions)
-  res.setHeader('Access-Control-Allow-Credentials', true)
+    // Request methods you wish to allow
+    res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS')
 
-  next()
-})
+    // Request headers you wish to allow
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
 
-var server = app
-  .use(`/message_service/v1/`, routeIndex)
-  .listen(PORT, () => console.log(`Listening on ${PORT}`))
+    /**
+     * Set to true if you need the website to include cookies in the requests sent
+     * to the API (e.g. in case you use sessions)
+     */
+    res.setHeader('Access-Control-Allow-Credentials', true)
 
-startUp(server)
+    next()
+  })
+
+  var PORT = config.get('PORT')
+  var port = parseInt(PORT) + cluster.worker.id
+  var server = app
+    .use(`/message_service/v1/`, routeIndex)
+    .listen(port, () => console.log(`Listening on ${port}`))
+
+  startUp(server)
+}
