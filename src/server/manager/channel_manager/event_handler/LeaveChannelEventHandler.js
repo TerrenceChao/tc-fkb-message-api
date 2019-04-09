@@ -21,7 +21,7 @@ LeaveChannelEventHandler.prototype.eventName = EVENTS.LEAVE_CHANNEL
 
 LeaveChannelEventHandler.prototype.handle = async function (requestInfo) {
   if (!this.isValid(requestInfo)) {
-    console.warn(`${this.eventName}:`, `request info is invalid.`)
+    console.warn(`${this.eventName}: request info is invalid.`)
     return
   }
 

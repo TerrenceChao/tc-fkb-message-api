@@ -20,7 +20,7 @@ GetChannelListEventHandler.prototype.eventName = EVENTS.GET_CHANNEL_LIST
 
 GetChannelListEventHandler.prototype.handle = async function (requestInfo) {
   if (!this.isValid(requestInfo)) {
-    console.warn(`${this.eventName}:`, `request info is invalid.`)
+    console.warn(`${this.eventName}: request info is invalid.`)
     return
   }
 

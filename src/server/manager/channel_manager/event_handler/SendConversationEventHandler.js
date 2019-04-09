@@ -20,7 +20,7 @@ SendConversationEventHandler.prototype.eventName = EVENTS.SEND_CONVERSATION
 
 SendConversationEventHandler.prototype.handle = function (requestInfo) {
   if (!this.isValid(requestInfo)) {
-    console.warn(`${this.eventName}:`, `request info is invalid.`)
+    console.warn(`${this.eventName}: request info is invalid.`)
     return
   }
 

@@ -17,7 +17,7 @@ LogoutEventHandler.prototype.eventName = EVENTS.LOGOUT
 
 LogoutEventHandler.prototype.handle = function (requestInfo) {
   if (!this.isValid(requestInfo)) {
-    console.warn(`${this.eventName}:`, `request info is invalid.`)
+    console.warn(`${this.eventName}: request info is invalid.`)
     return
   }
 

@@ -20,7 +20,7 @@ SendMessageEventHandler.prototype.eventName = EVENTS.SEND_MESSAGE
 
 SendMessageEventHandler.prototype.handle = function (responseInfo) {
   if (!this.isValid(responseInfo)) {
-    console.warn(`${this.eventName}:`, `response info is invalid.`)
+    console.warn(`${this.eventName}: response info is invalid.`)
     return
   }
 
