@@ -4,7 +4,7 @@ var fs = require('fs')
 const {
   REQUEST_EVENTS,
   BUSINESS_EVENTS
-} = require(path.join(config.get('property'), 'property'))
+} = require(path.join(config.get('src.property'), 'property'))
 const RequestInfo = require('./RequestInfo.js')
 
 function Manager () {}

@@ -7,9 +7,9 @@ const {
   EVENTS,
   BUSINESS_EVENTS,
   RESPONSE_EVENTS
-} = require(path.join(config.get('property'), 'property'))
-const ResponseInfo = require(path.join(config.get('manager'), 'ResponseInfo'))
-const EventHandler = require(path.join(config.get('manager'), 'EventHandler'))
+} = require(path.join(config.get('src.property'), 'property'))
+const ResponseInfo = require(path.join(config.get('src.manager'), 'ResponseInfo'))
+const EventHandler = require(path.join(config.get('src.manager'), 'EventHandler'))
 
 util.inherits(LeaveChannelEventHandler, EventHandler)
 

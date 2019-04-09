@@ -4,13 +4,13 @@ var path = require('path')
 const {
   authService
 } = require(path.join(
-  config.get('service'),
+  config.get('src.service'),
   'authService'
 ))
 const {
   storageService
 } = require(path.join(
-  config.get('service'),
+  config.get('src.service'),
   'storageService'
 ))
 

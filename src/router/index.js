@@ -4,9 +4,9 @@ const express = require('express')
 const routeIndex = express.Router()
 const {
   BUSINESS_EVENTS
-} = require(path.join(config.get('property'), 'property'))
-const RequestInfo = require(path.join(config.get('manager'), 'RequestInfo'))
-let globalContext = require(path.join(config.get('manager'), 'globalContext'))
+} = require(path.join(config.get('src.property'), 'property'))
+const RequestInfo = require(path.join(config.get('src.manager'), 'RequestInfo'))
+let globalContext = require(path.join(config.get('src.manager'), 'globalContext'))
 
 /**
  * ===========================================================
@@ -17,7 +17,7 @@ let globalContext = require(path.join(config.get('manager'), 'globalContext'))
 const businessEvent = globalContext.businessEvent
 
 routeIndex.get(`/index`, (req, res, next) => {
-  var fullUrl = `${req.protocol}://${req.get('host')}/${req.originalUrl}`
+  var fullUrl = `${req.protocol}://${req.get('app.host')}/${req.originalUrl}`
   console.log(`fullUrl: ${fullUrl}`)
   res.json(`${{a: 1, b: 2, fullUrl}}`)
 })

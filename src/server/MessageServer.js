@@ -5,13 +5,13 @@ var {
   adaptor
 } = require('./Adapter')
 
-let globalContext = require(path.join(config.get('manager'), 'globalContext'))
-var ConnectionManager = require(path.join(config.get('connection.manager'), 'ConnectionManager'))
-var AuthenticationManager = require(path.join(config.get('authentication.manager'), 'AuthenticationManager'))
-var ChannelManager = require(path.join(config.get('channel.manager'), 'ChannelManager'))
-var InvitationManager = require(path.join(config.get('invitation.manager'), 'InvitationManager'))
-var UserManager = require(path.join(config.get('user.manager'), 'UserManager'))
-var MessageManager = require(path.join(config.get('message.manager'), 'MessageManager'))
+let globalContext = require(path.join(config.get('src.manager'), 'globalContext'))
+var ConnectionManager = require(path.join(config.get('src.connectionManager'), 'ConnectionManager'))
+var AuthenticationManager = require(path.join(config.get('src.authenticationManager'), 'AuthenticationManager'))
+var ChannelManager = require(path.join(config.get('src.channelManager'), 'ChannelManager'))
+var InvitationManager = require(path.join(config.get('src.invitationManager'), 'InvitationManager'))
+var UserManager = require(path.join(config.get('src.userManager'), 'UserManager'))
+var MessageManager = require(path.join(config.get('src.messageManager'), 'MessageManager'))
 
 function startUp (httpServer) {
   var socketServer = socketIo.listen(httpServer)

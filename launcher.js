@@ -32,10 +32,10 @@ if (cluster.isWorker) {
   var cookieParser = require('cookie-parser')
   var bodyParser = require('body-parser')
 
-  var routeIndex = require(path.join(config.get('router'), 'index'))
+  var routeIndex = require(path.join(config.get('src.router'), 'index'))
   var {
     startUp
-  } = require(path.join(config.get('server'), 'MessageServer'))
+  } = require(path.join(config.get('src.server'), 'MessageServer'))
 
   var app = express()
 

@@ -3,7 +3,7 @@ var path = require('path')
 
 const {
   PROTOCOL
-} = require(path.join(config.get('property'), 'property'))
+} = require(path.join(config.get('src.property'), 'property'))
 
 function ResponseInfo () {
   this.req = null
