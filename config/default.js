@@ -1,10 +1,14 @@
-process.env.NODE_ENV = 'dev'
-
 var fs = require('fs')
 var path = require('path')
-var package = JSON.parse(fs.readFileSync(__dirname + '/../package.json'));
-const ROOT = getParentDirPath(__dirname, package.name);
+var package = JSON.parse(fs.readFileSync(__dirname + '/../package.json'))
+const ROOT = getParentDirPath(__dirname, package.name)
 
+/**
+ * @private
+ * @param {string} currentDir
+ * @param {string} specifyDir
+ * @returns {string}
+ */
 function getParentDirPath(currentDir, specifyDir) {
   if (specifyDir == null) {
     return path.resolve(currentDir, '../')
@@ -20,15 +24,11 @@ function getParentDirPath(currentDir, specifyDir) {
  * src path
  */
 var src = path.join(ROOT, 'src')
-var handler = path.join(src, 'handler')
 var property = path.join(src, 'property')
 var repository = path.join(src, 'repository')
 var router = path.join(src, 'router')
 var server = path.join(src, 'server')
 var service = path.join(src, 'service')
-var cache = path.join(repository, 'cache')
-var database = path.join(repository, 'database')
-var nosql = path.join(repository, 'database', 'nosql')
 
 var manager = path.join(server, 'manager')
 var connection_manager = path.join(manager, 'connection_manager')
@@ -48,19 +48,18 @@ var message_event_handler = path.join(manager, 'message_manager', 'event_handler
 /**
  * test path
  */
-var test = path.join(ROOT, 'test')
-var seed = path.join(test, 'seed')
-var handler_test = path.join(test, 'handler')
-var property_test = path.join(test, 'property')
-var repository_test = path.join(test, 'repository')
-var router_test = path.join(test, 'router')
-var server_test = path.join(test, 'server')
-var service_test = path.join(test, 'service')
-var cache_test = path.join(repository_test, 'cache')
-var database_test = path.join(repository_test, 'database')
-var nosql_test = path.join(repository_test, 'database', 'nosql')
+var feature_test = path.join(ROOT, 'test', 'feature')
+var unit_test = path.join(ROOT, 'test', 'unit')
 
-var manager_test = path.join(server_test, 'manager')
+var router_test = path.join(feature_test, 'router')
+var message_server_test = path.join(feature_test, 'server')
+var seed = path.join(feature_test, 'seed')
+
+var property_test = path.join(unit_test, 'property')
+var repository_test = path.join(unit_test, 'repository')
+var service_test = path.join(unit_test, 'service')
+
+var manager_test = path.join(unit_test, 'server', 'manager')
 var connection_manager_test = path.join(manager_test, 'connection_manager')
 var authentication_manager_test = path.join(manager_test, 'authentication_manager')
 var channel_manager_test = path.join(manager_test, 'channel_manager')
@@ -81,21 +80,13 @@ require('dotenv').config({
 
 module.exports = {
 
-  PORT: process.env.SERVER_PORT,
-  AUTH_PAYLOAD: process.env.AUTH_PAYLOAD,
-  EXPIRES_IN_MINS: process.env.EXPIRES_IN_MINS,
-  ADAPTOR_HOST: process.env.ADAPTOR_HOST,
-  ADAPTOR_PORT: process.env.ADAPTOR_PORT,
-  MONGODB_HOST: process.env.MONGODB_HOST,
-  MONGODB_POOL_SIZE: process.env.MONGODB_POOL_SIZE,
+  app: require('./_app'),
+  auth: require('./_auth'),
+  adaptor: require('./_adaptor'),
 
   // src
-  handler,
   property,
   repository,
-  cache,
-  database,
-  nosql,
 
   router,
   server,
@@ -127,18 +118,15 @@ module.exports = {
 
   service,
 
-  // test
+  // feature test
+  router_test,
+  message_server_test,
   seed,
-  handler_test,
+
+  // unit test
   property_test,
   repository_test,
-  cache_test,
-  database_test,
-  nosql_test,
 
-  router_test,
-  server_test,
-  manager_test,
   connection_test: {
     manager: connection_manager_test,
     event_handler: connection_event_handler_test

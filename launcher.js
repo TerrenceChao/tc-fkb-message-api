@@ -65,7 +65,7 @@ if (cluster.isWorker) {
     next()
   })
 
-  var PORT = config.get('PORT')
+  var PORT = config.get('app.port')
   var port = parseInt(PORT) + cluster.worker.id
   var server = app
     .use(`/message_service/v1/`, routeIndex)

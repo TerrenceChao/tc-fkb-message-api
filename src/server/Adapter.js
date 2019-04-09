@@ -3,8 +3,8 @@ const redisAdaptor = require('socket.io-redis')
 
 function adaptor (socketServer) {
   socketServer.adapter(redisAdaptor({
-    host: config.get('ADAPTOR_HOST'),
-    port: config.get('ADAPTOR_PORT')
+    host: config.get('adaptor.host'),
+    port: config.get('adaptor.port')
   }))
 }
 

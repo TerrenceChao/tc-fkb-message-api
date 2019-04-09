@@ -2,8 +2,8 @@ var jwt = require('jsonwebtoken')
 var crypto = require('crypto')
 const config = require('config')
 
-const expiresIn = config.get('EXPIRES_IN_MINS')
-const properties = config.get('AUTH_PAYLOAD').split(',')
+const expiresIn = config.get('auth.expiresInMins')
+const properties = config.get('auth.properties').split(',')
 
 /**
  * @private
@@ -93,8 +93,9 @@ AuthService.prototype.obtainAuthorization = function (userPayload) {
 
   return jwt.sign(
     getProperty(userPayload),
-    secretGenerator(userPayload),
-    { expiresIn }
+    secretGenerator(userPayload), {
+      expiresIn
+    }
   )
 }
 
