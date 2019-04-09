@@ -5,6 +5,12 @@ const config = require('config')
 const expiresIn = config.get('EXPIRES_IN_MINS')
 const properties = config.get('AUTH_PAYLOAD').split(',')
 
+/**
+ * @private
+ * @param {object} payload
+ * @param {object} token
+ * @returns {boolean}
+ */
 function hasProperty (payload, token = false) {
   if (typeof payload !== 'object' || payload == null) {
     return false
@@ -24,6 +30,11 @@ function hasProperty (payload, token = false) {
   return hasProp
 }
 
+/**
+ * @private
+ * @param {object} payload
+ * @returns {object}
+ */
 function getProperty (payload) {
   var data = {}
   properties.forEach(prop => {
@@ -33,6 +44,11 @@ function getProperty (payload) {
   return data
 }
 
+/**
+ * @private
+ * @param {object} payload
+ * @returns {string}
+ */
 function secretGenerator (payload) {
   var data = getProperty(payload)
 
@@ -42,6 +58,12 @@ function secretGenerator (payload) {
     .digest()
 }
 
+/**
+ * @private
+ * @param {object} verification
+ * @param {object} payload
+ * @returns {boolean}
+ */
 function isValid (verification, payload) {
   var valid = true
   properties.forEach(prop => {
@@ -53,6 +75,9 @@ function isValid (verification, payload) {
   return valid
 }
 
+/**
+ * @exports
+ */
 function AuthService () {}
 
 AuthService.prototype.authorized = function (packet) {
