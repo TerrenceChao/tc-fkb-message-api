@@ -53,11 +53,12 @@ GetConversationEventHandler.prototype.handle = async function (requestInfo) {
 
 GetConversationEventHandler.prototype.isValid = function (requestInfo) {
   var packet = requestInfo.packet
-  return packet !== undefined && this.isAuthenticated(packet) &&
+  return packet !== undefined &&
     typeof packet.uid === 'string' &&
     packet.ciid != null &&
     packet.limit != null &&
-    packet.skip != null
+    packet.skip != null &&
+    this.isAuthenticated(packet)
 }
 
 module.exports = {

@@ -89,12 +89,13 @@ LoginEventHandler.prototype.pack = function (userChannelInfo, conversations) {
 
 LoginEventHandler.prototype.isValid = function (requestInfo) {
   var packet = requestInfo.packet
-  return packet !== undefined && this.isAuthenticated(packet) &&
+  return packet !== undefined &&
     typeof packet.sessionId === 'string' &&
     typeof packet.msgToken === 'string' &&
     typeof packet.uid === 'string' &&
     packet.limit != null &&
-    packet.skip != null
+    packet.skip != null &&
+    this.isAuthenticated(packet)
 }
 
 module.exports = {

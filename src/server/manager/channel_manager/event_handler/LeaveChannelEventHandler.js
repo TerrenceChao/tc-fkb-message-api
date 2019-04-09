@@ -90,9 +90,10 @@ LeaveChannelEventHandler.prototype.packException = function (packet, requestInfo
 
 LeaveChannelEventHandler.prototype.isValid = function (requestInfo) {
   var packet = requestInfo.packet
-  return packet !== undefined && this.isAuthenticated(packet) &&
+  return packet !== undefined &&
     typeof packet.uid === 'string' &&
-    packet.chid != null
+    packet.chid != null &&
+    this.isAuthenticated(packet)
 }
 
 module.exports = {

@@ -82,11 +82,12 @@ require('dotenv').config({
 module.exports = {
 
   PORT: process.env.SERVER_PORT,
-  MONGODB_HOST: process.env.MONGODB_HOST,
-  MONGODB_POOL_SIZE: process.env.MONGODB_POOL_SIZE,
-  JWT_SECRET: process.env.JWT_SECRET,
+  AUTH_PAYLOAD: process.env.AUTH_PAYLOAD,
+  EXPIRES_IN_MINS: process.env.EXPIRES_IN_MINS,
   ADAPTOR_HOST: process.env.ADAPTOR_HOST,
   ADAPTOR_PORT: process.env.ADAPTOR_PORT,
+  MONGODB_HOST: process.env.MONGODB_HOST,
+  MONGODB_POOL_SIZE: process.env.MONGODB_POOL_SIZE,
 
   // src
   handler,

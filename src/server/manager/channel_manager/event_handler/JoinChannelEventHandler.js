@@ -62,11 +62,12 @@ JoinChannelEventHandler.prototype.handle = async function (requestInfo) {
 
 JoinChannelEventHandler.prototype.isValid = function (requestInfo) {
   var packet = requestInfo.packet
-  return packet !== undefined && this.isAuthenticated(packet) &&
+  return packet !== undefined &&
     typeof packet.uid === 'string' &&
     packet.iid != null &&
     packet.chid != null &&
-    packet.ciid != null
+    packet.ciid != null &&
+    this.isAuthenticated(packet)
 }
 
 module.exports = {

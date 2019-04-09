@@ -4,6 +4,8 @@ var cluster = require('cluster')
 var os = require('os')
 
 if (cluster.isMaster) {
+  console.log(`Master ${process.pid} is running`)
+
   for (var i = 0; i < os.cpus().length; i++) {
     cluster.fork().on('listening', function (address) {
       console.log(`worker is listening on port: ${address.port}`)
@@ -12,10 +14,17 @@ if (cluster.isMaster) {
 
   cluster.on('exit', function (worker, code, signal) {
     console.log(`worker ${worker.process.pid} died`)
+    if (signal) {
+      console.log(`worker was killed by signal: ${signal}`)
+    } else if (code !== 0) {
+      console.log(`worker exited with error code: ${code}`)
+    }
   })
 }
 
 if (cluster.isWorker) {
+  console.log(`Worker ${process.pid} started`)
+
   var config = require('config')
   var path = require('path')
   var express = require('express')

@@ -1,30 +1,26 @@
 var jwt = require('jsonwebtoken')
 var crypto = require('crypto')
+const config = require('config')
 
-const expiresInMins = 30
-const properties = ['uid', 'userAgent']
-const propertiesWithToken = properties.concat('msgToken')
+const expiresIn = config.get('EXPIRES_IN_MINS')
+const properties = config.get('AUTH_PAYLOAD').split(',')
 
 function hasProperty (payload, token = false) {
   if (typeof payload !== 'object' || payload == null) {
     return false
   }
 
-  var hasProp = true
-  if (!token) {
-    properties.forEach(prop => {
-      if (!payload.hasOwnProperty(prop)) {
-        hasProp = false
-      }
-    })
-    return hasProp
+  if (token === false) {
+    properties.pop()
   }
 
-  propertiesWithToken.forEach(prop => {
+  var hasProp = true
+  properties.forEach(prop => {
     if (!payload.hasOwnProperty(prop)) {
       hasProp = false
     }
   })
+
   return hasProp
 }
 
@@ -33,11 +29,13 @@ function getProperty (payload) {
   properties.forEach(prop => {
     data[prop] = payload[prop]
   })
+
   return data
 }
 
 function secretGenerator (payload) {
   var data = getProperty(payload)
+
   return crypto
     .createHash('sha256')
     .update(JSON.stringify(data))
@@ -51,6 +49,7 @@ function isValid (verification, payload) {
       valid = false
     }
   })
+
   return valid
 }
 
@@ -67,12 +66,11 @@ AuthService.prototype.obtainAuthorization = function (userPayload) {
     return false
   }
 
-  const msgToken = jwt.sign(
+  return jwt.sign(
     getProperty(userPayload),
     secretGenerator(userPayload),
-    { expiresIn: 60 * expiresInMins }
+    { expiresIn }
   )
-  return msgToken
 }
 
 // X). remove "temporary" user's payload if has { uid: payload },
@@ -82,8 +80,8 @@ AuthService.prototype.isAuthenticated = function (userPayload) {
   }
 
   try {
-    var msgToken = userPayload.msgToken
-    var decoded = jwt.verify(msgToken, secretGenerator(userPayload))
+    var decoded = jwt.verify(userPayload.msgToken, secretGenerator(userPayload))
+
     return isValid(decoded, userPayload)
   } catch (err) {
     console.log(JSON.stringify(err))

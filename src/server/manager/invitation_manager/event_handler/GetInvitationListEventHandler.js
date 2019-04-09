@@ -71,10 +71,11 @@ GetInvitationListEventHandler.prototype.pack = function (
 }
 
 GetInvitationListEventHandler.prototype.isValid = function (requestInfo) {
-  return requestInfo.packet != null && this.isAuthenticated(requestInfo.packet) &&
+  return requestInfo.packet != null &&
     requestInfo.packet.uid != null &&
     requestInfo.packet.inviteType != null &&
-    requestInfo.packet.limit != null
+    requestInfo.packet.limit != null &&
+    this.isAuthenticated(requestInfo.packet)
 }
 
 module.exports = {

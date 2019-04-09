@@ -56,11 +56,12 @@ SendConversationEventHandler.prototype.handle = function (requestInfo) {
 
 SendConversationEventHandler.prototype.isValid = function (requestInfo) {
   var packet = requestInfo.packet
-  return packet !== undefined && this.isAuthenticated(packet) &&
+  return packet !== undefined &&
     typeof packet.uid === 'string' &&
     packet.ciid != null &&
     packet.convType != null &&
-    packet.conversation != null
+    packet.conversation != null &&
+    this.isAuthenticated(packet)
 }
 
 module.exports = {

@@ -47,8 +47,9 @@ GetChannelListEventHandler.prototype.handle = async function (requestInfo) {
 
 GetChannelListEventHandler.prototype.isValid = function (requestInfo) {
   var packet = requestInfo.packet
-  return packet !== undefined && this.isAuthenticated(packet) &&
-    typeof packet.uid === 'string'
+  return packet !== undefined &&
+    typeof packet.uid === 'string' &&
+    this.isAuthenticated(packet)
 }
 
 module.exports = {
