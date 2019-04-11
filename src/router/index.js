@@ -5,7 +5,7 @@ const routeIndex = express.Router()
 const {
   BUSINESS_EVENTS
 } = require(path.join(config.get('src.property'), 'property'))
-const RequestInfo = require(path.join(config.get('src.manager'), 'RequestInfo'))
+var RequestInfo = require(path.join(config.get('src.manager'), 'RequestInfo'))
 let globalContext = require(path.join(config.get('src.manager'), 'globalContext'))
 
 /**

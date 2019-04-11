@@ -5,7 +5,7 @@ const {
   REQUEST_EVENTS,
   BUSINESS_EVENTS
 } = require(path.join(config.get('src.property'), 'property'))
-const RequestInfo = require('./RequestInfo.js')
+var RequestInfo = require('./RequestInfo.js')
 
 function Manager () {}
 

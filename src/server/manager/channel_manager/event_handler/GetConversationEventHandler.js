@@ -7,8 +7,8 @@ const {
   EVENTS,
   RESPONSE_EVENTS
 } = require(path.join(config.get('src.property'), 'property'))
-const ResponseInfo = require(path.join(config.get('src.manager'), 'ResponseInfo'))
-const EventHandler = require(path.join(config.get('src.manager'), 'EventHandler'))
+var ResponseInfo = require(path.join(config.get('src.manager'), 'ResponseInfo'))
+var EventHandler = require(path.join(config.get('src.manager'), 'EventHandler'))
 
 util.inherits(GetConversationEventHandler, EventHandler)
 
@@ -45,7 +45,7 @@ GetConversationEventHandler.prototype.handle = async function (requestInfo) {
     })
     .setPacket({
       msgCode: `get conversations from ${skip} to ${skip + limit}`,
-      data: [{ciid: conversations}]
+      data: [{ ciid: conversations }]
     })
 
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)

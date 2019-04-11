@@ -5,7 +5,7 @@ var path = require('path')
 const {
   EVENTS
 } = require(path.join(config.get('src.property'), 'property'))
-const EventHandler = require(path.join(config.get('src.manager'), 'EventHandler'))
+var EventHandler = require(path.join(config.get('src.manager'), 'EventHandler'))
 
 util.inherits(AuthenticateEventHandler, EventHandler)
 

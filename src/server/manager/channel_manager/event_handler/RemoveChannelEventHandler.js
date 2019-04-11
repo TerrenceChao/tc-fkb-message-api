@@ -7,8 +7,8 @@ const {
   EVENTS,
   RESPONSE_EVENTS
 } = require(path.join(config.get('src.property'), 'property'))
-const ResponseInfo = require(path.join(config.get('src.manager'), 'ResponseInfo'))
-const EventHandler = require(path.join(config.get('src.manager'), 'EventHandler'))
+var ResponseInfo = require(path.join(config.get('src.manager'), 'ResponseInfo'))
+var EventHandler = require(path.join(config.get('src.manager'), 'EventHandler'))
 
 util.inherits(RemoveChannelEventHandler, EventHandler)
 

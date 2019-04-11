@@ -2,14 +2,14 @@ var config = require('config')
 var util = require('util')
 var path = require('path')
 
+const TOKEN = config.get('auth.token')
 const {
   TO,
   EVENTS,
   RESPONSE_EVENTS
 } = require(path.join(config.get('src.property'), 'property'))
-const ResponseInfo = require(path.join(config.get('src.manager'), 'ResponseInfo'))
-const EventHandler = require(path.join(config.get('src.manager'), 'EventHandler'))
-const TOKEN = config.get('auth.token')
+var ResponseInfo = require(path.join(config.get('src.manager'), 'ResponseInfo'))
+var EventHandler = require(path.join(config.get('src.manager'), 'EventHandler'))
 
 util.inherits(LoginEventHandler, EventHandler)
 
