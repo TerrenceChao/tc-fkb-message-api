@@ -113,9 +113,9 @@ AuthService.prototype.isAuthenticated = function (userPayload) {
   }
 
   try {
-    var decoded = jwt.verify(userPayload[authToken], secretGenerator(userPayload))
+    var verification = jwt.verify(userPayload[authToken], secretGenerator(userPayload))
 
-    return isValid(decoded, userPayload)
+    return isValid(verification, userPayload)
   } catch (err) {
     console.log(JSON.stringify(err))
     return false
