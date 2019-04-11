@@ -2,7 +2,9 @@ var jwt = require('jsonwebtoken')
 var crypto = require('crypto')
 var config = require('config')
 
-var expiresInHours = config.get('auth.expiresInHours')
+var expiresInHours = config.get('auth.expiresIn')
+var algorithm = config.get('auth.algorithm')
+var authProperties = config.get('auth.authProperties')
 var properties = config.get('auth.properties')
 var authToken = config.get('auth.token')
 
@@ -17,16 +19,20 @@ function hasProperty (payload, token = false) {
     return false
   }
 
-  if (token === false) {
-    properties.pop()
-  }
-
   var hasProp = true
-  properties.forEach(prop => {
-    if (!payload.hasOwnProperty(prop)) {
-      hasProp = false
-    }
-  })
+  if (token === false) {
+    properties.forEach(prop => {
+      if (!payload.hasOwnProperty(prop)) {
+        hasProp = false
+      }
+    })
+  } else {
+    authProperties.forEach(prop => {
+      if (!payload.hasOwnProperty(prop)) {
+        hasProp = false
+      }
+    })
+  }
 
   return hasProp
 }
@@ -36,7 +42,7 @@ function hasProperty (payload, token = false) {
  * @param {object} payload
  * @returns {object}
  */
-function getProperty (payload) {
+function getPropertyWithoutToken (payload) {
   var data = {}
   properties.forEach(prop => {
     data[prop] = payload[prop]
@@ -51,10 +57,10 @@ function getProperty (payload) {
  * @returns {string}
  */
 function secretGenerator (payload) {
-  var data = getProperty(payload)
+  var data = getPropertyWithoutToken(payload)
 
   return crypto
-    .createHash('sha256')
+    .createHash(algorithm)
     .update(JSON.stringify(data))
     .digest()
 }
@@ -93,7 +99,7 @@ AuthService.prototype.obtainAuthorization = function (userPayload) {
   }
 
   return jwt.sign(
-    getProperty(userPayload),
+    getPropertyWithoutToken(userPayload),
     secretGenerator(userPayload), {
       expiresIn: expiresInHours
     }
@@ -108,7 +114,7 @@ AuthService.prototype.isAuthenticated = function (userPayload) {
 
   try {
     var decoded = jwt.verify(userPayload[authToken], secretGenerator(userPayload))
-    console.log(`\n\n decoded: ${decoded}`)
+
     return isValid(decoded, userPayload)
   } catch (err) {
     console.log(JSON.stringify(err))
