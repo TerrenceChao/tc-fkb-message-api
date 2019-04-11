@@ -9,6 +9,7 @@ const {
 } = require(path.join(config.get('src.property'), 'property'))
 const ResponseInfo = require(path.join(config.get('src.manager'), 'ResponseInfo'))
 const EventHandler = require(path.join(config.get('src.manager'), 'EventHandler'))
+const TOKEN = config.get('auth.token')
 
 util.inherits(LoginEventHandler, EventHandler)
 
@@ -91,7 +92,7 @@ LoginEventHandler.prototype.isValid = function (requestInfo) {
   var packet = requestInfo.packet
   return packet !== undefined &&
     typeof packet.sessionId === 'string' &&
-    typeof packet.msgToken === 'string' &&
+    typeof packet[TOKEN] === 'string' &&
     typeof packet.uid === 'string' &&
     packet.limit != null &&
     packet.skip != null &&

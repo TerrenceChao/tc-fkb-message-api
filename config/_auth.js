@@ -1,6 +1,10 @@
 require('dotenv').config()
 
+var properties = process.env.AUTH_PROPERTIES.split(',')
+var token = properties[properties.length - 1]
+
 module.exports = {
-  properties: process.env.AUTH_PROPERTIES,
-  expiresInMins: process.env.EXPIRES_IN_MINS
+  expiresInMins: process.env.EXPIRES_IN_MINS,
+  properties,
+  token
 }
