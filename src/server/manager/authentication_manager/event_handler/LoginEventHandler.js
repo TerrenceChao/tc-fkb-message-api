@@ -41,8 +41,9 @@ LoginEventHandler.prototype.handle = async function (requestInfo) {
   var userChannelInfo = await storageService.getUserChannelInfo(uid)
 
   Promise
-    .all(userChannelInfo.map(chInfo => {
-      return storageService.getConversationList(chInfo.ciid)
+    .all(userChannelInfo.map(async (chInfo) => {
+      var conversationList = await storageService.getConversationList(chInfo.ciid)
+      return conversationList
     }))
     .then(channelConversations => {
       var packet = this.pack(userChannelInfo, channelConversations)
