@@ -18,7 +18,7 @@ describe('authService test', () => {
     userPayload[EXTRA_INFO] = 'FireFox'
   })
 
-  it('Positive: check the token is valid if user payload is correct', () => {
+  it('[isAuthenticated, Pass]: check the token is valid if user payload is correct', () => {
     // arrange
     var token = authService.obtainAuthorization(userPayload)
     userPayload[TOKEN] = token
@@ -30,7 +30,7 @@ describe('authService test', () => {
     assert.isTrue(actual)
   })
 
-  it('Nagative: check the token is ERROR if user payload is INCORRECT', () => {
+  it('[isAuthenticated, Fail]: check the token is ERROR if user payload is INCORRECT', () => {
     // arrange
     var token = authService.obtainAuthorization(userPayload)
     var invalidUser = {}
@@ -45,7 +45,7 @@ describe('authService test', () => {
     assert.isFalse(actual)
   })
 
-  it('Nagative: get no token if payload IS NOT AN OBJECT', () => {
+  it('[obtainAuthorization, Fail]: get no token if payload IS NOT AN OBJECT', () => {
     // arrange
     var payload = 'is a string'
 
@@ -56,7 +56,7 @@ describe('authService test', () => {
     assert.isFalse(actualToken)
   })
 
-  it('Nagative: is invalid if payload IS NOT AN OBJECT', () => {
+  it('[isAuthenticated, Fail]: is invalid if payload IS NOT AN OBJECT', () => {
     // arrange
     var payload = 'is a string'
 
@@ -65,5 +65,9 @@ describe('authService test', () => {
 
     // assert
     assert.isFalse(actualAuthenticatedResult)
+  })
+
+  it('[authorized, Pending]', () => {
+    // TODO: do test if there's session service
   })
 })
