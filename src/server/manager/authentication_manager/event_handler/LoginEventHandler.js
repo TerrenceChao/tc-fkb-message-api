@@ -33,39 +33,57 @@ LoginEventHandler.prototype.handle = async function (requestInfo) {
     return
   }
 
+  // Notify: user is online
   var businessEvent = this.globalContext['businessEvent']
   businessEvent.emit(EVENTS.USER_ONLINE, requestInfo)
 
+  // get user's channel list
   var uid = packet.uid
+  var chanLimit = packet.chanLimit
   var storageService = this.globalContext['storageService']
-  var userChannelInfo = await storageService.getUserChannelInfo(uid)
+  var userChannelInfo = await storageService.getUserChannelInfoList(uid, chanLimit)
+
+  this.sendChannelInfoAndConversations(requestInfo, userChannelInfo)
+  this.getReceivedInvitations(requestInfo)
+}
+
+LoginEventHandler.prototype.sendChannelInfoAndConversations = function (requestInfo, userChannelInfo) {
+  var storageService = this.globalContext['storageService']
+  var businessEvent = this.globalContext['businessEvent']
+
+  var packet = requestInfo.packet
+  var uid = packet.uid
+  var convLimit = packet.convLimit
+
+  userChannelInfo.forEach(async (chInfo) => {
+    chInfo.conversations = await storageService.getConversationList(chInfo.ciid, convLimit)
+
+    var resInfo = new ResponseInfo()
+      .assignProtocol(requestInfo)
+      .setHeader({
+        to: TO.USER,
+        receiver: uid,
+        responseEvent: RESPONSE_EVENTS.CHANNEL_LIST
+      })
+      .setPacket({
+        msgCode: `channel: ${chInfo.name} and conversations`,
+        data: chInfo
+      })
+
+    businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
+  })
+}
+
+LoginEventHandler.prototype.getReceivedInvitations = function (requestInfo) {
+  var storageService = this.globalContext['storageService']
+  var businessEvent = this.globalContext['businessEvent']
+
+  var packet = requestInfo.packet
+  var uid = packet.uid
+  var inviLimit = packet.inviLimit
 
   Promise
-    .all(userChannelInfo.map(async (chInfo) => {
-      var conversationList = await storageService.getConversationList(chInfo.ciid)
-      return conversationList
-    }))
-    .then(channelConversations => {
-      var packet = this.pack(userChannelInfo, channelConversations)
-
-      var resInfo = new ResponseInfo()
-        .assignProtocol(requestInfo)
-        .setHeader({
-          to: TO.USER,
-          receiver: uid,
-          responseEvent: RESPONSE_EVENTS.CHANNEL_LIST
-        })
-        .setPacket({
-          msgCode: `channel list and conversations`,
-          data: packet
-        })
-      businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
-    })
-
-  var limit = packet.limit
-  var skip = packet.skip
-  Promise
-    .resolve(storageService.getReceivedInvitationList(uid, limit, skip))
+    .resolve(storageService.getReceivedInvitationList(uid, inviLimit))
     .then(invitationList => {
       var resInfo = new ResponseInfo()
         .assignProtocol(requestInfo)
@@ -78,15 +96,9 @@ LoginEventHandler.prototype.handle = async function (requestInfo) {
           msgCode: `invitation list`,
           data: invitationList
         })
+
       businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
     })
-}
-
-LoginEventHandler.prototype.pack = function (userChannelInfo, conversations) {
-  for (var i = 0; i < userChannelInfo.length; i++) {
-    userChannelInfo[i].conversations = conversations[i]
-  }
-  return userChannelInfo
 }
 
 LoginEventHandler.prototype.isValid = function (requestInfo) {
@@ -95,8 +107,9 @@ LoginEventHandler.prototype.isValid = function (requestInfo) {
     typeof packet.sessionId === 'string' &&
     typeof packet[TOKEN] === 'string' &&
     typeof packet.uid === 'string' &&
-    packet.limit != null &&
-    packet.skip != null &&
+    packet.inviLimit != null &&
+    packet.chanLimit != null &&
+    packet.convLimit != null &&
     this.isAuthenticated(packet)
 }
 
