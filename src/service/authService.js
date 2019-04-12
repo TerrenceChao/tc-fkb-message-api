@@ -59,6 +59,7 @@ function getPropertyWithoutToken (payload) {
 function secretGenerator (payload) {
   var data = getPropertyWithoutToken(payload)
 
+  // the time cost is 10 ~ 15 times
   return crypto
     .createHash(algorithm)
     .update(JSON.stringify(data))
