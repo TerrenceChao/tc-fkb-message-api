@@ -28,14 +28,14 @@ GetConversationEventHandler.prototype.handle = async function (requestInfo) {
   var {
     uid,
     ciid,
-    limit,
-    skip
+    convLimit,
+    convSkip
   } = packet
 
   var businessEvent = this.globalContext['businessEvent']
   var storageService = this.globalContext['storageService']
 
-  var conversations = await storageService.getConversationList(ciid, limit, skip)
+  var conversations = await storageService.getConversationList(ciid, convLimit, convSkip)
   var resInfo = new ResponseInfo()
     .assignProtocol(requestInfo)
     .setHeader({
@@ -44,7 +44,7 @@ GetConversationEventHandler.prototype.handle = async function (requestInfo) {
       responseEvent: RESPONSE_EVENTS.CONVERSATION_LIST
     })
     .setPacket({
-      msgCode: `get conversations from ${skip} to ${skip + limit}`,
+      msgCode: `get conversations from ${convSkip} to ${convSkip + convLimit}`,
       data: [{ ciid: conversations }]
     })
 
@@ -56,8 +56,8 @@ GetConversationEventHandler.prototype.isValid = function (requestInfo) {
   return packet !== undefined &&
     typeof packet.uid === 'string' &&
     packet.ciid != null &&
-    packet.limit != null &&
-    packet.skip != null &&
+    packet.convLimit != null &&
+    packet.convSkip != null &&
     this.isAuthenticated(packet)
 }
 

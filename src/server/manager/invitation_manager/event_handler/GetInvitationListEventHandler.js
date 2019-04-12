@@ -30,8 +30,8 @@ GetInvitationListEventHandler.prototype.handle = async function (requestInfo) {
   var packet = requestInfo.packet
   var uid = packet.uid
   var inviteType = packet.inviteType
-  var limit = packet.limit
-  var skip = packet.skip || 0
+  var limit = packet.inviLimit
+  var skip = packet.inviSkip || 0
 
   var storageService = this.globalContext['storageService']
   var invitationList = []
@@ -74,7 +74,7 @@ GetInvitationListEventHandler.prototype.isValid = function (requestInfo) {
   return requestInfo.packet != null &&
     requestInfo.packet.uid != null &&
     requestInfo.packet.inviteType != null &&
-    requestInfo.packet.limit != null &&
+    requestInfo.packet.inviLimit != null &&
     this.isAuthenticated(requestInfo.packet)
 }
 

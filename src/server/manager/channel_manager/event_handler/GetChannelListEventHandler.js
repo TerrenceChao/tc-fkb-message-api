@@ -26,10 +26,12 @@ GetChannelListEventHandler.prototype.handle = async function (requestInfo) {
 
   var packet = requestInfo.packet
   var uid = packet.uid
+  var limit = packet.chanLimit
+  var skip = packet.chanSkip
 
   var businessEvent = this.globalContext['businessEvent']
   var storageService = this.globalContext['storageService']
-  var userChannelInfo = await storageService.getUserChannelInfo(uid)
+  var userChannelInfo = await storageService.getUserChannelInfoList(uid, limit, skip)
 
   var resInfo = new ResponseInfo()
     .assignProtocol(requestInfo)

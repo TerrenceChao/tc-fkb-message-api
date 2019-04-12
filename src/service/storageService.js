@@ -54,7 +54,7 @@ StorageService.prototype.getInvitation = async function (iid) {
   } || null
 }
 
-StorageService.prototype.getReceivedInvitationList = async function (uid, limit = 'all', skip = 0) {
+StorageService.prototype.getReceivedInvitationList = async function (uid, limit = 10, skip = 0) {
   return [{
     apple: 'an apple a day keeps the doctor away'
   },
@@ -65,7 +65,7 @@ StorageService.prototype.getReceivedInvitationList = async function (uid, limit 
   ] || []
 }
 
-StorageService.prototype.getSentInvitationList = async function (uid, limit = 'all', skip = 0) {
+StorageService.prototype.getSentInvitationList = async function (uid, limit = 10, skip = 0) {
   return [{
     banana: 'a banana give you power!'
   },
@@ -148,7 +148,8 @@ StorageService.prototype.getChannelInfo = async function (queryCondition) {
   } || null
 }
 
-StorageService.prototype.getUserChannelInfo = async function (uid) {
+StorageService.prototype.getUserChannelInfoList = async function (uid, limit = 10, skip = 0) {
+  // order by conversation's 'created_at' DESC
   return [{
     ciid: 'ciid B',
     creator: 'someone',
@@ -184,28 +185,27 @@ StorageService.prototype.conversationCreated = function (ciid, uid, content, typ
 }
 
 StorageService.prototype.getConversationList = async function (ciid, limit = 10, skip = 0) {
-  return [
-    {
-      ciid: 'ciid B',
-      sender: 'Eason',
-      content: 'this is a messaging service',
-      type: 'text',
-      created_at: Date.now()
-    },
-    {
-      ciid: 'ciid B',
-      sender: 'Billy',
-      content: 'Today is a sunny day',
-      type: 'text',
-      created_at: Date.now()
-    },
-    {
-      ciid: 'ciid B',
-      sender: 'Jessica',
-      content: 'Hello world',
-      type: 'text',
-      created_at: Date.now()
-    }
+  return [{
+    ciid: 'ciid B',
+    sender: 'Eason',
+    content: 'this is a messaging service',
+    type: 'text',
+    created_at: Date.now()
+  },
+  {
+    ciid: 'ciid B',
+    sender: 'Billy',
+    content: 'Today is a sunny day',
+    type: 'text',
+    created_at: Date.now()
+  },
+  {
+    ciid: 'ciid B',
+    sender: 'Jessica',
+    content: 'Hello world',
+    type: 'text',
+    created_at: Date.now()
+  }
   ] || []
 }
 
