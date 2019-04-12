@@ -44,7 +44,7 @@ LoginEventHandler.prototype.handle = async function (requestInfo) {
   var userChannelInfo = await storageService.getUserChannelInfoList(uid, chanLimit)
 
   this.sendChannelInfoAndConversations(requestInfo, userChannelInfo)
-  this.getReceivedInvitations(requestInfo)
+  this.sendReceivedInvitations(requestInfo)
 }
 
 LoginEventHandler.prototype.sendChannelInfoAndConversations = function (requestInfo, userChannelInfo) {
@@ -74,7 +74,7 @@ LoginEventHandler.prototype.sendChannelInfoAndConversations = function (requestI
   })
 }
 
-LoginEventHandler.prototype.getReceivedInvitations = function (requestInfo) {
+LoginEventHandler.prototype.sendReceivedInvitations = function (requestInfo) {
   var storageService = this.globalContext['storageService']
   var businessEvent = this.globalContext['businessEvent']
 
