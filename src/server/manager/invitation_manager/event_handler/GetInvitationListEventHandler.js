@@ -27,53 +27,61 @@ GetInvitationListEventHandler.prototype.handle = async function (requestInfo) {
     return
   }
 
+  Promise.resolve(this.getInvitationList(requestInfo))
+    .then(invitationList => {
+      if (invitationList == null) {
+        throw new Error(`invitationList is null`)
+      }
+
+      this.sendInvitationList(invitationList, requestInfo)
+    })
+    .catch((msg) => {
+      this.alertException(msg, requestInfo)
+    })
+}
+
+GetInvitationListEventHandler.prototype.getInvitationList = async function (requestInfo) {
+  var storageService = this.globalContext['storageService']
+
   var packet = requestInfo.packet
   var uid = packet.uid
-  var inviteType = packet.inviteType
+  var inviType = packet.inviType
   var limit = packet.inviLimit
   var skip = packet.inviSkip || 0
 
-  var storageService = this.globalContext['storageService']
-  var invitationList = []
-  if (inviteType === 'received') {
-    invitationList = await storageService.getReceivedInvitationList(
-      uid,
-      limit,
-      skip
-    )
-  } else if (inviteType === 'sent') {
-    invitationList = await storageService.getSentInvitationList(
-      uid,
-      limit,
-      skip
-    )
+  var invitationList
+  if (inviType === 'received') {
+    invitationList = await storageService.getReceivedInvitationList(uid, limit, skip)
+  } else if (inviType === 'sent') {
+    invitationList = await storageService.getSentInvitationList(uid, limit, skip)
   }
 
-  var businessEvent = this.globalContext['businessEvent']
-  var resInfo = new ResponseInfo().assignProtocol(requestInfo).setHeader({
-    to: TO.USER,
-    receiver: uid,
-    responseEvent: RESPONSE_EVENTS.INVITATION_LIST_FROM_CHANNEL
-  })
-  this.pack(resInfo, invitationList, inviteType)
-  businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
+  return invitationList
 }
 
-GetInvitationListEventHandler.prototype.pack = function (
-  responseInfo,
-  packet,
-  inviteType
-) {
-  responseInfo.packet = {
-    msgCode: `get ${inviteType} invitation list`,
-    data: packet
-  }
+GetInvitationListEventHandler.prototype.sendInvitationList = function (invitationList, requestInfo) {
+  var businessEvent = this.globalContext['businessEvent']
+  var packet = requestInfo.packet
+
+  var resInfo = new ResponseInfo()
+    .assignProtocol(requestInfo)
+    .setHeader({
+      to: TO.USER,
+      receiver: packet.uid,
+      responseEvent: RESPONSE_EVENTS.INVITATION_LIST_FROM_CHANNEL
+    })
+    .setPacket({
+      msgCode: `get ${packet.inviType} invitation list`,
+      data: invitationList
+    })
+
+  businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 }
 
 GetInvitationListEventHandler.prototype.isValid = function (requestInfo) {
   return requestInfo.packet != null &&
     requestInfo.packet.uid != null &&
-    requestInfo.packet.inviteType != null &&
+    requestInfo.packet.inviType != null &&
     requestInfo.packet.inviLimit != null &&
     this.isAuthenticated(requestInfo.packet)
 }
