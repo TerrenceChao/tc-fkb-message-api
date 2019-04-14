@@ -25,29 +25,33 @@ LoginEventHandler.prototype.handle = async function (requestInfo) {
     return
   }
 
+  var authService = this.globalContext['authService']
+  var storageService = this.globalContext['storageService']
+
   var socket = requestInfo.socket
   var packet = requestInfo.packet
-  var authService = this.globalContext['authService']
   if (!await authService.authorized(packet)) {
     socket.disconnect(true)
     return
   }
 
-  // Notify: user is online
+  // Notify: user joins ALL channels and notify members in channel
   var businessEvent = this.globalContext['businessEvent']
   businessEvent.emit(EVENTS.USER_ONLINE, requestInfo)
 
   // get user's channel list
-  var uid = packet.uid
-  var chanLimit = packet.chanLimit
-  var storageService = this.globalContext['storageService']
-  var userChannelInfo = await storageService.getUserChannelInfoList(uid, chanLimit)
+  Promise.resolve(storageService.getUserChannelInfoList(packet.uid, packet.chanLimit))
+    .then(channelInfoList => {
+      this.sendChannelInfoAndConversations(requestInfo, channelInfoList)
+    })
+    .catch(() => {
+      this.alertException(`get user's channel list FAIL`, requestInfo)
+    })
 
-  this.sendChannelInfoAndConversations(requestInfo, userChannelInfo)
   this.sendReceivedInvitations(requestInfo)
 }
 
-LoginEventHandler.prototype.sendChannelInfoAndConversations = function (requestInfo, userChannelInfo) {
+LoginEventHandler.prototype.sendChannelInfoAndConversations = function (requestInfo, userChannelInfoList) {
   var storageService = this.globalContext['storageService']
   var businessEvent = this.globalContext['businessEvent']
 
@@ -55,22 +59,29 @@ LoginEventHandler.prototype.sendChannelInfoAndConversations = function (requestI
   var uid = packet.uid
   var convLimit = packet.convLimit
 
-  userChannelInfo.forEach(async (chInfo) => {
-    chInfo.conversations = await storageService.getConversationList(chInfo.ciid, convLimit)
+  userChannelInfoList.forEach(async (chInfo) => {
+    var ciid = chInfo.ciid
+    Promise.resolve(storageService.getConversationList(ciid, convLimit))
+      .then(conversations => {
+        chInfo.conversations = conversations
 
-    var resInfo = new ResponseInfo()
-      .assignProtocol(requestInfo)
-      .setHeader({
-        to: TO.USER,
-        receiver: uid,
-        responseEvent: RESPONSE_EVENTS.CHANNEL_LIST
-      })
-      .setPacket({
-        msgCode: `channel: ${chInfo.name} and conversations`,
-        data: chInfo
-      })
+        var resInfo = new ResponseInfo()
+          .assignProtocol(requestInfo)
+          .setHeader({
+            to: TO.USER,
+            receiver: uid,
+            responseEvent: RESPONSE_EVENTS.CHANNEL_LIST
+          })
+          .setPacket({
+            msgCode: `channel: ${chInfo.name} and conversations`,
+            data: chInfo
+          })
 
-    businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
+        businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
+      })
+      .catch(() => {
+        this.alertException(`get conversations of channel: ${ciid} FAIL`, requestInfo)
+      })
   })
 }
 
@@ -82,8 +93,7 @@ LoginEventHandler.prototype.sendReceivedInvitations = function (requestInfo) {
   var uid = packet.uid
   var inviLimit = packet.inviLimit
 
-  Promise
-    .resolve(storageService.getReceivedInvitationList(uid, inviLimit))
+  Promise.resolve(storageService.getReceivedInvitationList(uid, inviLimit))
     .then(invitationList => {
       var resInfo = new ResponseInfo()
         .assignProtocol(requestInfo)
@@ -98,6 +108,9 @@ LoginEventHandler.prototype.sendReceivedInvitations = function (requestInfo) {
         })
 
       businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
+    })
+    .catch(() => {
+      this.alertException(`get invitation(s) FAIL`, requestInfo)
     })
 }
 

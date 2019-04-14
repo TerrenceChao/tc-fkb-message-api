@@ -165,6 +165,7 @@ StorageService.prototype.getUserChannelInfoList = async function (uid, limit = 1
     invitee: [],
     members: ['uidE', 'uidF']
   }] || []
+  // throw Exception OR return null if not found
 }
 
 StorageService.prototype.channelJoined = async function (uid, chid) {
