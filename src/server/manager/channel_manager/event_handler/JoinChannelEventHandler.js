@@ -76,8 +76,7 @@ JoinChannelEventHandler.prototype.isValid = function (requestInfo) {
   return packet !== undefined &&
     typeof packet.uid === 'string' &&
     typeof packet.firstName === 'string' &&
-    typeof packet.chid === 'string' &&
-    this.isAuthenticated(packet)
+    typeof packet.chid === 'string'
 }
 
 module.exports = {

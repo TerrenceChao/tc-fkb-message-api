@@ -78,8 +78,7 @@ DealWithInvitationEventHandler.prototype.isValid = function (requestInfo) {
     typeof packet.uid === 'string' &&
     typeof packet.firstName === 'string' &&
     typeof packet.iid === 'string' &&
-    packet.dealWith != null &&
-    this.isAuthenticated(packet)
+    packet.dealWith != null
 }
 
 module.exports = {
