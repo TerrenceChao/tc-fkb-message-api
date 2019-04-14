@@ -28,55 +28,42 @@ DealWithInvitationEventHandler.prototype.handle = async function (requestInfo) {
   var packet = requestInfo.packet
   var {
     uid,
+    firstName,
     iid,
-    channelName,
-    dealwith,
-    removingIid
+    dealWith
   } = packet
 
-  var businessEvent = this.globalContext['businessEvent']
   var storageService = this.globalContext['storageService']
-
-  // callback from BUSINESS_EVENTS.JOIN_CHANNEL
-  if (iid === removingIid) {
-    storageService.invitationRemoved(removingIid)
+  var invitation = await storageService.getInvitation(iid)
+  if (invitation == null) {
+    this.alertException(`invitation id is invalid.`, requestInfo)
     return
   }
 
-  var msgCode
-  var reqEvent
-
-  if (dealwith === 'y') {
-    var invitation = await storageService.getInvitation(iid)
-
-    if (invitation == null) {
-      msgCode = `invitation id is invalid.`
-      reqEvent = RESPONSE_EVENTS.EXCEPTION_ALERT
-    } else {
-      msgCode = `You have joined into channel ${channelName}`
-      reqEvent = RESPONSE_EVENTS.INVITATION_FROM_CHANNEL_TO_ME // push again
-
-      businessEvent.emit(
-        BUSINESS_EVENTS.JOIN_CHANNEL,
-        requestInfo.setPacket({
-          uid,
-          iid,
-          chid: invitation.sensitive.chid,
-          ciid: invitation.sensitive.ciid,
-          dealwith
-        }))
-    }
+  if (dealWith === 'y') {
+    var businessEvent = this.globalContext['businessEvent']
+    businessEvent.emit(
+      BUSINESS_EVENTS.JOIN_CHANNEL,
+      requestInfo.setPacket({
+        uid,
+        firstName,
+        chid: invitation.sensitive.chid
+      }))
   } else {
-    msgCode = `You have canceled to join channel ${channelName}`
-    reqEvent = RESPONSE_EVENTS.INVITATION_FROM_CHANNEL_TO_ME // push again
-    storageService.invitationRemoved(iid)
+    var reqEvent = RESPONSE_EVENTS.CONVERSATION_FROM_CHANNEL // notify in channel
+    var msgCode = `${firstName} is canceled`
+    this.notifyInChanel(reqEvent, msgCode, invitation, requestInfo)
   }
+}
+
+DealWithInvitationEventHandler.prototype.notifyInChanel = function (reqEvent, msgCode, invitation, requestInfo) {
+  var businessEvent = this.globalContext['businessEvent']
 
   var resInfo = new ResponseInfo()
     .assignProtocol(requestInfo)
     .setHeader({
-      to: TO.USER,
-      receiver: uid,
+      to: TO.CHANNEL,
+      receiver: invitation.sensitive.ciid,
       responseEvent: reqEvent
     })
     .setPacket({
@@ -88,9 +75,10 @@ DealWithInvitationEventHandler.prototype.handle = async function (requestInfo) {
 DealWithInvitationEventHandler.prototype.isValid = function (requestInfo) {
   var packet = requestInfo.packet
   return packet !== undefined &&
-    packet.iid != null &&
     typeof packet.uid === 'string' &&
-    packet.dealwith != null &&
+    typeof packet.firstName === 'string' &&
+    typeof packet.iid === 'string' &&
+    packet.dealWith != null &&
     this.isAuthenticated(packet)
 }
 

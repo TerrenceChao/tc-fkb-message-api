@@ -9,7 +9,7 @@ var path = require('path')
 function StorageService () {}
 
 //   var invitations = []
-//   invitations = invitee.map(invi => {
+//   invitations = invitees.map(invi => {
 //     return {
 //       // Avoid creating repeat items
 //       iid: `${invi}.encrypt(${chid}, ${invi}, secret?)`,
@@ -38,6 +38,32 @@ function StorageService () {}
 
 //   return invitations || []
 // }
+
+StorageService.prototype.invitationMultiCreated = async function (
+  inviter,
+  invitees,
+  header,
+  content,
+  sensitive
+) {
+  return [{
+    iid: 'mbnht594EokdMvfht54elwTsd98',
+    inviter,
+    invitee: invitees[0] || 'invitee?',
+    header,
+    content,
+    sensitive,
+    create_at: Date.now()
+  }, {
+    iid: 'vfgty78iolkmnhgtrfdcvbhjkjmn',
+    inviter,
+    invitee: invitees[1] || 'invitee?',
+    header,
+    content,
+    sensitive,
+    create_at: Date.now()
+  }] || null
+}
 
 StorageService.prototype.getInvitation = async function (iid) {
   return {
@@ -76,11 +102,6 @@ StorageService.prototype.getSentInvitationList = async function (uid, limit = 10
   ] || []
 }
 
-StorageService.prototype.getInviteesHadBeenInvited = function (chid, invitee) {
-  var invitedInvitees = ['Rose']
-  return invitedInvitees || []
-}
-
 StorageService.prototype.getInvitationThenRemoved = async function (iid) {
   /**
    * Database:
@@ -114,7 +135,7 @@ StorageService.prototype.invitationRemoved = async function (iid) {
    * 4. for 'channelInfo': pull element(uid) from ChannelInfo.invitee(schema)
    * 5. remove InvitationOfChannel(schema)
    */
-  return true
+  return true || false
 }
 
 // for channel
@@ -126,7 +147,7 @@ StorageService.prototype.channelInfoCreated = async function (uid, channelName) 
     creator: uid,
     chid: 'chid:l4ehfuvljifgbudvzsugkurliLO4U*T&IYEOW*UGY',
     name: 'Room 18',
-    invitee: [],
+    invitees: [],
     members: [uid]
   } || null
 }
@@ -143,7 +164,7 @@ StorageService.prototype.getChannelInfo = async function (queryCondition) {
     creator: 'someone',
     chid: 'chid:l4ehfuvljifgbudvzsugkurliLO4U*T&IYEOW*UGY',
     name: 'Room 18',
-    invitee: [],
+    invitees: [],
     members: ['uidA', 'uidB', 'uidC']
   } || null
 }
@@ -155,14 +176,14 @@ StorageService.prototype.getUserChannelInfoList = async function (uid, limit = 1
     creator: 'someone',
     chid: 'chid:l4ehfuvljifgbudvzsugkurliLO4U*T&IYEOW*UGY',
     name: 'Room 18',
-    invitee: [],
+    invitees: [],
     members: ['uidA', 'uidB', 'uidC']
   }, {
     ciid: 'ciid A',
     creator: 'WHO?',
     chid: 'chid:ijmlYIOUYGVUYBK>DFRUTYIHUJNJKTSARFDCVSBUN',
     name: 'Night Bar',
-    invitee: [],
+    invitees: [],
     members: ['uidE', 'uidF']
   }] || []
 }

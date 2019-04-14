@@ -25,104 +25,85 @@ SendInvitationEventHandler.prototype.handle = async function (requestInfo) {
     return
   }
 
-  var packet = requestInfo.packet
-  var invitee = packet.invitee
-  var chid = packet.chid
-
   var storageService = this.globalContext['storageService']
-  var invitedInvitees = await storageService.getInviteesHadBeenInvited(chid, invitee)
-  invitee = _.pullAll(invitee, invitedInvitees)
 
-  var query = {
+  var packet = requestInfo.packet
+  var inviter = packet.inviter
+  var newInvitees = packet.invitees
+  var chid = packet.chid
+  var content = packet.content
+
+  var channelInfo = await storageService.getChannelInfo({
     chid
-  }
-  var channelInfo = await storageService.getChannelInfo(query)
+  })
   if (channelInfo == null) {
-    this.packException(packet, requestInfo)
+    requestInfo.packet.uid = inviter
+    this.alertException(`couldn't get channel info with chid: ${chid}`, requestInfo)
     return
   }
 
-  var sensitive = {
-    chid: channelInfo.chid,
-    ciid: channelInfo.ciid
-  }
-  packet.channelName = channelInfo.name
+  var inviteesHasBeenInvited = channelInfo.invitees
+  var invitees = _.pullAll(newInvitees, inviteesHasBeenInvited)
+  var inviData = this.getInvitationCreateionData(channelInfo)
 
-  var businessEvent = this.globalContext['businessEvent']
-  Promise.resolve(this.pack(invitee, packet, sensitive)).then(resInfoList =>
-    resInfoList.map(resInfo => {
-      resInfo.assignProtocol(requestInfo)
-      businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
-    })
-  )
-}
-
-SendInvitationEventHandler.prototype.pack = async function (
-  invitee,
-  packet,
-  sensitive
-) {
-  var {
-    inviter,
-    channelName,
-    content
-  } = packet
-
-  var headerForInvitee = {
-    requestEvent: EVENTS.DEAL_WITH_INVITATION,
-    data: {
-      channelName
-    }
-  }
-
-  var storageService = this.globalContext['storageService']
   var invitations = await storageService.invitationMultiCreated(
     inviter,
-    invitee,
-    headerForInvitee,
+    invitees,
+    inviData.header,
     content,
-    sensitive
+    inviData.sensitive
   )
 
-  return invitations.map(invitation => {
+  this.sendInvitations(invitations, requestInfo)
+}
+
+SendInvitationEventHandler.prototype.getInvitationCreateionData = function (channelInfo) {
+  return {
+    header: {
+      requestEvent: EVENTS.DEAL_WITH_INVITATION,
+      data: {
+        channelName: channelInfo.name
+      }
+    },
+    sensitive: {
+      chid: channelInfo.chid,
+      ciid: channelInfo.ciid
+    }
+  }
+}
+
+SendInvitationEventHandler.prototype.sendInvitations = function (invitations, requestInfo) {
+  var businessEvent = this.globalContext['businessEvent']
+
+  if (invitations == null) {
+    requestInfo.packet.uid = requestInfo.packet.inviter
+    this.alertException(`create invitation(s) fail`, requestInfo)
+    return
+  }
+
+  invitations.forEach(invitation => {
     _.unset(invitation, 'sensitive')
 
-    return new ResponseInfo()
+    var resInfo = new ResponseInfo()
+      .assignProtocol(requestInfo)
       .setHeader({
         to: TO.USER,
         receiver: invitation.invitee,
-        responseEvent: RESPONSE_EVENTS.INVITATION_FROM_CHANNEL_TO_ME // to individual invitee
+        responseEvent: RESPONSE_EVENTS.INVITATION_FROM_CHANNEL_TO_ME // to individual invitees
       })
       .setPacket({
         msgCode: 'you got an invitation',
         data: invitation
       })
+    businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
   })
-}
-
-SendInvitationEventHandler.prototype.packException = function (
-  packet,
-  requestInfo
-) {
-  var businessEvent = this.globalContext['businessEvent']
-  var resInfo = new ResponseInfo()
-    .assignProtocol(requestInfo)
-    .setHeader({
-      to: TO.USER,
-      receiver: packet.inviter,
-      responseEvent: RESPONSE_EVENTS.EXCEPTION_ALERT // back to inviter
-    })
-    .setPacket({
-      msgCode: `couldn't get channel info with chid:${packet.chid}`
-    })
-  businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 }
 
 SendInvitationEventHandler.prototype.isValid = function (requestInfo) {
   return (
     requestInfo.packet != null &&
     requestInfo.packet.inviter != null &&
-    Array.isArray(requestInfo.packet.invitee) &&
+    Array.isArray(requestInfo.packet.invitees) &&
     typeof requestInfo.packet.chid === 'string' &&
     requestInfo.packet.content != null
   )
