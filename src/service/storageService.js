@@ -62,7 +62,8 @@ StorageService.prototype.invitationMultiCreated = async function (
     content,
     sensitive,
     create_at: Date.now()
-  }] || null
+  }]
+  // throw new Error(`create invitation(s) fail`)
 }
 
 StorageService.prototype.getInvitation = async function (iid) {
@@ -77,7 +78,8 @@ StorageService.prototype.getInvitation = async function (iid) {
       ciid: 'ciid B'
     },
     create_at: Date.now()
-  } || null
+  }
+  // throw new Error(`invitation ID(iid) is invalid`)
 }
 
 StorageService.prototype.getReceivedInvitationList = async function (uid, limit = 10, skip = 0) {
@@ -89,6 +91,7 @@ StorageService.prototype.getReceivedInvitationList = async function (uid, limit 
   },
   {}
   ] || []
+  // throw new Error(`invitationList(received) is null`)
 }
 
 StorageService.prototype.getSentInvitationList = async function (uid, limit = 10, skip = 0) {
@@ -100,6 +103,7 @@ StorageService.prototype.getSentInvitationList = async function (uid, limit = 10
   },
   {}
   ] || []
+  // throw new Error(`invitationList(sent) is null`)
 }
 
 StorageService.prototype.getInvitationThenRemoved = async function (iid) {
@@ -135,7 +139,8 @@ StorageService.prototype.invitationRemoved = async function (iid) {
    * 4. for 'channelInfo': pull element(uid) from ChannelInfo.invitee(schema)
    * 5. remove InvitationOfChannel(schema)
    */
-  return true || false
+  return true
+  // throw new Error(`remove invitation: ${iid} fail`)
 }
 
 // for channel
@@ -158,7 +163,7 @@ StorageService.prototype.getAllChannelIds = async function (uid) {
 }
 
 StorageService.prototype.getChannelInfo = async function (queryCondition) {
-  // ciid saved in local storage (for frontend)
+  // ciid?? saved in local storage (for frontend)
   return {
     ciid: 'ciid B',
     creator: 'someone',
@@ -166,7 +171,8 @@ StorageService.prototype.getChannelInfo = async function (queryCondition) {
     name: 'Room 18',
     invitees: [],
     members: ['uidA', 'uidB', 'uidC']
-  } || null
+  }
+  // throw new Error(`couldn't get channel info with: ${JSON.stringify(queryCondition, null, 2)}`)
 }
 
 StorageService.prototype.getUserChannelInfoList = async function (uid, limit = 10, skip = 0) {
@@ -189,7 +195,8 @@ StorageService.prototype.getUserChannelInfoList = async function (uid, limit = 1
 }
 
 StorageService.prototype.channelJoined = async function (uid, chid) {
-  return true || false
+  return true
+  // throw new Error(`join channel: ${chid} fail. uid: ${uid}`)
 }
 
 StorageService.prototype.channelLeaved = async function (uid, chid) {

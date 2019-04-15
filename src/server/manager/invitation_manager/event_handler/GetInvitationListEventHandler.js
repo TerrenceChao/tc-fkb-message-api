@@ -28,16 +28,8 @@ GetInvitationListEventHandler.prototype.handle = async function (requestInfo) {
   }
 
   Promise.resolve(this.getInvitationList(requestInfo))
-    .then(invitationList => {
-      if (invitationList == null) {
-        throw new Error(`invitationList is null`)
-      }
-
-      this.sendInvitationList(invitationList, requestInfo)
-    })
-    .catch((msg) => {
-      this.alertException(msg, requestInfo)
-    })
+    .then(invitationList => this.sendInvitationList(invitationList, requestInfo))
+    .catch(err => this.alertException(err, requestInfo))
 }
 
 GetInvitationListEventHandler.prototype.getInvitationList = async function (requestInfo) {

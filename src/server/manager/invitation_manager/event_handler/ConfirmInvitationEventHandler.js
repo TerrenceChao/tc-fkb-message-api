@@ -15,20 +15,18 @@ function ConfirmInvitationEventHandler () {
 
 ConfirmInvitationEventHandler.prototype.eventName = EVENTS.CONFIRM_INVITATION
 
-ConfirmInvitationEventHandler.prototype.handle = async function (requestInfo) {
+ConfirmInvitationEventHandler.prototype.handle = function (requestInfo) {
   if (!this.isValid(requestInfo)) {
     console.warn(`${this.eventName}: request info is invalid.`)
     return
   }
 
+  var storageService = this.globalContext['storageService']
   var packet = requestInfo.packet
   var iid = packet.iid
 
-  var storageService = this.globalContext['storageService']
-  if (await storageService.invitationRemoved(iid) === false) {
-    // must have 'uid' if 'alertException'
-    this.alertException(`remove invitation: ${iid} fail`, requestInfo)
-  }
+  Promise.resolve(storageService.invitationRemoved(iid))
+    .catch(err => this.alertException(err.message, requestInfo))
 }
 
 ConfirmInvitationEventHandler.prototype.isValid = function (requestInfo) {

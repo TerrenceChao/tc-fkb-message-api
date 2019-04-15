@@ -19,28 +19,29 @@ function SendInvitationEventHandler () {
 
 SendInvitationEventHandler.prototype.eventName = EVENTS.SEND_INVITATION
 
-SendInvitationEventHandler.prototype.handle = async function (requestInfo) {
+SendInvitationEventHandler.prototype.handle = function (requestInfo) {
   if (!this.isValid(requestInfo)) {
     console.warn(`${this.eventName}: request info is invalid.`)
     return
   }
 
   var storageService = this.globalContext['storageService']
+  var packet = requestInfo.packet
+  var chid = packet.chid
 
+  Promise.resolve(storageService.getChannelInfo({ chid }))
+    .then(channelInfo => this.createAndGetInvitations(channelInfo, requestInfo),
+      err => this.alertException(err.message, requestInfo))
+    .then(invitations => this.sendInvitations(invitations, requestInfo),
+      err => this.alertException(err.message, requestInfo))
+}
+
+SendInvitationEventHandler.prototype.createAndGetInvitations = async function (channelInfo, requestInfo) {
+  var storageService = this.globalContext['storageService']
   var packet = requestInfo.packet
   var inviter = packet.inviter
   var newInvitees = packet.invitees
-  var chid = packet.chid
   var content = packet.content
-
-  var channelInfo = await storageService.getChannelInfo({
-    chid
-  })
-  if (channelInfo == null) {
-    requestInfo.packet.uid = inviter
-    this.alertException(`couldn't get channel info with chid: ${chid}`, requestInfo)
-    return
-  }
 
   var inviteesHasBeenInvited = channelInfo.invitees
   var invitees = _.pullAll(newInvitees, inviteesHasBeenInvited)
@@ -54,7 +55,7 @@ SendInvitationEventHandler.prototype.handle = async function (requestInfo) {
     inviData.sensitive
   )
 
-  this.sendInvitations(invitations, requestInfo)
+  return invitations
 }
 
 SendInvitationEventHandler.prototype.getInvitationCreateionData = function (channelInfo) {
@@ -74,12 +75,6 @@ SendInvitationEventHandler.prototype.getInvitationCreateionData = function (chan
 
 SendInvitationEventHandler.prototype.sendInvitations = function (invitations, requestInfo) {
   var businessEvent = this.globalContext['businessEvent']
-
-  if (invitations == null) {
-    requestInfo.packet.uid = requestInfo.packet.inviter
-    this.alertException(`create invitation(s) fail`, requestInfo)
-    return
-  }
 
   invitations.forEach(invitation => {
     _.unset(invitation, 'sensitive')

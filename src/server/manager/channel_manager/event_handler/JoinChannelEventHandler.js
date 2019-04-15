@@ -18,34 +18,35 @@ function JoinChannelEventHandler () {
 
 JoinChannelEventHandler.prototype.eventName = EVENTS.JOIN_CHANNEL
 
-JoinChannelEventHandler.prototype.handle = async function (requestInfo) {
+JoinChannelEventHandler.prototype.handle = function (requestInfo) {
   if (!this.isValid(requestInfo)) {
     console.warn(`${this.eventName}: request info is invalid.`)
     return
   }
 
+  var storageService = this.globalContext['storageService']
+  var chid = requestInfo.packet.chid
+
+  Promise.resolve(storageService.getChannelInfo({
+    chid
+  }))
+    .then(channelInfo => this.executeJoin(channelInfo, requestInfo),
+      err => this.alertException(err.message, requestInfo))
+    .catch(err => this.alertException(err.message, requestInfo))
+}
+
+JoinChannelEventHandler.prototype.executeJoin = async function (channelInfo, requestInfo) {
+  var storageService = this.globalContext['storageService']
+  var socketServer = this.globalContext['socketServer']
   var packet = requestInfo.packet
   var socket = requestInfo.socket
   var uid = packet.uid
   var chid = packet.chid
 
-  var storageService = this.globalContext['storageService']
+  await storageService.channelJoined(uid, chid)
+  socketServer.of('/').adapter.remoteJoin(socket.id, channelInfo.ciid)
 
-  var channelInfo = await storageService.getChannelInfo({
-    chid
-  })
-  if (channelInfo == null) {
-    this.alertException(`couldn't get channel info with chid: ${chid}`, requestInfo)
-    return
-  }
-
-  if (await storageService.channelJoined(uid, chid)) {
-    var socketServer = this.globalContext['socketServer']
-    socketServer.of('/').adapter.remoteJoin(socket.id, channelInfo.ciid)
-    this.notifyUserIsJoinedInChannel(channelInfo.ciid, requestInfo)
-  } else {
-    this.alertException(`join channel fail. uid: ${uid}`, requestInfo)
-  }
+  this.notifyUserIsJoinedInChannel(channelInfo.ciid, requestInfo)
 }
 
 JoinChannelEventHandler.prototype.notifyUserIsJoinedInChannel = function (ciid, requestInfo) {
@@ -59,7 +60,7 @@ JoinChannelEventHandler.prototype.notifyUserIsJoinedInChannel = function (ciid, 
     .setHeader({
       to: TO.CHANNEL,
       receiver: ciid,
-      responseEvent: RESPONSE_EVENTS.CONVERSATION_FROM_CHANNEL
+      responseEvent: RESPONSE_EVENTS.CONVERSATION_FROM_CHANNEL // notify in channel
     })
     .setPacket({
       msgCode: `${firstName} is joined`,
