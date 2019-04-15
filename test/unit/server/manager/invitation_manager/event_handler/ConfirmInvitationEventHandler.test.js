@@ -8,13 +8,22 @@ var {
 } = require(path.join(config.get('src.invitationEventHandler'), 'ConfirmInvitationEventHandler'))
 var RequestInfo = require(path.join(config.get('src.manager'), 'RequestInfo'))
 var globalContext = require(path.join(config.get('src.manager'), 'globalContext'))
+var {
+  delayFunc
+} = require(path.join(config.get('test.mock'), 'common'))
 
 describe('ConfirmInvitationEventHandler test', () => {
+  const DELAY_IN_MS = 2
+  var stub
   var requestInfo
   var userPayload
+  var storageService
+  var businessEvent
 
   before(() => {
     handler.globalContext = globalContext
+    storageService = globalContext.storageService
+    businessEvent = globalContext.businessEvent
   })
 
   beforeEach(() => {
@@ -27,8 +36,32 @@ describe('ConfirmInvitationEventHandler test', () => {
     requestInfo.packet = userPayload
   })
 
-  it('[handle, Pass] ', () => {
-    userPayload.fn = 9
-    assert.isTrue(true)
+  it('[handle, Pass] test success if invitation removed', (done) => {
+    // arrange
+    stub = sinon.stub(storageService, 'invitationRemoved')
+      .callsFake((iid) => delayFunc(DELAY_IN_MS).then(() => done()))
+
+    // act & assert
+    sinon.assert.pass(handler.handle(requestInfo))
+  })
+
+  it('[handle, Fail] test fail if invitation not removed', () => {
+    // arrange
+    stub = sinon.stub(storageService, 'invitationRemoved')
+      .callsFake((iid) => {
+        throw new Error(`invitation NOT REMOVED`)
+      })
+
+    // assert
+    var emit = sinon.spy(businessEvent, 'emit')
+    emit.restore()
+    sinon.assert.calledOnce(emit)
+
+    // act
+    handler.handle(requestInfo)
+  })
+
+  afterEach(() => {
+    stub.restore()
   })
 })
