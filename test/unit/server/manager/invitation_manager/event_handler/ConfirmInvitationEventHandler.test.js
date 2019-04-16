@@ -1,6 +1,5 @@
 var config = require('config')
 var path = require('path')
-var assert = require('chai').assert
 var sinon = require('sinon')
 
 var {
@@ -13,12 +12,11 @@ var {
 } = require(path.join(config.get('test.mock'), 'common'))
 
 describe('ConfirmInvitationEventHandler test', () => {
-  const DELAY_IN_MS = 2
+  const DELAY_IN_MS = 1
   var stub
   var requestInfo
   var userPayload
   var storageService
-  var businessEvent
 
   before(() => {
     handler.globalContext = globalContext
@@ -34,31 +32,38 @@ describe('ConfirmInvitationEventHandler test', () => {
     }
 
     requestInfo.packet = userPayload
+    stub = sinon.stub(storageService, 'invitationRemoved')
   })
 
   it('[handle, Pass] test success if invitation removed', (done) => {
     // arrange
-    stub = sinon.stub(storageService, 'invitationRemoved')
-      .callsFake((iid) => delayFunc(DELAY_IN_MS).then(() => done()))
-
-    // act & assert
-    sinon.assert.pass(handler.handle(requestInfo))
-  })
-
-  it('[handle, Fail] test fail if invitation not removed', () => {
-    // arrange
-    stub = sinon.stub(storageService, 'invitationRemoved')
-      .callsFake((iid) => {
-        throw new Error(`invitation NOT REMOVED`)
-      })
-
-    // assert
-    var emit = sinon.spy(businessEvent, 'emit')
-    emit.restore()
-    sinon.assert.calledOnce(emit)
+    stub.callsFake(async (iid) => {
+      await delayFunc(DELAY_IN_MS, done)
+      return true
+    })
+    var alertException = sinon.spy(handler, 'alertException')
 
     // act
     handler.handle(requestInfo)
+
+    // assert
+    sinon.assert.notCalled(alertException)
+    alertException.restore()
+  })
+
+  it('[handle, Fail] test fail if invitation not removed', (done) => {
+    // arrange
+    stub.callsFake((iid) => {
+      return delayFunc(DELAY_IN_MS, done, new Error(`invitation NOT REMOVED`))
+    })
+    var alertException = sinon.spy(handler, 'alertException')
+
+    // act
+    handler.handle(requestInfo)
+
+    // assert
+    // sinon.assert.calledOnce(alertException)
+    alertException.restore()
   })
 
   afterEach(() => {
