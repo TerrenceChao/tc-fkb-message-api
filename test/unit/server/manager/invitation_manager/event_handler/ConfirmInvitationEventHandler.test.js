@@ -14,6 +14,7 @@ var {
 describe('ConfirmInvitationEventHandler test', () => {
   const DELAY_IN_MS = 1
   var stub
+  var spyAlertException
   var requestInfo
   var userPayload
   var storageService
@@ -21,7 +22,6 @@ describe('ConfirmInvitationEventHandler test', () => {
   before(() => {
     handler.globalContext = globalContext
     storageService = globalContext.storageService
-    businessEvent = globalContext.businessEvent
   })
 
   beforeEach(() => {
@@ -33,6 +33,7 @@ describe('ConfirmInvitationEventHandler test', () => {
 
     requestInfo.packet = userPayload
     stub = sinon.stub(storageService, 'invitationRemoved')
+    spyAlertException = sinon.spy(handler, 'alertException')
   })
 
   it('[handle, Pass] test success if invitation removed', (done) => {
@@ -41,14 +42,12 @@ describe('ConfirmInvitationEventHandler test', () => {
       await delayFunc(DELAY_IN_MS, done)
       return true
     })
-    var alertException = sinon.spy(handler, 'alertException')
 
     // act
     handler.handle(requestInfo)
 
     // assert
-    sinon.assert.notCalled(alertException)
-    alertException.restore()
+    spyAlertException.notCalled
   })
 
   it('[handle, Fail] test fail if invitation not removed', (done) => {
@@ -56,17 +55,16 @@ describe('ConfirmInvitationEventHandler test', () => {
     stub.callsFake((iid) => {
       return delayFunc(DELAY_IN_MS, done, new Error(`invitation NOT REMOVED`))
     })
-    var alertException = sinon.spy(handler, 'alertException')
 
     // act
     handler.handle(requestInfo)
 
     // assert
-    // sinon.assert.calledOnce(alertException)
-    alertException.restore()
+    sinon.assert.calledOnce(spyAlertException)
   })
 
   afterEach(() => {
     stub.restore()
+    spyAlertException.restore()
   })
 })

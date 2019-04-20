@@ -42,9 +42,9 @@ GetInvitationListEventHandler.prototype.getInvitationList = async function (requ
   var skip = packet.inviSkip || 0
 
   var invitationList
-  if (inviType === 'received') {
+  if (inviType.indexOf('received') === 0) {
     invitationList = await storageService.getReceivedInvitationList(uid, limit, skip)
-  } else if (inviType === 'sent') {
+  } else if (inviType.indexOf('sent') === 0) {
     invitationList = await storageService.getSentInvitationList(uid, limit, skip)
   }
 
@@ -73,7 +73,7 @@ GetInvitationListEventHandler.prototype.sendInvitationList = function (invitatio
 GetInvitationListEventHandler.prototype.isValid = function (requestInfo) {
   return requestInfo.packet != null &&
     requestInfo.packet.uid != null &&
-    requestInfo.packet.inviType != null &&
+    typeof requestInfo.packet.inviType === 'string' &&
     requestInfo.packet.inviLimit != null
 }
 

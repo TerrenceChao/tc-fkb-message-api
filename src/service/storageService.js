@@ -84,13 +84,28 @@ StorageService.prototype.getInvitation = async function (iid) {
 
 StorageService.prototype.getReceivedInvitationList = async function (uid, limit = 10, skip = 0) {
   return [{
-    apple: 'an apple a day keeps the doctor away'
-  },
-  {
-    inviteType: 'received invitations from others'
-  },
-  {}
-  ] || []
+    iid: 'mbnht594EokdMvfht54elwTsd98',
+    inviter: 'ruby',
+    invitee: 'me',
+    header: {},
+    content: 'HTML string',
+    sensitive: {
+      chid: 'chid: sdfghjklcbvghikliuyuii7g',
+      ciid: 'ciid A'
+    },
+    create_at: Date.now()
+  }, {
+    iid: '9kjnbvcdrtyuiljhgtloytfghjk',
+    inviter: 'summer',
+    invitee: 'me',
+    header: {},
+    content: 'another HTML string',
+    sensitive: {
+      chid: 'chid: aert5hewinaslgsi584waesr',
+      ciid: 'ciid B'
+    },
+    create_at: Date.now()
+  }] || []
   // throw new Error(`invitationList(received) is null`)
 }
 
