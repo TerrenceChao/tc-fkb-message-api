@@ -25,65 +25,86 @@ LeaveChannelEventHandler.prototype.handle = async function (requestInfo) {
     return
   }
 
-  var packet = requestInfo.packet
-  var uid = packet.uid
-  var chid = packet.chid
-
   var businessEvent = this.globalContext['businessEvent']
   var storageService = this.globalContext['storageService']
 
-  if (await storageService.channelLeaved(uid, chid)) {
-    var query = {
-      chid
-    }
-    var channelInfo = await storageService.getChannelInfo(query)
-    if (channelInfo == null) {
-      this.packException(packet, requestInfo)
-      return
-    }
-
-    var ciid = channelInfo.ciid
-    var resInfo = this.pack(ciid, uid, requestInfo)
-    businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
-
-    if (channelInfo.members.length === 0) {
-      businessEvent.emit(BUSINESS_EVENTS.REMOVE_CHANNEL, requestInfo)
-    }
-
-    var socketServer = this.globalContext['socketServer']
-    socketServer.of('/').adapter.remoteLeave(requestInfo.socket.id, ciid)
+  var packet = requestInfo.packet
+  var uid = packet.uid
+  var chid = packet.chid
+  var chInfoQuery = {
+    chid
   }
+
+  // channelLeaved: refresh channelInfo FIRST
+  Promise.resolve(storageService.channelLeaved(uid, chid))
+    .then(confirm => storageService.getChannelInfo(chInfoQuery),
+      err => this.alertException(err.message, requestInfo))
+    .then(refreshedChannelInfo => this.executeLeave(refreshedChannelInfo, requestInfo),
+      err => this.alertException(err.message, requestInfo))
+    .then(refreshedChannelInfo => {
+      // remove entire channel & belonged conversations if there's no member
+      if (refreshedChannelInfo.members.length === 0) {
+        businessEvent.emit(BUSINESS_EVENTS.REMOVE_CHANNEL, requestInfo)
+      }
+    })
 }
 
-LeaveChannelEventHandler.prototype.pack = function (ciid, uid, requestInfo) {
-  return new ResponseInfo()
+LeaveChannelEventHandler.prototype.executeLeave = function (channelInfo, requestInfo) {
+  this.broadcastUserHasLeft(channelInfo, requestInfo)
+  this.notifyUserToDelete(channelInfo, requestInfo)
+
+  var socketServer = this.globalContext['socketServer']
+  socketServer.of('/').adapter.remoteLeave(requestInfo.socket.id, channelInfo.ciid)
+
+  return channelInfo
+}
+
+LeaveChannelEventHandler.prototype.broadcastUserHasLeft = function (channelInfo, requestInfo) {
+  var businessEvent = this.globalContext['businessEvent']
+  var uid = requestInfo.packet.uid
+  var firstName = requestInfo.packet.firstName
+
+  var resInfo = new ResponseInfo()
     .assignProtocol(requestInfo)
     .setHeader({
       to: TO.CHANNEL,
-      receiver: ciid,
+      receiver: channelInfo.ciid,
       responseEvent: RESPONSE_EVENTS.CONVERSATION_FROM_CHANNEL
     })
     .setPacket({
-      msgCode: `${uid} is leaved`,
+      msgCode: `${firstName} has left`,
       data: {
         uid,
-        ciid,
+        // 1. delete uid from channel.members(array) for "each member" in localStorage (frontend)
+        // 2. 其他使用者登入時，只載入了少數的 channelInfo, 有可能沒載入此 channelInfo 的資訊。當有成員離開時可提供更新後的 channelInfo 給前端
+        channelInfo,
         datetime: Date.now()
-      } // delete uid from channel.members(array) for "each member" in localStorage (frontend)
+      }
     })
+  
+  businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 }
 
-LeaveChannelEventHandler.prototype.packException = function (packet, requestInfo) {
+LeaveChannelEventHandler.prototype.notifyUserToDelete = function (channelInfo, requestInfo) {
   var businessEvent = this.globalContext['businessEvent']
+  var uid = requestInfo.packet.uid
+
   var resInfo = new ResponseInfo()
     .assignProtocol(requestInfo)
     .setHeader({
       to: TO.USER,
-      receiver: packet.uid,
-      responseEvent: RESPONSE_EVENTS.EXCEPTION_ALERT // back to user
+      receiver: uid,
+      // to user self
+      responseEvent: [
+        RESPONSE_EVENTS.CHANNEL_LIST,
+        RESPONSE_EVENTS.PERSONAL_INFO
+      ]
     })
     .setPacket({
-      msgCode: `couldn't get channel info with chid:${packet.chid}`
+      msgCode: `delete channelinfo (${channelInfo.chid})`,
+      data: {
+        chid: channelInfo.chid
+      }
     })
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 }
@@ -92,7 +113,8 @@ LeaveChannelEventHandler.prototype.isValid = function (requestInfo) {
   var packet = requestInfo.packet
   return packet !== undefined &&
     typeof packet.uid === 'string' &&
-    packet.chid != null
+    typeof packet.firstName === 'string' &&
+    typeof packet.chid === 'string'
 }
 
 module.exports = {

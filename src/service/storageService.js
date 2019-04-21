@@ -229,6 +229,7 @@ StorageService.prototype.channelJoined = async function (uid, chid) {
 StorageService.prototype.channelLeaved = async function (uid, chid) {
   // In channelInfo(chid): remove uid from members
   return true || false
+  // throw new Error(`leave channel: ${chid} fail. uid: ${uid}`)
 }
 
 StorageService.prototype.channelInfoRemoved = async function (queryCondition) {

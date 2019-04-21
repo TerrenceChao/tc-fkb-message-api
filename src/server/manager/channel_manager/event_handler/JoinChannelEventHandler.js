@@ -25,32 +25,32 @@ JoinChannelEventHandler.prototype.handle = function (requestInfo) {
   }
 
   var storageService = this.globalContext['storageService']
-  var chid = requestInfo.packet.chid
-
-  Promise.resolve(storageService.getChannelInfo({
-    chid
-  }))
-    .then(channelInfo => this.executeJoin(channelInfo, requestInfo),
-      err => this.alertException(err.message, requestInfo))
-    .catch(err => this.alertException(err.message, requestInfo))
-}
-
-JoinChannelEventHandler.prototype.executeJoin = async function (channelInfo, requestInfo) {
-  var storageService = this.globalContext['storageService']
-  var socketServer = this.globalContext['socketServer']
   var packet = requestInfo.packet
-  var socket = requestInfo.socket
   var uid = packet.uid
   var chid = packet.chid
+  var chInfoQuery = {
+    chid
+  }
 
-  await storageService.channelJoined(uid, chid)
+  // channelJoined: refresh channelInfo FIRST
+  Promise.resolve(storageService.channelJoined(uid, chid))
+    .then(confirm => storageService.getChannelInfo(chInfoQuery),
+      err => this.alertException(err.message, requestInfo))
+    .then(refreshedChannelInfo => this.executeJoin(refreshedChannelInfo, requestInfo),
+      err => this.alertException(err.message, requestInfo))
+}
+
+JoinChannelEventHandler.prototype.executeJoin = function (channelInfo, requestInfo) {
+  var socketServer = this.globalContext['socketServer']
+  var socket = requestInfo.socket
+
   socketServer.of('/').adapter.remoteJoin(socket.id, channelInfo.ciid)
 
-  this.notifyUserIsJoinedInChannel(channelInfo.ciid, requestInfo)
+  this.broadcastUserHasJoined(channelInfo, requestInfo)
   this.sendChannelInfoToUser(channelInfo, requestInfo)
 }
 
-JoinChannelEventHandler.prototype.notifyUserIsJoinedInChannel = function (ciid, requestInfo) {
+JoinChannelEventHandler.prototype.broadcastUserHasJoined = function (channelInfo, requestInfo) {
   var businessEvent = this.globalContext['businessEvent']
   var packet = requestInfo.packet
   var uid = packet.uid
@@ -60,15 +60,18 @@ JoinChannelEventHandler.prototype.notifyUserIsJoinedInChannel = function (ciid, 
     .assignProtocol(requestInfo)
     .setHeader({
       to: TO.CHANNEL,
-      receiver: ciid,
+      receiver: channelInfo.ciid,
       responseEvent: RESPONSE_EVENTS.CONVERSATION_FROM_CHANNEL // notify in channel
     })
     .setPacket({
-      msgCode: `${firstName} is joined`,
+      msgCode: `${firstName} has joined`,
       data: {
         uid,
+        // 1. refresh members: add uid to channel.members(array), remove uid from channel.invitees(array) for "each member" in localStorage (frontend)
+        // 2. 其他使用者登入時，只載入了少數的 channelInfo, 有可能沒載入此 channelInfo 的資訊。當新的成員加入時可提供更新後的 channelInfo 給前端
+        channelInfo,
         datetime: Date.now()
-      } // refresh members NOW: add uid to channel.members(array), remove uid from channel.invitees(array) for "each member" in localStorage (frontend)
+      }
     })
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 }
@@ -82,14 +85,11 @@ JoinChannelEventHandler.prototype.sendChannelInfoToUser = function (channelInfo,
     .setHeader({
       to: TO.USER,
       receiver: uid,
-      responseEvent: RESPONSE_EVENTS.z // to user self
+      responseEvent: RESPONSE_EVENTS.CHANNEL_LIST // to user self
     })
     .setPacket({
-      msgCode: `get channelinfo. including name, chid, ciid, creator, members`,
-      data: {
-        uid,
-        channelInfo
-      }
+      msgCode: `get refreshed channelinfo. including name, chid, ciid, creator, members`,
+      data: [channelInfo]
     })
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 }

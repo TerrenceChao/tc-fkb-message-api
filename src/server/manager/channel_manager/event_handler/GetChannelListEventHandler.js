@@ -31,7 +31,7 @@ GetChannelListEventHandler.prototype.handle = async function (requestInfo) {
 
   var businessEvent = this.globalContext['businessEvent']
   var storageService = this.globalContext['storageService']
-  var userChannelInfo = await storageService.getUserChannelInfoList(uid, limit, skip)
+  var userChannelInfoList = await storageService.getUserChannelInfoList(uid, limit, skip)
 
   var resInfo = new ResponseInfo()
     .assignProtocol(requestInfo)
@@ -42,7 +42,7 @@ GetChannelListEventHandler.prototype.handle = async function (requestInfo) {
     })
     .setPacket({
       msgCode: `channel list`,
-      data: userChannelInfo
+      data: userChannelInfoList
     })
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 }
@@ -50,7 +50,8 @@ GetChannelListEventHandler.prototype.handle = async function (requestInfo) {
 GetChannelListEventHandler.prototype.isValid = function (requestInfo) {
   var packet = requestInfo.packet
   return packet !== undefined &&
-    typeof packet.uid === 'string'
+    typeof packet.uid === 'string' &&
+    packet.chanLimit != null
 }
 
 module.exports = {
