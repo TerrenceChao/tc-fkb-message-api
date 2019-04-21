@@ -2,9 +2,15 @@
 Responsible for broadcasting / receiving messages to the Fakebook project.
 
 ## Features
+### Authenticate
 * 目前和 main-api 搭配的 user 驗證機制，只會存取 main db 一次。也就是說只透過 main-api 驗證 user 後， 直接請 main-api 透過 http request 取得 message-api 的 token 只須驗證 user 一次，這樣的機制運作良好。
+### Conversation
 * channelInfo: ciid 是內部發送/接收訊息的重要資訊之一，目前有 user login, get channel list, join/leave channel & get conversation list 的時機會從 server(message-api) 拿到 ciid。其他 events 諸如 invitation ... etc 無法拿到 ciid。
 * channelInfo: message-api <-> frontend 兩者最主要還是以 chid 交換整個 channel 資訊。
+### REQUEST_EVENTS (Client side. request from client's event)
+* 略
+### BUSINESS_EVENTS (Server side. triggered by internal service(s))
+* CONNECT/DISCONNECT 從原本的 skt_connect/disconnect (socket層級) 變成 service_connect/service_disconnect (服務層級的連線/斷線)。可透過內部服務 (main-api,message-api ...etc) 決定特定 user 是否可以傳送/接收訊息。
 
 ## Formats
 ### types of limit, skip, type
