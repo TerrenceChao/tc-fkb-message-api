@@ -44,13 +44,13 @@ DealWithInvitationEventHandler.prototype.triggerJoinChannelEvent = function (inv
   var businessEvent = this.globalContext['businessEvent']
   var packet = requestInfo.packet
   var uid = packet.uid
-  var firstName = packet.firstName
+  var nickname = packet.nickname
 
   businessEvent.emit(
     BUSINESS_EVENTS.JOIN_CHANNEL,
     requestInfo.setPacket({
       uid,
-      firstName,
+      nickname,
       chid: invitation.sensitive.chid
     }))
 }
@@ -67,7 +67,7 @@ DealWithInvitationEventHandler.prototype.broadcastUserHasCanceled = function (in
       responseEvent: RESPONSE_EVENTS.CONVERSATION_FROM_CHANNEL // notify in channel
     })
     .setPacket({
-      msgCode: `${packet.firstName} is canceled`
+      msgCode: `${packet.nickname} is canceled`
     })
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 }
@@ -76,7 +76,7 @@ DealWithInvitationEventHandler.prototype.isValid = function (requestInfo) {
   var packet = requestInfo.packet
   return packet !== undefined &&
     typeof packet.uid === 'string' &&
-    typeof packet.firstName === 'string' &&
+    typeof packet.nickname === 'string' &&
     typeof packet.iid === 'string' &&
     typeof packet.dealWith === 'string'
 }

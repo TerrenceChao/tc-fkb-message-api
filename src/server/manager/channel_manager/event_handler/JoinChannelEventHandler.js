@@ -54,7 +54,7 @@ JoinChannelEventHandler.prototype.broadcastUserHasJoined = function (channelInfo
   var businessEvent = this.globalContext['businessEvent']
   var packet = requestInfo.packet
   var uid = packet.uid
-  var firstName = packet.firstName
+  var nickname = packet.nickname
 
   var resInfo = new ResponseInfo()
     .assignProtocol(requestInfo)
@@ -64,7 +64,7 @@ JoinChannelEventHandler.prototype.broadcastUserHasJoined = function (channelInfo
       responseEvent: RESPONSE_EVENTS.CONVERSATION_FROM_CHANNEL // notify in channel
     })
     .setPacket({
-      msgCode: `${firstName} has joined`,
+      msgCode: `${nickname} has joined`,
       data: {
         uid,
         // 1. refresh members: add uid to channel.members(array), remove uid from channel.invitees(array) for "each member" in localStorage (frontend)
@@ -98,7 +98,7 @@ JoinChannelEventHandler.prototype.isValid = function (requestInfo) {
   var packet = requestInfo.packet
   return packet !== undefined &&
     typeof packet.uid === 'string' &&
-    typeof packet.firstName === 'string' &&
+    typeof packet.nickname === 'string' &&
     typeof packet.chid === 'string'
 }
 

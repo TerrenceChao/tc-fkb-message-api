@@ -62,7 +62,7 @@ LeaveChannelEventHandler.prototype.executeLeave = function (channelInfo, request
 LeaveChannelEventHandler.prototype.broadcastUserHasLeft = function (channelInfo, requestInfo) {
   var businessEvent = this.globalContext['businessEvent']
   var uid = requestInfo.packet.uid
-  var firstName = requestInfo.packet.firstName
+  var nickname = requestInfo.packet.nickname
 
   var resInfo = new ResponseInfo()
     .assignProtocol(requestInfo)
@@ -72,7 +72,7 @@ LeaveChannelEventHandler.prototype.broadcastUserHasLeft = function (channelInfo,
       responseEvent: RESPONSE_EVENTS.CONVERSATION_FROM_CHANNEL
     })
     .setPacket({
-      msgCode: `${firstName} has left`,
+      msgCode: `${nickname} has left`,
       data: {
         uid,
         // 1. delete uid from channel.members(array) for "each member" in localStorage (frontend)
@@ -113,7 +113,7 @@ LeaveChannelEventHandler.prototype.isValid = function (requestInfo) {
   var packet = requestInfo.packet
   return packet !== undefined &&
     typeof packet.uid === 'string' &&
-    typeof packet.firstName === 'string' &&
+    typeof packet.nickname === 'string' &&
     typeof packet.chid === 'string'
 }
 
