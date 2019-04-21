@@ -28,14 +28,14 @@ DealWithInvitationEventHandler.prototype.handle = function (requestInfo) {
   var storageService = this.globalContext['storageService']
   var packet = requestInfo.packet
   var iid = packet.iid
-  var dealWith = packet.dealWith
+  var dealWith = packet.dealWith.toLowerCase()
 
   Promise.resolve(storageService.getInvitation(iid))
     .then(invitation => {
       if (dealWith === 'y') {
         this.triggerJoinChannelEvent(invitation, requestInfo)
       } else {
-        this.notifyUserIsCanceledInChanel(invitation, requestInfo)
+        this.broadcastUserHasCanceled(invitation, requestInfo)
       }
     }, err => this.alertException(err.message, requestInfo))
 }
@@ -55,7 +55,7 @@ DealWithInvitationEventHandler.prototype.triggerJoinChannelEvent = function (inv
     }))
 }
 
-DealWithInvitationEventHandler.prototype.notifyUserIsCanceledInChanel = function (invitation, requestInfo) {
+DealWithInvitationEventHandler.prototype.broadcastUserHasCanceled = function (invitation, requestInfo) {
   var businessEvent = this.globalContext['businessEvent']
   var packet = requestInfo.packet
 
@@ -78,7 +78,7 @@ DealWithInvitationEventHandler.prototype.isValid = function (requestInfo) {
     typeof packet.uid === 'string' &&
     typeof packet.firstName === 'string' &&
     typeof packet.iid === 'string' &&
-    packet.dealWith != null
+    typeof packet.dealWith === 'string'
 }
 
 module.exports = {

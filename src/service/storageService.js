@@ -83,6 +83,7 @@ StorageService.prototype.getInvitation = async function (iid) {
 }
 
 StorageService.prototype.getReceivedInvitationList = async function (uid, limit = 10, skip = 0) {
+  // get invitations where "invitee" is uid
   return [{
     iid: 'mbnht594EokdMvfht54elwTsd98',
     inviter: 'ruby',
@@ -120,14 +121,40 @@ StorageService.prototype.getReceivedInvitationList = async function (uid, limit 
 }
 
 StorageService.prototype.getSentInvitationList = async function (uid, limit = 10, skip = 0) {
+  // get invitations where "inviter" is uid
   return [{
-    banana: 'a banana give you power!'
-  },
-  {
-    inviteType: 'sent invitation by me'
-  },
-  {}
-  ] || []
+    iid: 'fyjael5845givsydgvldygrfila',
+    inviter: 'me',
+    invitee: 'william',
+    header: {
+      requestEvent: 'req_invitation_deal_with_invitation',
+      data: {
+        channelName: 'Night Bar'
+      }
+    },
+    content: 'HTML string',
+    sensitive: {
+      chid: 'chid: cgh78oluiuefhwrbjsdhfvbas',
+      ciid: 'ciid C'
+    },
+    create_at: Date.now()
+  }, {
+    iid: 'l8hnadfvbwritgbsi5rgtbirwas',
+    inviter: 'me',
+    invitee: 'cathy',
+    header: {
+      requestEvent: 'req_invitation_deal_with_invitation',
+      data: {
+        channelName: 'Room 18'
+      }
+    },
+    content: 'another HTML string',
+    sensitive: {
+      chid: 'chid: fguiodbfmjuytfghjkemngfgh',
+      ciid: 'ciid D'
+    },
+    create_at: Date.now()
+  }] || []
   // throw new Error(`invitationList(sent) is null`)
 }
 
@@ -247,21 +274,24 @@ StorageService.prototype.getConversationList = async function (ciid, limit = 10,
     sender: 'Eason',
     content: 'this is a messaging service',
     type: 'text',
-    created_at: Date.now()
+    datetime: Date.now(),
+    // created_at: '發送時間和 DB 建立 record 時間會有落差'
   },
   {
     ciid: 'ciid B',
     sender: 'Billy',
     content: 'Today is a sunny day',
     type: 'text',
-    created_at: Date.now()
+    datetime: Date.now(),
+    // created_at: '發送時間和 DB 建立 record 時間會有落差'
   },
   {
     ciid: 'ciid B',
     sender: 'Jessica',
     content: 'Hello world',
     type: 'text',
-    created_at: Date.now()
+    datetime: Date.now(),
+    // created_at: '發送時間和 DB 建立 record 時間會有落差'
   }
   ] || []
   // throw new Error(`get conversations of channel: ${ciid} FAIL`)

@@ -84,7 +84,7 @@ SendInvitationEventHandler.prototype.sendInvitations = function (invitationList,
       .setHeader({
         to: TO.USER,
         receiver: invitation.invitee,
-        responseEvent: RESPONSE_EVENTS.INVITATION_FROM_CHANNEL_TO_ME // to individual invitees
+        responseEvent: RESPONSE_EVENTS.INVITATION_FROM_CHANNEL_TO_ME // to individual invitees (realtime)
       })
       .setPacket({
         msgCode: 'you got an invitation',
