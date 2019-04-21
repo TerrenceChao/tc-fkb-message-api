@@ -18,56 +18,66 @@ function JoinChannelEventHandler () {
 
 JoinChannelEventHandler.prototype.eventName = EVENTS.JOIN_CHANNEL
 
-JoinChannelEventHandler.prototype.handle = async function (requestInfo) {
+JoinChannelEventHandler.prototype.handle = function (requestInfo) {
   if (!this.isValid(requestInfo)) {
     console.warn(`${this.eventName}: request info is invalid.`)
     return
   }
 
+  var storageService = this.globalContext['storageService']
+  var chid = requestInfo.packet.chid
+
+  Promise.resolve(storageService.getChannelInfo({
+    chid
+  }))
+    .then(channelInfo => this.executeJoin(channelInfo, requestInfo),
+      err => this.alertException(err.message, requestInfo))
+    .catch(err => this.alertException(err.message, requestInfo))
+}
+
+JoinChannelEventHandler.prototype.executeJoin = async function (channelInfo, requestInfo) {
+  var storageService = this.globalContext['storageService']
+  var socketServer = this.globalContext['socketServer']
   var packet = requestInfo.packet
   var socket = requestInfo.socket
   var uid = packet.uid
-  var iid = packet.iid
   var chid = packet.chid
-  var ciid = packet.ciid
 
-  var socketServer = this.globalContext['socketServer']
+  await storageService.channelJoined(uid, chid)
+  socketServer.of('/').adapter.remoteJoin(socket.id, channelInfo.ciid)
+
+  this.notifyUserIsJoinedInChannel(channelInfo.ciid, requestInfo)
+}
+
+JoinChannelEventHandler.prototype.notifyUserIsJoinedInChannel = function (ciid, requestInfo) {
   var businessEvent = this.globalContext['businessEvent']
-  var storageService = this.globalContext['storageService']
+  var packet = requestInfo.packet
+  var uid = packet.uid
+  var firstName = packet.firstName
 
-  if (await storageService.channelJoined(uid, chid)) {
-    socketServer.of('/').adapter.remoteJoin(socket.id, ciid)
-
-    var resInfo = new ResponseInfo()
-      .assignProtocol(requestInfo)
-      .setHeader({
-        to: TO.CHANNEL,
-        receiver: ciid,
-        responseEvent: RESPONSE_EVENTS.CONVERSATION_FROM_CHANNEL
-      })
-      .setPacket({
-        msgCode: `${uid} is joined`,
-        data: {
-          uid,
-          ciid,
-          datetime: Date.now()
-        } // add uid to channel.members(array) for "each member" in localStorage (frontend)
-      })
-    businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
-
-    requestInfo.packet.removingIid = iid
-    businessEvent.emit(EVENTS.DEAL_WITH_INVITATION, requestInfo)
-  }
+  var resInfo = new ResponseInfo()
+    .assignProtocol(requestInfo)
+    .setHeader({
+      to: TO.CHANNEL,
+      receiver: ciid,
+      responseEvent: RESPONSE_EVENTS.CONVERSATION_FROM_CHANNEL // notify in channel
+    })
+    .setPacket({
+      msgCode: `${firstName} is joined`,
+      data: {
+        uid,
+        datetime: Date.now()
+      } // refresh members NOW: add uid to channel.members(array) for "each member" in localStorage (frontend)
+    })
+  businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 }
 
 JoinChannelEventHandler.prototype.isValid = function (requestInfo) {
   var packet = requestInfo.packet
   return packet !== undefined &&
     typeof packet.uid === 'string' &&
-    packet.iid != null &&
-    packet.chid != null &&
-    packet.ciid != null &&
-    this.isAuthenticated(packet)
+    typeof packet.firstName === 'string' &&
+    typeof packet.chid === 'string'
 }
 
 module.exports = {

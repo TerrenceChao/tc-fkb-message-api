@@ -36,6 +36,7 @@ const EVENTS = {
   GET_INVITATION_LIST: 'req_invitation_get_invitation_list',
   SEND_INVITATION: 'req_invitation_send_invitation',
   DEAL_WITH_INVITATION: 'req_invitation_deal_with_invitation',
+  CONFIRM_INVITATION: 'req_invitation_confirm_invitation',
 
   // UserManager
   USER_ONLINE: 'req_user_user_online',
@@ -72,6 +73,7 @@ const REQUEST_EVENTS = {
   GET_INVITATION_LIST: EVENTS.GET_INVITATION_LIST,
   SEND_INVITATION: EVENTS.SEND_INVITATION,
   DEAL_WITH_INVITATION: EVENTS.DEAL_WITH_INVITATION,
+  CONFIRM_INVITATION: EVENTS.CONFIRM_INVITATION,
 
   // UserManager
 

@@ -9,7 +9,7 @@ var path = require('path')
 function StorageService () {}
 
 //   var invitations = []
-//   invitations = invitee.map(invi => {
+//   invitations = invitees.map(invi => {
 //     return {
 //       // Avoid creating repeat items
 //       iid: `${invi}.encrypt(${chid}, ${invi}, secret?)`,
@@ -39,6 +39,33 @@ function StorageService () {}
 //   return invitations || []
 // }
 
+StorageService.prototype.invitationMultiCreated = async function (
+  inviter,
+  invitees,
+  header,
+  content,
+  sensitive
+) {
+  return [{
+    iid: 'mbnht594EokdMvfht54elwTsd98',
+    inviter,
+    invitee: invitees[0] || 'invitee?',
+    header,
+    content,
+    sensitive,
+    create_at: Date.now()
+  }, {
+    iid: 'vfgty78iolkmnhgtrfdcvbhjkjmn',
+    inviter,
+    invitee: invitees[1] || 'invitee?',
+    header,
+    content,
+    sensitive,
+    create_at: Date.now()
+  }]
+  // throw new Error(`create invitation(s) fail`)
+}
+
 StorageService.prototype.getInvitation = async function (iid) {
   return {
     iid: 'mbnht594EokdMvfht54elwTsd98',
@@ -51,18 +78,35 @@ StorageService.prototype.getInvitation = async function (iid) {
       ciid: 'ciid B'
     },
     create_at: Date.now()
-  } || null
+  }
+  // throw new Error(`invitation ID(iid) is invalid`)
 }
 
 StorageService.prototype.getReceivedInvitationList = async function (uid, limit = 10, skip = 0) {
   return [{
-    apple: 'an apple a day keeps the doctor away'
-  },
-  {
-    inviteType: 'received invitations from others'
-  },
-  {}
-  ] || []
+    iid: 'mbnht594EokdMvfht54elwTsd98',
+    inviter: 'ruby',
+    invitee: 'me',
+    header: {},
+    content: 'HTML string',
+    sensitive: {
+      chid: 'chid: sdfghjklcbvghikliuyuii7g',
+      ciid: 'ciid A'
+    },
+    create_at: Date.now()
+  }, {
+    iid: '9kjnbvcdrtyuiljhgtloytfghjk',
+    inviter: 'summer',
+    invitee: 'me',
+    header: {},
+    content: 'another HTML string',
+    sensitive: {
+      chid: 'chid: aert5hewinaslgsi584waesr',
+      ciid: 'ciid B'
+    },
+    create_at: Date.now()
+  }] || []
+  // throw new Error(`invitationList(received) is null`)
 }
 
 StorageService.prototype.getSentInvitationList = async function (uid, limit = 10, skip = 0) {
@@ -74,11 +118,7 @@ StorageService.prototype.getSentInvitationList = async function (uid, limit = 10
   },
   {}
   ] || []
-}
-
-StorageService.prototype.getInviteesHadBeenInvited = function (chid, invitee) {
-  var invitedInvitees = ['Rose']
-  return invitedInvitees || []
+  // throw new Error(`invitationList(sent) is null`)
 }
 
 StorageService.prototype.getInvitationThenRemoved = async function (iid) {
@@ -115,6 +155,7 @@ StorageService.prototype.invitationRemoved = async function (iid) {
    * 5. remove InvitationOfChannel(schema)
    */
   return true
+  // throw new Error(`remove invitation: ${iid} fail`)
 }
 
 // for channel
@@ -126,7 +167,7 @@ StorageService.prototype.channelInfoCreated = async function (uid, channelName) 
     creator: uid,
     chid: 'chid:l4ehfuvljifgbudvzsugkurliLO4U*T&IYEOW*UGY',
     name: 'Room 18',
-    invitee: [],
+    invitees: [],
     members: [uid]
   } || null
 }
@@ -137,15 +178,16 @@ StorageService.prototype.getAllChannelIds = async function (uid) {
 }
 
 StorageService.prototype.getChannelInfo = async function (queryCondition) {
-  // ciid saved in local storage (for frontend)
+  // ciid?? saved in local storage (for frontend)
   return {
     ciid: 'ciid B',
     creator: 'someone',
     chid: 'chid:l4ehfuvljifgbudvzsugkurliLO4U*T&IYEOW*UGY',
     name: 'Room 18',
-    invitee: [],
+    invitees: [],
     members: ['uidA', 'uidB', 'uidC']
-  } || null
+  }
+  // throw new Error(`couldn't get channel info with: ${JSON.stringify(queryCondition, null, 2)}`)
 }
 
 StorageService.prototype.getUserChannelInfoList = async function (uid, limit = 10, skip = 0) {
@@ -155,21 +197,22 @@ StorageService.prototype.getUserChannelInfoList = async function (uid, limit = 1
     creator: 'someone',
     chid: 'chid:l4ehfuvljifgbudvzsugkurliLO4U*T&IYEOW*UGY',
     name: 'Room 18',
-    invitee: [],
+    invitees: [],
     members: ['uidA', 'uidB', 'uidC']
   }, {
     ciid: 'ciid A',
     creator: 'WHO?',
     chid: 'chid:ijmlYIOUYGVUYBK>DFRUTYIHUJNJKTSARFDCVSBUN',
     name: 'Night Bar',
-    invitee: [],
+    invitees: [],
     members: ['uidE', 'uidF']
   }] || []
   // throw Exception OR return null if not found
 }
 
 StorageService.prototype.channelJoined = async function (uid, chid) {
-  return true || false
+  return true
+  // throw new Error(`join channel: ${chid} fail. uid: ${uid}`)
 }
 
 StorageService.prototype.channelLeaved = async function (uid, chid) {

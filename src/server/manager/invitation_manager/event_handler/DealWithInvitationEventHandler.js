@@ -19,68 +19,55 @@ function DealWithInvitationEventHandler () {
 
 DealWithInvitationEventHandler.prototype.eventName = EVENTS.DEAL_WITH_INVITATION
 
-DealWithInvitationEventHandler.prototype.handle = async function (requestInfo) {
+DealWithInvitationEventHandler.prototype.handle = function (requestInfo) {
   if (!this.isValid(requestInfo)) {
     console.warn(`${this.eventName}: request info is invalid.`)
     return
   }
 
-  var packet = requestInfo.packet
-  var {
-    uid,
-    iid,
-    channelName,
-    dealwith,
-    removingIid
-  } = packet
-
-  var businessEvent = this.globalContext['businessEvent']
   var storageService = this.globalContext['storageService']
+  var packet = requestInfo.packet
+  var iid = packet.iid
+  var dealWith = packet.dealWith
 
-  // callback from BUSINESS_EVENTS.JOIN_CHANNEL
-  if (iid === removingIid) {
-    storageService.invitationRemoved(removingIid)
-    return
-  }
+  Promise.resolve(storageService.getInvitation(iid))
+    .then(invitation => {
+      if (dealWith === 'y') {
+        this.triggerJoinChannelEvent(invitation, requestInfo)
+      } else {
+        this.notifyUserIsCanceledInChanel(invitation, requestInfo)
+      }
+    }, err => this.alertException(err.message, requestInfo))
+}
 
-  var msgCode
-  var reqEvent
+DealWithInvitationEventHandler.prototype.triggerJoinChannelEvent = function (invitation, requestInfo) {
+  var businessEvent = this.globalContext['businessEvent']
+  var packet = requestInfo.packet
+  var uid = packet.uid
+  var firstName = packet.firstName
 
-  if (dealwith === 'y') {
-    var invitation = await storageService.getInvitation(iid)
+  businessEvent.emit(
+    BUSINESS_EVENTS.JOIN_CHANNEL,
+    requestInfo.setPacket({
+      uid,
+      firstName,
+      chid: invitation.sensitive.chid
+    }))
+}
 
-    if (invitation == null) {
-      msgCode = `invitation id is invalid.`
-      reqEvent = RESPONSE_EVENTS.EXCEPTION_ALERT
-    } else {
-      msgCode = `You have joined into channel ${channelName}`
-      reqEvent = RESPONSE_EVENTS.INVITATION_FROM_CHANNEL_TO_ME // push again
-
-      businessEvent.emit(
-        BUSINESS_EVENTS.JOIN_CHANNEL,
-        requestInfo.setPacket({
-          uid,
-          iid,
-          chid: invitation.sensitive.chid,
-          ciid: invitation.sensitive.ciid,
-          dealwith
-        }))
-    }
-  } else {
-    msgCode = `You have canceled to join channel ${channelName}`
-    reqEvent = RESPONSE_EVENTS.INVITATION_FROM_CHANNEL_TO_ME // push again
-    storageService.invitationRemoved(iid)
-  }
+DealWithInvitationEventHandler.prototype.notifyUserIsCanceledInChanel = function (invitation, requestInfo) {
+  var businessEvent = this.globalContext['businessEvent']
+  var packet = requestInfo.packet
 
   var resInfo = new ResponseInfo()
     .assignProtocol(requestInfo)
     .setHeader({
-      to: TO.USER,
-      receiver: uid,
-      responseEvent: reqEvent
+      to: TO.CHANNEL,
+      receiver: invitation.sensitive.ciid,
+      responseEvent: RESPONSE_EVENTS.CONVERSATION_FROM_CHANNEL // notify in channel
     })
     .setPacket({
-      msgCode
+      msgCode: `${packet.firstName} is canceled`
     })
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 }
@@ -88,10 +75,10 @@ DealWithInvitationEventHandler.prototype.handle = async function (requestInfo) {
 DealWithInvitationEventHandler.prototype.isValid = function (requestInfo) {
   var packet = requestInfo.packet
   return packet !== undefined &&
-    packet.iid != null &&
     typeof packet.uid === 'string' &&
-    packet.dealwith != null &&
-    this.isAuthenticated(packet)
+    typeof packet.firstName === 'string' &&
+    typeof packet.iid === 'string' &&
+    packet.dealWith != null
 }
 
 module.exports = {
