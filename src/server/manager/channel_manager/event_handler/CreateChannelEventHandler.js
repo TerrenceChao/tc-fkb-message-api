@@ -28,6 +28,9 @@ CreateChannelEventHandler.prototype.handle = function (requestInfo) {
   var uid = requestInfo.packet.uid
   var channelName = requestInfo.packet.channelName
 
+  // 待優化：client 可以自定義 ciid, chid 先建立 channel, 事後再透過 DB 建立紀錄
+  // [NOTE] 那如果沒接收到 DB 建立成功的訊息？
+
   Promise.resolve(storageService.channelInfoCreated(uid, channelName))
     .then(newChannelInfo => this.enterChannel(newChannelInfo, requestInfo),
       err => this.alertException(err.message, requestInfo))

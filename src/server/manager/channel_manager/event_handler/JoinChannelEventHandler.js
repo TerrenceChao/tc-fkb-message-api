@@ -32,6 +32,8 @@ JoinChannelEventHandler.prototype.handle = function (requestInfo) {
     chid
   }
 
+  // 待優化？
+
   // channelJoined: refresh channelInfo FIRST
   Promise.resolve(storageService.channelJoined(uid, chid))
     .then(confirm => storageService.getChannelInfo(chInfoQuery),

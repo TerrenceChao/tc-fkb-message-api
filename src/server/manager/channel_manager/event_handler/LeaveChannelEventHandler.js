@@ -35,6 +35,11 @@ LeaveChannelEventHandler.prototype.handle = function (requestInfo) {
     chid
   }
 
+  // 待優化：client 可以傳送自己版本的 channelInfo(所有資訊), 藉此先更新其他人的 channelInfo, 
+  // 等待 DB 確實更新 channelInfo 紀錄, 收到 response 後再刪除 client 端的 channelInfo。
+  // [NOTE] 那如果沒接收到 DB 更新成功的訊息？
+  // [NOTE] 是否要跟 join 成對的用同樣的 pattern? 交互的 join/leave 會有更新不即時的情況？
+
   // channelLeaved: refresh channelInfo FIRST
   Promise.resolve(storageService.channelLeaved(uid, chid))
     .then(confirm => storageService.getChannelInfo(chInfoQuery),
