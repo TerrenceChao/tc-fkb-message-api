@@ -45,11 +45,11 @@ LoginEventHandler.prototype.handle = async function (requestInfo) {
 
   // get user's channel list & belonged conversations
   Promise.resolve(storageService.getUserChannelInfoList(packet.uid, packet.chanLimit))
-    .then(channelInfoList => this.sendChannelInfoAndConversations(requestInfo, channelInfoList))
+    .then(userChannelInfoList => this.sendChannelInfoAndConversations(userChannelInfoList, requestInfo))
     .catch(err => this.alertException(err.message, requestInfo))
 }
 
-LoginEventHandler.prototype.sendChannelInfoAndConversations = function (requestInfo, userChannelInfoList) {
+LoginEventHandler.prototype.sendChannelInfoAndConversations = function (userChannelInfoList, requestInfo) {
   var storageService = this.globalContext['storageService']
   var businessEvent = this.globalContext['businessEvent']
 
@@ -59,8 +59,6 @@ LoginEventHandler.prototype.sendChannelInfoAndConversations = function (requestI
 
   userChannelInfoList.forEach(async (chInfo) => {
     var ciid = chInfo.ciid
-    // avoid send sensitive info to client ("ciid" is sensitive)
-    delete chInfo.ciid
 
     Promise.resolve(storageService.getConversationList(ciid, convLimit))
       .then(conversationList => {
