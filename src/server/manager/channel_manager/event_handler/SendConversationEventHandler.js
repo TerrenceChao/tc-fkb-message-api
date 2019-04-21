@@ -24,17 +24,26 @@ SendConversationEventHandler.prototype.handle = function (requestInfo) {
     return
   }
 
-  var packet = requestInfo.packet
-  var uid = packet.uid
-  var ciid = packet.ciid
-  var convType = packet.convType
-  var conversation = packet.conversation
-
-  var businessEvent = this.globalContext['businessEvent']
   var storageService = this.globalContext['storageService']
 
+  var packet = requestInfo.packet
+  var ciid = packet.ciid
+  var uid = packet.uid
+  var content = packet.content
+  var convType = packet.convType
   var datetime = Date.now()
-  storageService.conversationCreated(ciid, uid, conversation, convType, datetime)
+
+  storageService.conversationCreated(ciid, uid, content, convType, datetime)
+  this.executeSend(datetime, requestInfo)
+}
+
+SendConversationEventHandler.prototype.executeSend = function (datetime, requestInfo) {
+  var businessEvent = this.globalContext['businessEvent']
+  var packet = requestInfo.packet
+  var ciid = packet.ciid
+  var uid = packet.uid
+  var content = packet.content
+  var type = packet.convType
 
   var resInfo = new ResponseInfo()
     .assignProtocol(requestInfo)
@@ -44,10 +53,13 @@ SendConversationEventHandler.prototype.handle = function (requestInfo) {
       responseEvent: RESPONSE_EVENTS.CONVERSATION_FROM_CHANNEL
     })
     .setPacket({
-      msgCode: `convType: ${convType}`,
+      msgCode: `conversation type: ${type}`,
       data: {
-        uid,
-        conversation,
+        // apply ciid to make things easy at frontend
+        ciid,
+        sender: uid,
+        content,
+        type,
         datetime
       }
     })
@@ -57,10 +69,10 @@ SendConversationEventHandler.prototype.handle = function (requestInfo) {
 SendConversationEventHandler.prototype.isValid = function (requestInfo) {
   var packet = requestInfo.packet
   return packet !== undefined &&
-    typeof packet.uid === 'string' &&
     packet.ciid != null &&
-    packet.convType != null &&
-    packet.conversation != null
+    typeof packet.uid === 'string' &&
+    packet.content != null &&
+    packet.convType != null
 }
 
 module.exports = {

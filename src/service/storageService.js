@@ -270,7 +270,7 @@ StorageService.prototype.conversationCreated = function (ciid, uid, content, typ
 
 StorageService.prototype.getConversationList = async function (ciid, limit = 10, skip = 0) {
   return [{
-    ciid: 'ciid B',
+    ciid,
     sender: 'Eason',
     content: 'this is a messaging service',
     type: 'text',
@@ -278,7 +278,7 @@ StorageService.prototype.getConversationList = async function (ciid, limit = 10,
     // created_at: '發送時間和 DB 建立 record 時間會有落差'
   },
   {
-    ciid: 'ciid B',
+    ciid,
     sender: 'Billy',
     content: 'Today is a sunny day',
     type: 'text',
@@ -286,7 +286,7 @@ StorageService.prototype.getConversationList = async function (ciid, limit = 10,
     // created_at: '發送時間和 DB 建立 record 時間會有落差'
   },
   {
-    ciid: 'ciid B',
+    ciid,
     sender: 'Jessica',
     content: 'Hello world',
     type: 'text',
