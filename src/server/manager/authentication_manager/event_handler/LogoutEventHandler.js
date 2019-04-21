@@ -28,8 +28,7 @@ LogoutEventHandler.prototype.handle = function (requestInfo) {
 LogoutEventHandler.prototype.isValid = function (requestInfo) {
   var packet = requestInfo.packet
   return packet !== undefined &&
-    typeof packet.uid === 'string' &&
-    this.isAuthenticated(packet)
+    typeof packet.uid === 'string'
 }
 
 module.exports = {

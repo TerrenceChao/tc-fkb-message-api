@@ -92,8 +92,7 @@ LeaveChannelEventHandler.prototype.isValid = function (requestInfo) {
   var packet = requestInfo.packet
   return packet !== undefined &&
     typeof packet.uid === 'string' &&
-    packet.chid != null &&
-    this.isAuthenticated(packet)
+    packet.chid != null
 }
 
 module.exports = {

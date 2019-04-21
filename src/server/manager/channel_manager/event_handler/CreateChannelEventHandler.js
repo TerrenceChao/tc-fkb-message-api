@@ -74,8 +74,7 @@ CreateChannelEventHandler.prototype.isValid = function (requestInfo) {
   var packet = requestInfo.packet
   return packet !== undefined &&
     typeof packet.uid === 'string' &&
-    typeof packet.channelName === 'string' &&
-    this.isAuthenticated(packet)
+    typeof packet.channelName === 'string'
 }
 
 module.exports = {

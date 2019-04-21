@@ -122,8 +122,7 @@ LoginEventHandler.prototype.isValid = function (requestInfo) {
     typeof packet.uid === 'string' &&
     packet.inviLimit != null &&
     packet.chanLimit != null &&
-    packet.convLimit != null &&
-    this.isAuthenticated(packet)
+    packet.convLimit != null
 }
 
 module.exports = {

@@ -47,6 +47,7 @@ Manager.prototype.startListen = function (protocol) {
 
 Manager.prototype.listenRequestEvent = function (protocol, handler) {
   handler.globalContext = this.globalContext
+  const authService = this.globalContext['authService']
   const thisManager = this
 
   const {
@@ -56,13 +57,19 @@ Manager.prototype.listenRequestEvent = function (protocol, handler) {
   } = protocol
   let requestInfo = new RequestInfo()
 
+  // client request
   if (socket !== undefined) {
     socket.on(handler.eventName, (packet) => {
+      if (authService.isAuthenticated(packet) === false) {
+        console.warn(`${handler.eventName}: token validation fail`)
+        return
+      }
       requestInfo.socket = socket
       requestInfo.packet = packet
       handler.handle(requestInfo)
       thisManager.receiveAlert(handler.eventName, requestInfo)
     })
+  // internal service request
   } else if (req !== undefined && res !== undefined) {
     requestInfo.req = req
     requestInfo.res = res

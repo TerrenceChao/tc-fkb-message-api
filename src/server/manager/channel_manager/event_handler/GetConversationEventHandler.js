@@ -57,8 +57,7 @@ GetConversationEventHandler.prototype.isValid = function (requestInfo) {
     typeof packet.uid === 'string' &&
     packet.ciid != null &&
     packet.convLimit != null &&
-    packet.convSkip != null &&
-    this.isAuthenticated(packet)
+    packet.convSkip != null
 }
 
 module.exports = {

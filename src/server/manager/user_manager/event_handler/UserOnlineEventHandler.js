@@ -53,8 +53,7 @@ UserOnlineEventHandler.prototype.handle = async function (requestInfo) {
 
 UserOnlineEventHandler.prototype.isValid = function (requestInfo) {
   return requestInfo.packet != null &&
-    requestInfo.packet.uid != null &&
-    this.isAuthenticated(requestInfo.packet)
+    requestInfo.packet.uid != null
 }
 
 module.exports = {

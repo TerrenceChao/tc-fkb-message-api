@@ -60,8 +60,7 @@ SendConversationEventHandler.prototype.isValid = function (requestInfo) {
     typeof packet.uid === 'string' &&
     packet.ciid != null &&
     packet.convType != null &&
-    packet.conversation != null &&
-    this.isAuthenticated(packet)
+    packet.conversation != null
 }
 
 module.exports = {

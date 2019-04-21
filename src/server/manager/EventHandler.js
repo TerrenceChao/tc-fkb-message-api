@@ -33,9 +33,5 @@ EventHandler.prototype.alertException = function (msgCode, requestInfo) {
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 }
 
-EventHandler.prototype.isAuthenticated = function (packet) {
-  var authService = this.globalContext['authService']
-  return authService.isAuthenticated(packet)
-}
-
 module.exports = EventHandler
+
