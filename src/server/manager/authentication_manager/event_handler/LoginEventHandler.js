@@ -26,6 +26,7 @@ LoginEventHandler.prototype.handle = async function (requestInfo) {
   }
 
   var authService = this.globalContext['authService']
+  var businessEvent = this.globalContext['businessEvent']
   var storageService = this.globalContext['storageService']
 
   var socket = requestInfo.socket
@@ -35,18 +36,14 @@ LoginEventHandler.prototype.handle = async function (requestInfo) {
     return
   }
 
-  // Notify: user joins ALL channels and notify members in channel
-  var businessEvent = this.globalContext['businessEvent']
+  // Initial: user makes connections to self & channel
   businessEvent.emit(EVENTS.USER_ONLINE, requestInfo)
+  businessEvent.emit(EVENTS.CHANNEL_ONLINE, requestInfo)
 
   // get user's channel list
   Promise.resolve(storageService.getUserChannelInfoList(packet.uid, packet.chanLimit))
-    .then(channelInfoList => {
-      this.sendChannelInfoAndConversations(requestInfo, channelInfoList)
-    })
-    .catch(() => {
-      this.alertException(`get user's channel list FAIL`, requestInfo)
-    })
+    .then(channelInfoList => this.sendChannelInfoAndConversations(requestInfo, channelInfoList))
+    .catch(() => this.alertException(`get user's channel list FAIL`, requestInfo))
 
   this.sendReceivedInvitations(requestInfo)
 }
@@ -61,6 +58,9 @@ LoginEventHandler.prototype.sendChannelInfoAndConversations = function (requestI
 
   userChannelInfoList.forEach(async (chInfo) => {
     var ciid = chInfo.ciid
+    // avoid send sensitive info to client ("ciid" is sensitive)
+    delete chInfo.ciid
+
     Promise.resolve(storageService.getConversationList(ciid, convLimit))
       .then(conversations => {
         chInfo.conversations = conversations
@@ -79,9 +79,7 @@ LoginEventHandler.prototype.sendChannelInfoAndConversations = function (requestI
 
         businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
       })
-      .catch(() => {
-        this.alertException(`get conversations of channel: ${ciid} FAIL`, requestInfo)
-      })
+      .catch(() => this.alertException(`get conversations of channel: ${ciid} FAIL`, requestInfo))
   })
 }
 

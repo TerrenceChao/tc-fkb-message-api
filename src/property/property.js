@@ -13,8 +13,8 @@ const TO = {
 
 const EVENTS = {
   // ConnectionManager
-  CONNECT: 'skt_connect',
-  DISCONNECT: 'disconnect',
+  CONNECT: 'service_connect',
+  DISCONNECT: 'service_disconnect',
 
   // AuthenticationManager
   AUTHENTICATE: 'req_authentication_authenticate',
@@ -22,6 +22,8 @@ const EVENTS = {
   LOGOUT: 'req_authentication_logout',
 
   // ChannelManager
+  CHANNEL_ONLINE: 'req_channel_channel_online',
+  CHANNEL_OFFLINE: 'req_channel_channel_offline',
   GET_CHANNEL_LIST: 'req_channel_get_channel_list',
   COMPETE_LOCK: 'req_channel_compete_lock',
   RELEASE_LOCK: 'req_channel_release_lock',
@@ -47,10 +49,9 @@ const EVENTS = {
   SEND_MESSAGE: 'req_message_send_message'
 }
 
+// Client side (request from client's event)
 const REQUEST_EVENTS = {
   // ConnectionManager
-  CONNECT: EVENTS.CONNECT,
-  DISCONNECT: EVENTS.DISCONNECT,
 
   // AuthenticationManager
   LOGIN: EVENTS.LOGIN,
@@ -62,7 +63,7 @@ const REQUEST_EVENTS = {
   RELEASE_LOCK: EVENTS.RELEASE_LOCK,
   CREATE_CHANNEL: EVENTS.CREATE_CHANNEL,
 
-  // for testing (will be removed)
+  // [NOTE]: Will be keeped if there's invitation implementation. Otherwise will be removed
   JOIN_CHANNEL: EVENTS.JOIN_CHANNEL,
 
   LEAVE_CHANNEL: EVENTS.LEAVE_CHANNEL,
@@ -81,14 +82,19 @@ const REQUEST_EVENTS = {
   SEND_MESSAGE: EVENTS.SEND_MESSAGE
 }
 
+// Server side (triggered by internal service(s))
 const BUSINESS_EVENTS = {
   // ConnectionManager
+  // Send and receive permission: fully allowed OR complete prohibition
+  CONNECT: EVENTS.CONNECT,
   DISCONNECT: EVENTS.DISCONNECT,
 
   // AuthenticationManager
   AUTHENTICATE: EVENTS.AUTHENTICATE,
 
   // ChannelManager
+  CHANNEL_ONLINE: EVENTS.CHANNEL_ONLINE,
+  CHANNEL_OFFLINE: EVENTS.CHANNEL_OFFLINE,
   RELEASE_LOCK: EVENTS.RELEASE_LOCK,
   JOIN_CHANNEL: EVENTS.JOIN_CHANNEL,
   REMOVE_CHANNEL: EVENTS.REMOVE_CHANNEL,
@@ -107,22 +113,23 @@ const BUSINESS_EVENTS = {
   SEND_MESSAGE: EVENTS.SEND_MESSAGE
 }
 
+// Client side (respose to client's event)
 const RESPONSE_EVENTS = {
-  // client side (respose to client's event):
+  // Personal info
+  PERSONAL_INFO: 'personal_info',
+  EXCEPTION_ALERT: 'exception_alert',
+  // Personal info: Invitation (realtime)
+  INVITATION_FROM_CHANNEL_TO_ME: 'invitation_from_channel_to_me',
+  // Personal info: Invitation (non-realtime)
+  INVITATION_LIST_FROM_CHANNEL: 'invitation_list_from_channel',
 
   // Channel
   CHANNEL_LIST: 'channel_list',
   CHANNEL_CREATED: 'channel_created',
   CHANNEL_REMOVED: 'channel_removed',
-
-  // Channel
-  INVITATION_LIST_FROM_CHANNEL: 'invitation_list_from_channel',
-  INVITATION_FROM_CHANNEL_TO_ME: 'invitation_from_channel_to_me',
+  // Channel: Conversation
   CONVERSATION_LIST: 'conversation_list',
   CONVERSATION_FROM_CHANNEL: 'conversation_from_channel',
-
-  // Exception
-  EXCEPTION_ALERT: 'exception_alert'
 }
 
 module.exports = {

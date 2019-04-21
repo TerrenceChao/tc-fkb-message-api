@@ -23,6 +23,7 @@ LogoutEventHandler.prototype.handle = function (requestInfo) {
 
   var businessEvent = this.globalContext['businessEvent']
   businessEvent.emit(EVENTS.USER_OFFLINE, requestInfo)
+  businessEvent.emit(EVENTS.CHANNEL_OFFLINE, requestInfo)
 }
 
 LogoutEventHandler.prototype.isValid = function (requestInfo) {

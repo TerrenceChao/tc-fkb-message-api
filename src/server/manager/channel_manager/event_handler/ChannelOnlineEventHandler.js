@@ -10,46 +10,50 @@ const {
 var ResponseInfo = require(path.join(config.get('src.manager'), 'ResponseInfo'))
 var EventHandler = require(path.join(config.get('src.manager'), 'EventHandler'))
 
-util.inherits(UserOfflineEventHandler, EventHandler)
+util.inherits(ChannelOnlineEventHandler, EventHandler)
 
-function UserOfflineEventHandler () {
+function ChannelOnlineEventHandler () {
   this.name = arguments.callee.name
 }
 
-UserOfflineEventHandler.prototype.eventName = EVENTS.USER_OFFLINE
+ChannelOnlineEventHandler.prototype.eventName = EVENTS.CHANNEL_ONLINE
 
-UserOfflineEventHandler.prototype.handle = function (requestInfo) {
+ChannelOnlineEventHandler.prototype.handle = async function (requestInfo) {
   if (!this.isValid(requestInfo)) {
-    console.warn(`${this.eventName}`, `request info is invalid`)
+    console.warn(`${this.eventName}: request info is invalid.`)
     return
   }
 
   var socketServer = this.globalContext['socketServer']
+  var storageService = this.globalContext['storageService']
   var businessEvent = this.globalContext['businessEvent']
   var socket = requestInfo.socket
   var packet = requestInfo.packet
   var uid = packet.uid
 
+  var channelIds = await storageService.getAllChannelIds(uid)
+  channelIds.forEach(ciid => {
+    socketServer.of('/').adapter.remoteJoin(socket.id, ciid)
+  })
+
   var resInfo = new ResponseInfo()
     .assignProtocol(requestInfo)
     .setHeader({
-      to: TO.USER,
-      receiver: uid,
-      responseEvent: RESPONSE_EVENTS.PERSONAL_INFO
+      to: TO.CHANNEL,
+      receiver: channelIds,
+      responseEvent: RESPONSE_EVENTS.CONVERSATION_FROM_CHANNEL
     })
     .setPacket({
-      msgCode: `user is offline`
+      msgCode: `user: ${uid} is online`
     })
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
-
-  socketServer.of('/').adapter.remoteLeave(socket.id, uid)
 }
 
-UserOfflineEventHandler.prototype.isValid = function (requestInfo) {
+ChannelOnlineEventHandler.prototype.isValid = function (requestInfo) {
   return requestInfo.packet != null &&
     requestInfo.packet.uid != null
 }
 
 module.exports = {
-  handler: new UserOfflineEventHandler()
+  handler: new ChannelOnlineEventHandler()
 }

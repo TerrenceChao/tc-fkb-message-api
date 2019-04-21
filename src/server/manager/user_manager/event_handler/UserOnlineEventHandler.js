@@ -18,35 +18,29 @@ function UserOnlineEventHandler () {
 
 UserOnlineEventHandler.prototype.eventName = EVENTS.USER_ONLINE
 
-UserOnlineEventHandler.prototype.handle = async function (requestInfo) {
+UserOnlineEventHandler.prototype.handle = function (requestInfo) {
   if (!this.isValid(requestInfo)) {
     console.warn(`${this.eventName}: request info is invalid.`)
     return
   }
 
+  var socketServer = this.globalContext['socketServer']
+  var businessEvent = this.globalContext['businessEvent']
   var socket = requestInfo.socket
   var packet = requestInfo.packet
   var uid = packet.uid
 
-  var socketServer = this.globalContext['socketServer']
   socketServer.of('/').adapter.remoteJoin(socket.id, uid)
 
-  var storageService = this.globalContext['storageService']
-  var channelIds = await storageService.getAllChannelIds(uid)
-  channelIds.forEach(ciid => {
-    socketServer.of('/').adapter.remoteJoin(socket.id, ciid)
-  })
-
-  var businessEvent = this.globalContext['businessEvent']
   var resInfo = new ResponseInfo()
     .assignProtocol(requestInfo)
     .setHeader({
-      to: TO.CHANNEL,
-      receiver: channelIds,
-      responseEvent: RESPONSE_EVENTS.CONVERSATION_FROM_CHANNEL
+      to: TO.USER,
+      receiver: uid,
+      responseEvent: RESPONSE_EVENTS.PERSONAL_INFO
     })
     .setPacket({
-      msgCode: `user: ${uid} is online`
+      msgCode: `user is online`
     })
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 }
