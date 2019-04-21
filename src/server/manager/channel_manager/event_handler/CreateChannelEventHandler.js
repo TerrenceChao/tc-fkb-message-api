@@ -18,56 +18,42 @@ function CreateChannelEventHandler () {
 
 CreateChannelEventHandler.prototype.eventName = EVENTS.CREATE_CHANNEL
 
-CreateChannelEventHandler.prototype.handle = async function (requestInfo) {
+CreateChannelEventHandler.prototype.handle = function (requestInfo) {
   if (!this.isValid(requestInfo)) {
     console.warn(`${this.eventName}: request info is invalid.`)
     return
   }
 
-  var packet = requestInfo.packet
-  var socket = requestInfo.socket
-  var uid = packet.uid
-  var channelName = packet.channelName
-
-  var resInfo = new ResponseInfo()
-    .assignProtocol(requestInfo)
-
-  var socketServer = this.globalContext['socketServer']
   var storageService = this.globalContext['storageService']
+  var uid = requestInfo.packet.uid
+  var channelName = requestInfo.packet.channelName
+
+  Promise.resolve(storageService.channelInfoCreated(uid, channelName))
+    .then(newChannelInfo => this.enterChannel(newChannelInfo, requestInfo),
+      err => this.alertException(err.message, requestInfo))
+}
+
+CreateChannelEventHandler.prototype.enterChannel = function (channelInfo, requestInfo) {
+  var socketServer = this.globalContext['socketServer']
+  var socket = requestInfo.socket
+
+  socketServer.of('/').adapter.remoteJoin(socket.id, channelInfo.ciid)
+  this.sendChannelInfoToUser(channelInfo, requestInfo)
+}
+
+CreateChannelEventHandler.prototype.sendChannelInfoToUser = function (channelInfo, requestInfo) {
   var businessEvent = this.globalContext['businessEvent']
-
-  // 'return null' if channelInfo had has been created.
-  var channelInfo = await storageService.channelInfoCreated(uid, channelName)
-  if (channelInfo == null) {
-    resInfo = this.packException(packet, resInfo)
-  } else {
-    socketServer.of('/').adapter.remoteJoin(socket.id, channelInfo.ciid)
-    resInfo = this.pack(channelInfo, resInfo)
-  }
-
+  var resInfo = new ResponseInfo()
+    .assignProtocol(requestInfo).setHeader({
+      to: TO.USER,
+      receiver: channelInfo.creator,
+      responseEvent: RESPONSE_EVENTS.CHANNEL_CREATED
+    }).setPacket({
+      msgCode: `channel: ${channelInfo.name} is created`,
+      data: channelInfo
+    })
+  
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
-}
-
-CreateChannelEventHandler.prototype.pack = function (channelInfo, responseInfo) {
-  return responseInfo.setHeader({
-    to: TO.USER,
-    receiver: channelInfo.creator,
-    responseEvent: RESPONSE_EVENTS.CHANNEL_CREATED
-  }).setPacket({
-    msgCode: `channel: ${channelInfo.name} is created`,
-    data: channelInfo
-  })
-}
-
-CreateChannelEventHandler.prototype.packException = function (packet, responseInfo) {
-  return responseInfo.setHeader({
-    to: TO.USER,
-    receiver: packet.uid,
-    responseEvent: RESPONSE_EVENTS.EXCEPTION_ALERT
-  }).setPacket({
-    msgCode: `channel: ${packet.channelName} is failed to create or has been created`,
-    data: false
-  })
 }
 
 CreateChannelEventHandler.prototype.isValid = function (requestInfo) {

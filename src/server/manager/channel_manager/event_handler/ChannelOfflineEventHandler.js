@@ -18,21 +18,32 @@ function ChannelOfflineEventHandler () {
 
 ChannelOfflineEventHandler.prototype.eventName = EVENTS.CHANNEL_OFFLINE
 
-ChannelOfflineEventHandler.prototype.handle = async function (requestInfo) {
+ChannelOfflineEventHandler.prototype.handle = function (requestInfo) {
   if (!this.isValid(requestInfo)) {
     console.warn(`${this.eventName}`, `request info is invalid`)
     return
   }
 
-  var socketServer = this.globalContext['socketServer']
   var storageService = this.globalContext['storageService']
-  var businessEvent = this.globalContext['businessEvent']
+  var uid = requestInfo.packet.uid
+
+  Promise.resolve(storageService.getAllChannelIds(uid))
+    .then(channelIds => this.leaveChannels(channelIds, requestInfo),
+      err => this.alertException(err.message, requestInfo))
+}
+
+ChannelOfflineEventHandler.prototype.leaveChannels = function (channelIds, requestInfo) {
+  this.broadcast(channelIds, requestInfo)
+
+  var socketServer = this.globalContext['socketServer']
   var socket = requestInfo.socket
-  var packet = requestInfo.packet
-  var uid = packet.uid
+  channelIds.forEach(ciid => {
+    socketServer.of('/').adapter.remoteLeave(socket.id, ciid)
+  })
+}
 
-  var channelIds = await storageService.getAllChannelIds(uid)
-
+ChannelOfflineEventHandler.prototype.broadcast = function (channelIds, requestInfo) {
+  var businessEvent = this.globalContext['businessEvent']
   var resInfo = new ResponseInfo()
     .assignProtocol(requestInfo)
     .setHeader({
@@ -43,11 +54,8 @@ ChannelOfflineEventHandler.prototype.handle = async function (requestInfo) {
     .setPacket({
       msgCode: `user: ${uid} is offline`
     })
+  
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
-
-  channelIds.forEach(ciid => {
-    socketServer.of('/').adapter.remoteLeave(socket.id, ciid)
-  })
 }
 
 ChannelOfflineEventHandler.prototype.isValid = function (requestInfo) {

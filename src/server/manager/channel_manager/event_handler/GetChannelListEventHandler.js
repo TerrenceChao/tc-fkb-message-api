@@ -18,21 +18,26 @@ function GetChannelListEventHandler () {
 
 GetChannelListEventHandler.prototype.eventName = EVENTS.GET_CHANNEL_LIST
 
-GetChannelListEventHandler.prototype.handle = async function (requestInfo) {
+GetChannelListEventHandler.prototype.handle = function (requestInfo) {
   if (!this.isValid(requestInfo)) {
     console.warn(`${this.eventName}: request info is invalid.`)
     return
   }
+
+  var storageService = this.globalContext['storageService']
 
   var packet = requestInfo.packet
   var uid = packet.uid
   var limit = packet.chanLimit
   var skip = packet.chanSkip
 
-  var businessEvent = this.globalContext['businessEvent']
-  var storageService = this.globalContext['storageService']
-  var userChannelInfoList = await storageService.getUserChannelInfoList(uid, limit, skip)
+  Promise.resolve(storageService.getUserChannelInfoList(uid, limit, skip))
+    .then(userChannelInfoList => this.sendChInfoListBelongedUser(userChannelInfoList, requestInfo),
+      err => this.alertException(err.message, requestInfo))
+}
 
+GetChannelListEventHandler.prototype.sendChInfoListBelongedUser = function (userChannelInfoList, requestInfo) {
+  var businessEvent = this.globalContext['businessEvent']
   var resInfo = new ResponseInfo()
     .assignProtocol(requestInfo)
     .setHeader({
@@ -44,6 +49,7 @@ GetChannelListEventHandler.prototype.handle = async function (requestInfo) {
       msgCode: `channel list`,
       data: userChannelInfoList
     })
+
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 }
 

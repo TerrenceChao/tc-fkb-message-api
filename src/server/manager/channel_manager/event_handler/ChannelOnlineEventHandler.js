@@ -18,23 +18,34 @@ function ChannelOnlineEventHandler () {
 
 ChannelOnlineEventHandler.prototype.eventName = EVENTS.CHANNEL_ONLINE
 
-ChannelOnlineEventHandler.prototype.handle = async function (requestInfo) {
+ChannelOnlineEventHandler.prototype.handle = function (requestInfo) {
   if (!this.isValid(requestInfo)) {
     console.warn(`${this.eventName}: request info is invalid.`)
     return
   }
 
-  var socketServer = this.globalContext['socketServer']
   var storageService = this.globalContext['storageService']
-  var businessEvent = this.globalContext['businessEvent']
-  var socket = requestInfo.socket
-  var packet = requestInfo.packet
-  var uid = packet.uid
+  var uid = requestInfo.packet.uid
 
-  var channelIds = await storageService.getAllChannelIds(uid)
+  Promise.resolve(storageService.getAllChannelIds(uid))
+    .then(channelIds => this.joinChannels(channelIds, requestInfo),
+      err => this.alertException(err.message, requestInfo))
+}
+
+ChannelOnlineEventHandler.prototype.joinChannels = function (channelIds, requestInfo) {
+  var socketServer = this.globalContext['socketServer']
+  var socket = requestInfo.socket
   channelIds.forEach(ciid => {
     socketServer.of('/').adapter.remoteJoin(socket.id, ciid)
   })
+
+  this.broadcast(channelIds, requestInfo)
+}
+
+ChannelOnlineEventHandler.prototype.broadcast = function (channelIds, requestInfo) {
+  var businessEvent = this.globalContext['businessEvent']
+  var packet = requestInfo.packet
+  var uid = packet.uid
 
   var resInfo = new ResponseInfo()
     .assignProtocol(requestInfo)
@@ -46,6 +57,7 @@ ChannelOnlineEventHandler.prototype.handle = async function (requestInfo) {
     .setPacket({
       msgCode: `user: ${uid} is online`
     })
+  
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 }
 

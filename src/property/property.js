@@ -125,15 +125,19 @@ const RESPONSE_EVENTS = {
   // Invitation (non-realtime) (to.USER)
   INVITATION_LIST_FROM_CHANNEL: 'invitation_list_from',
 
-  // Channel (to.USER)
-  CHANNEL_LIST: 'channel_list',
+  // Channel (realtime) (to.USER)
   CHANNEL_CREATED: 'channel_created',
   CHANNEL_REMOVED: 'channel_removed',
+  // Channel (realtime) (to.CHANNEL / USER)
+  CHANNEL_JOINED: 'channel_joined',
+  CHANNEL_LEFT: 'channel_left',
+  // Channel (non-realtime) (to.USER)
+  CHANNEL_LIST: 'channel_list',
 
-  // Channel: Conversation (to.USER)
-  CONVERSATION_LIST: 'conversation_list',
-  // (to.CHANNEL)
+  // Channel: Conversation (realtime) (to.CHANNEL)
   CONVERSATION_FROM_CHANNEL: 'conversation_from_channel',
+  // Channel: Conversation (non-realtime) (to.USER)
+  CONVERSATION_LIST: 'conversation_list',
 }
 
 module.exports = {

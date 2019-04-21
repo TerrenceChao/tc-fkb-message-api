@@ -16,17 +16,18 @@ EventHandler.prototype.handle = function (requestInfo) {
   throw new Error(`[EventHandler]: You should implement 'handle'.`)
 }
 
-EventHandler.prototype.alertException = function (msgCode, requestInfo) {
+EventHandler.prototype.alertException = function (msgCode, requestInfo, header = null) {
   var businessEvent = this.globalContext['businessEvent']
   var packet = requestInfo.packet
+  var resHeader = (header === null) ? {
+    to: TO.USER,
+    receiver: packet.uid,
+    responseEvent: RESPONSE_EVENTS.EXCEPTION_ALERT // back to user
+  } : header
 
   var resInfo = new ResponseInfo()
     .assignProtocol(requestInfo)
-    .setHeader({
-      to: TO.USER,
-      receiver: packet.uid,
-      responseEvent: RESPONSE_EVENTS.EXCEPTION_ALERT // back to user
-    })
+    .setHeader(resHeader)
     .setPacket({
       msgCode
     })

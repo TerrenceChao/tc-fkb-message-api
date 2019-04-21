@@ -207,11 +207,13 @@ StorageService.prototype.channelInfoCreated = async function (uid, channelName) 
     invitees: [],
     members: [uid]
   } || null
+  // throw new Error(`channel: ${channelName} is failed to create or has been created`)
 }
 
 StorageService.prototype.getAllChannelIds = async function (uid) {
   // return ciid !!! (for internal)
   return ['ciid chPub', 'ciid chGasStation', 'ciid chHospital', 'ciid B'] || []
+  // throw new Error(`fail to get user's all channel ciid(s). user: ${uid}`)
 }
 
 StorageService.prototype.getChannelInfo = async function (queryCondition) {
@@ -248,7 +250,7 @@ StorageService.prototype.getUserChannelInfoList = async function (uid, limit = 1
 }
 
 StorageService.prototype.channelJoined = async function (uid, chid) {
-  // In channelInfo(chid): remove uid from invitees,append uid to members.
+  // In channelInfo(chid): remove uid from invitees, append uid to members.
   return true
   // throw new Error(`join channel: ${chid} fail. uid: ${uid}`)
 }
@@ -261,11 +263,13 @@ StorageService.prototype.channelLeaved = async function (uid, chid) {
 
 StorageService.prototype.channelInfoRemoved = async function (queryCondition) {
   return true || false
+  // throw new Error(`channel: ${queryCondition.chid} is failed to remove`)
 }
 
 // for channel => conversations
 StorageService.prototype.conversationCreated = function (ciid, uid, content, type, datetime) {
   return true || false
+  // throw new Error(`conversation in channelInfo(ciid): ${ciid} is failed to created`)
 }
 
 StorageService.prototype.getConversationList = async function (ciid, limit = 10, skip = 0) {
@@ -294,7 +298,7 @@ StorageService.prototype.getConversationList = async function (ciid, limit = 10,
     // created_at: '發送時間和 DB 建立 record 時間會有落差'
   }
   ] || []
-  // throw new Error(`get conversations of channel: ${ciid} FAIL`)
+  // throw new Error(`get conversations in channel(ciid): ${ciid} FAIL`)
 }
 
 /**

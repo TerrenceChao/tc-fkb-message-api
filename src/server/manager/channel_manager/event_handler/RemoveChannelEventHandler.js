@@ -18,16 +18,28 @@ function RemoveChannelEventHandler () {
 
 RemoveChannelEventHandler.prototype.eventName = EVENTS.REMOVE_CHANNEL
 
-RemoveChannelEventHandler.prototype.handle = async function (requestInfo) {
+RemoveChannelEventHandler.prototype.handle = function (requestInfo) {
   if (!this.isValid(requestInfo)) {
     console.warn(`${this.eventName}: request info is invalid.`)
     return
   }
 
+  var storageService = this.globalContext['storageService']
+  var chid = requestInfo.packet.chid
+  var query = {
+    chid
+  }
+
+  Promise.resolve(storageService.channelInfoRemoved(query))
+    .then(confirm => this.notifyUser(requestInfo),
+      err => this.alertException(err.message, requestInfo))
+}
+
+RemoveChannelEventHandler.prototype.notifyUser = function (requestInfo) {
+  var businessEvent = this.globalContext['businessEvent']
   var packet = requestInfo.packet
   var uid = packet.uid
   var chid = packet.chid
-  var channelName = packet.channelName
 
   var resInfo = new ResponseInfo()
     .assignProtocol(requestInfo)
@@ -36,27 +48,13 @@ RemoveChannelEventHandler.prototype.handle = async function (requestInfo) {
       receiver: uid,
       responseEvent: RESPONSE_EVENTS.CHANNEL_REMOVED
     })
-
-  var businessEvent = this.globalContext['businessEvent']
-  var storageService = this.globalContext['storageService']
-  var query = {
-    chid
-  }
-
-  if (await storageService.channelInfoRemoved(query) === true) {
-    resInfo.setPacket({
+    .setPacket({
       msgCode: `channel: ${channelName} is removed`,
-      data: true
+      data: {
+        chid
+      }
     })
-  } else {
-    resInfo.setHeader({
-      responseEvent: RESPONSE_EVENTS.EXCEPTION_ALERT
-    }).setPacket({
-      msgCode: `channel: ${channelName} is failed to remove`,
-      data: false
-    })
-  }
-
+  
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 }
 

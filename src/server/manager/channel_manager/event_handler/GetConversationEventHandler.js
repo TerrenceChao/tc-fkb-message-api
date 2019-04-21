@@ -18,24 +18,29 @@ function GetConversationEventHandler () {
 
 GetConversationEventHandler.prototype.eventName = EVENTS.GET_CONVERSATION
 
-GetConversationEventHandler.prototype.handle = async function (requestInfo) {
+GetConversationEventHandler.prototype.handle = function (requestInfo) {
   if (!this.isValid(requestInfo)) {
     console.warn(`${this.eventName}: request info is invalid.`)
     return
   }
 
+  var storageService = this.globalContext['storageService']
+  var packet = requestInfo.packet
+
+  Promise.resolve(storageService.getConversationList(packet.ciid, packet.convLimit, packet.convSkip))
+    .then(conversationList => this.sendConversationList(conversationList, requestInfo),
+      err => this.alertException(err.message, requestInfo))
+}
+
+GetConversationEventHandler.prototype.sendConversationList = function (conversationList, requestInfo) {
+  var businessEvent = this.globalContext['businessEvent']
   var packet = requestInfo.packet
   var {
     uid,
-    ciid,
     convLimit,
     convSkip
   } = packet
 
-  var businessEvent = this.globalContext['businessEvent']
-  var storageService = this.globalContext['storageService']
-
-  var conversations = await storageService.getConversationList(ciid, convLimit, convSkip)
   var resInfo = new ResponseInfo()
     .assignProtocol(requestInfo)
     .setHeader({
@@ -45,7 +50,7 @@ GetConversationEventHandler.prototype.handle = async function (requestInfo) {
     })
     .setPacket({
       msgCode: `get conversations from ${convSkip} to ${convSkip + convLimit}`,
-      data: [{ ciid: conversations }]
+      data: { ciid: conversationList }
     })
 
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)

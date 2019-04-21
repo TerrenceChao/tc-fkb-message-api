@@ -19,7 +19,7 @@ function LeaveChannelEventHandler () {
 
 LeaveChannelEventHandler.prototype.eventName = EVENTS.LEAVE_CHANNEL
 
-LeaveChannelEventHandler.prototype.handle = async function (requestInfo) {
+LeaveChannelEventHandler.prototype.handle = function (requestInfo) {
   if (!this.isValid(requestInfo)) {
     console.warn(`${this.eventName}: request info is invalid.`)
     return
@@ -94,11 +94,7 @@ LeaveChannelEventHandler.prototype.notifyUserToDelete = function (channelInfo, r
     .setHeader({
       to: TO.USER,
       receiver: uid,
-      // to user self
-      responseEvent: [
-        RESPONSE_EVENTS.CHANNEL_LIST,
-        RESPONSE_EVENTS.PERSONAL_INFO
-      ]
+      responseEvent: RESPONSE_EVENTS.CHANNEL_LEFT // to user self
     })
     .setPacket({
       msgCode: `delete channelinfo (${channelInfo.chid})`,

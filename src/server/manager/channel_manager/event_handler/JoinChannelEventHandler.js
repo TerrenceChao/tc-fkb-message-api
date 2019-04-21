@@ -42,9 +42,7 @@ JoinChannelEventHandler.prototype.handle = function (requestInfo) {
 
 JoinChannelEventHandler.prototype.executeJoin = function (channelInfo, requestInfo) {
   var socketServer = this.globalContext['socketServer']
-  var socket = requestInfo.socket
-
-  socketServer.of('/').adapter.remoteJoin(socket.id, channelInfo.ciid)
+  socketServer.of('/').adapter.remoteJoin(requestInfo.socket.id, channelInfo.ciid)
 
   this.broadcastUserHasJoined(channelInfo, requestInfo)
   this.sendChannelInfoToUser(channelInfo, requestInfo)
@@ -85,11 +83,13 @@ JoinChannelEventHandler.prototype.sendChannelInfoToUser = function (channelInfo,
     .setHeader({
       to: TO.USER,
       receiver: uid,
-      responseEvent: RESPONSE_EVENTS.CHANNEL_LIST // to user self
+      responseEvent: RESPONSE_EVENTS.CHANNEL_JOINED // to user self
     })
     .setPacket({
       msgCode: `get refreshed channelinfo. including name, chid, ciid, creator, members`,
-      data: [channelInfo]
+      data: {
+        chid: channelInfo
+      }
     })
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 }
