@@ -64,7 +64,7 @@ SendMessageEventHandler.prototype.handle = function (responseInfo) {
             return
           }
 
-          console.log(`${EVENTS.SEND_MESSAGE}:`, `emit to ${header.to}: ${JSON.stringify(receiver)}`, `responseEvent: "${responseEvent}"`, JSON.stringify(packet))
+          console.log(`"${EVENTS.SEND_MESSAGE}": {"emit to ${header.to}": ${JSON.stringify(receiver)}, "responseEvent": "${responseEvent}"}`, `, "packet": ${JSON.stringify(packet)},`)
           break
 
         case TO.SOCKET:
