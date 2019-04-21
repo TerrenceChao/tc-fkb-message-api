@@ -2,7 +2,7 @@ var config = require('config')
 var util = require('util')
 var path = require('path')
 
-const Manager = require(path.join(config.get('manager'), 'Manager'))
+const Manager = require(path.join(config.get('src.manager'), 'Manager'))
 
 util.inherits(ConnectionManager, Manager)
 

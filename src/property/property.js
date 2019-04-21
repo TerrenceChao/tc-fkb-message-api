@@ -13,8 +13,8 @@ const TO = {
 
 const EVENTS = {
   // ConnectionManager
-  CONNECT: 'skt_connect',
-  DISCONNECT: 'disconnect',
+  CONNECT: 'service_connect',
+  DISCONNECT: 'service_disconnect',
 
   // AuthenticationManager
   AUTHENTICATE: 'req_authentication_authenticate',
@@ -22,6 +22,8 @@ const EVENTS = {
   LOGOUT: 'req_authentication_logout',
 
   // ChannelManager
+  CHANNEL_ONLINE: 'req_channel_channel_online',
+  CHANNEL_OFFLINE: 'req_channel_channel_offline',
   GET_CHANNEL_LIST: 'req_channel_get_channel_list',
   COMPETE_LOCK: 'req_channel_compete_lock',
   RELEASE_LOCK: 'req_channel_release_lock',
@@ -33,9 +35,10 @@ const EVENTS = {
   GET_CONVERSATION: 'req_channel_get_conversation',
 
   // InvitationManager
-  GET_INVITATION_LIST: 'req_channel_get_invitation_list',
-  SEND_INVITATION: 'req_channel_send_invitation',
-  DEAL_WITH_INVITATION: 'req_channel_deal_with_invitation',
+  GET_INVITATION_LIST: 'req_invitation_get_invitation_list',
+  SEND_INVITATION: 'req_invitation_send_invitation',
+  DEAL_WITH_INVITATION: 'req_invitation_deal_with_invitation',
+  CONFIRM_INVITATION: 'req_invitation_confirm_invitation',
 
   // UserManager
   USER_ONLINE: 'req_user_user_online',
@@ -44,13 +47,11 @@ const EVENTS = {
   // MessageManager
   SERVER_PUSH: 'req_message_server_push',
   SEND_MESSAGE: 'req_message_send_message'
-
 }
 
+// Client side (request from client's event)
 const REQUEST_EVENTS = {
   // ConnectionManager
-  CONNECT: EVENTS.CONNECT,
-  DISCONNECT: EVENTS.DISCONNECT,
 
   // AuthenticationManager
   LOGIN: EVENTS.LOGIN,
@@ -61,7 +62,10 @@ const REQUEST_EVENTS = {
   COMPETE_LOCK: EVENTS.COMPETE_LOCK,
   RELEASE_LOCK: EVENTS.RELEASE_LOCK,
   CREATE_CHANNEL: EVENTS.CREATE_CHANNEL,
+
+  // [NOTE]: Will be keeped if there's invitation implementation. Otherwise will be removed
   JOIN_CHANNEL: EVENTS.JOIN_CHANNEL,
+
   LEAVE_CHANNEL: EVENTS.LEAVE_CHANNEL,
   SEND_CONVERSATION: EVENTS.SEND_CONVERSATION,
   GET_CONVERSATION: EVENTS.GET_CONVERSATION,
@@ -70,26 +74,36 @@ const REQUEST_EVENTS = {
   GET_INVITATION_LIST: EVENTS.GET_INVITATION_LIST,
   SEND_INVITATION: EVENTS.SEND_INVITATION,
   DEAL_WITH_INVITATION: EVENTS.DEAL_WITH_INVITATION,
+  CONFIRM_INVITATION: EVENTS.CONFIRM_INVITATION,
 
   // UserManager
 
   // MessageManager
   SEND_MESSAGE: EVENTS.SEND_MESSAGE
-
 }
 
+// Server side (triggered by internal service(s))
 const BUSINESS_EVENTS = {
   // ConnectionManager
+  // Send and receive permission: fully allowed OR complete prohibition
+  CONNECT: EVENTS.CONNECT,
   DISCONNECT: EVENTS.DISCONNECT,
 
   // AuthenticationManager
   AUTHENTICATE: EVENTS.AUTHENTICATE,
 
   // ChannelManager
+  CHANNEL_ONLINE: EVENTS.CHANNEL_ONLINE,
+  CHANNEL_OFFLINE: EVENTS.CHANNEL_OFFLINE,
   RELEASE_LOCK: EVENTS.RELEASE_LOCK,
+  JOIN_CHANNEL: EVENTS.JOIN_CHANNEL,
   REMOVE_CHANNEL: EVENTS.REMOVE_CHANNEL,
   SEND_CONVERSATION: EVENTS.SEND_CONVERSATION,
   GET_CONVERSATION: EVENTS.GET_CONVERSATION,
+
+  // InvitationManager
+  GET_INVITATION_LIST: EVENTS.GET_INVITATION_LIST,
+  DEAL_WITH_INVITATION: EVENTS.DEAL_WITH_INVITATION,
 
   // UserManager
   USER_ONLINE: EVENTS.USER_ONLINE,
@@ -98,26 +112,32 @@ const BUSINESS_EVENTS = {
   // MessageManager
   SERVER_PUSH: EVENTS.SERVER_PUSH,
   SEND_MESSAGE: EVENTS.SEND_MESSAGE
-
 }
 
+// Client side (respose to client's event)
 const RESPONSE_EVENTS = {
-  // client side (respose to client's event):
+  // Personal info (to.USER)
+  PERSONAL_INFO: 'personal_info',
+  EXCEPTION_ALERT: 'exception_alert',
 
-  // Authentication
-  USER_LOGIN: 'user_login',
-  USER_LOGOUT: 'user_logout',
+  // Invitation (realtime) (to.USER)
+  INVITATION_FROM_CHANNEL_TO_ME: 'invitation_from_channel_to_me',
+  // Invitation (non-realtime) (to.USER)
+  INVITATION_LIST_FROM_CHANNEL: 'invitation_list_from',
 
-  // Channel
-  CHANNEL_LIST: 'channel_list',
+  // Channel (realtime) (to.USER)
   CHANNEL_CREATED: 'channel_created',
-  CHANNEL_LEAVED: 'channel_leaved',
   CHANNEL_REMOVED: 'channel_removed',
+  // Channel (realtime) (to.CHANNEL / USER)
+  CHANNEL_JOINED: 'channel_joined',
+  CHANNEL_LEFT: 'channel_left',
+  // Channel (non-realtime) (to.USER)
+  CHANNEL_LIST: 'channel_list',
 
-  // Channel
-  INVITATION_LIST_FROM_CHANNEL: 'invitation_list_from_channel',
-  // INVITATION_FROM_CHANNEL_TO_: `invitation_from_channel_to_${uid}`,
-  CONVERSATION_FROM_CHANNEL: 'conversation_from_channel'
+  // Channel: Conversation (realtime) (to.CHANNEL)
+  CONVERSATION_FROM_CHANNEL: 'conversation_from_channel',
+  // Channel: Conversation (non-realtime) (to.USER)
+  CONVERSATION_LIST: 'conversation_list',
 }
 
 module.exports = {

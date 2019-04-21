@@ -1,44 +1,14 @@
-
-function RequestInfo() {
-    this.req;
-    this.res;
-    this.socket;
-    this.packetContent = {};
-
-    this.clientPacketContent = null;
+function RequestInfo () {
+  this.req = null
+  this.res = null
+  this.socket = null
+  this.packet = null
 }
 
-RequestInfo.prototype.clientPacket = function(sender, TO, receiver, responseEvent, clientPacket) {
-    if ( ! this.clientPacketContent) {
-        this.clientPacketContent = {
-            header: {},
-            body: {}
-        };
-    }
-    
-    let client = this.clientPacketContent;
-    // header
-    client.header.sender     = sender || client.header.sender;
-    client.header.to         = to || client.header.to;
-    client.header.receiver   = receiver || client.header.receiver;
-    client.header.responseEvent  = responseEvent || client.header.responseEvent;
+RequestInfo.prototype.setPacket = function (packet) {
+  this.packet = packet
 
-    // body
-    client.body   = clientPacket || client.body;
+  return this
 }
 
-RequestInfo.prototype.channelParam = function(uid, type, channelKey) {
-    if ( ! this.clientPacketContent) {
-        this.clientPacketContent = {
-            header: {},
-            body: {}
-        };
-    }   
-
-    let clientHeader = this.clientPacketContent.header;
-    clientHeader.uid = uid;
-    clientHeader.type = type;
-    clientHeader.channelKey = channelKey;
-}
-
-module.exports = RequestInfo;
+module.exports = RequestInfo

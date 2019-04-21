@@ -4,9 +4,9 @@ const express = require('express')
 const routeIndex = express.Router()
 const {
   BUSINESS_EVENTS
-} = require(path.join(config.get('property'), 'property'))
-const RequestInfo = require(path.join(config.get('manager'), 'RequestInfo'))
-let globalContext = require(path.join(config.get('manager'), 'globalContext'))
+} = require(path.join(config.get('src.property'), 'property'))
+var RequestInfo = require(path.join(config.get('src.manager'), 'RequestInfo'))
+let globalContext = require(path.join(config.get('src.manager'), 'globalContext'))
 
 /**
  * ===========================================================
@@ -14,29 +14,25 @@ let globalContext = require(path.join(config.get('manager'), 'globalContext'))
  * check main-app => src => services => messageService
  * ===========================================================
  */
-const businessEvent = globalContext.businessEvent
+var authService = globalContext.authService
+var businessEvent = globalContext.businessEvent
+const TOKEN = config.get('auth.token')
 
 routeIndex.get(`/index`, (req, res, next) => {
-  var fullUrl = `${req.protocol}://${req.get('host')}/${req.originalUrl}`
-  console.log(`fullUrl: ${fullUrl}`)
-  res.json(`${{a: 1, b: 2, fullUrl}}`)
+  var url = `${req.protocol}://${req.get('host')}/${req.originalUrl}`
+  console.log(`url: ${url}`)
+  res.send({
+    a: 1,
+    b: 2,
+    url
+  })
 })
 
-routeIndex.post(`/${BUSINESS_EVENTS.AUTHENTICATE}`, (req, res, next) => {
-  /**
-   * authenticationManager...
-   * return a MS_TOKEN;
-   */
-  // const protocol = { req, res };
-  // let handler = authenticationManager.getEventHandler(BUSINESS_EVENTS.AUTHENTICATE);
-  // authenticationManager.listenRequestEvent(protocol, handler);
-  let requestInfo = new RequestInfo()
-  requestInfo.req = req
-  requestInfo.res = res
-  requestInfo.packetContent = req.body
-  console.log(`requestInfo.packetContent: ${JSON.stringify(requestInfo.packetContent)}`)
-
-  businessEvent.emit(BUSINESS_EVENTS.AUTHENTICATE, requestInfo)
+routeIndex.get(`/${BUSINESS_EVENTS.AUTHENTICATE}`, (req, res, next) => {
+  var token = authService.obtainAuthorization(req.headers)
+  res.send({
+    [TOKEN]: token
+  })
 })
 
 routeIndex.post(`/${BUSINESS_EVENTS.SERVER_PUSH}`, (req, res, next) => {
@@ -59,8 +55,8 @@ routeIndex.post(`/${BUSINESS_EVENTS.SERVER_PUSH}`, (req, res, next) => {
   let requestInfo = new RequestInfo()
   requestInfo.req = req
   requestInfo.res = res
-  requestInfo.packetContent = req.body
-  console.log(`requestInfo.packetContent: ${JSON.stringify(requestInfo.packetContent)}`)
+  requestInfo.packet = req.body
+  console.log(`requestInfo.packet: ${JSON.stringify(requestInfo.packet)}`)
 
   businessEvent.emit(BUSINESS_EVENTS.SERVER_PUSH, requestInfo)
 })

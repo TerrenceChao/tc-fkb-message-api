@@ -4,8 +4,8 @@ var fs = require('fs')
 const {
   REQUEST_EVENTS,
   BUSINESS_EVENTS
-} = require(path.join(config.get('property'), 'property'))
-const RequestInfo = require('./RequestInfo.js')
+} = require(path.join(config.get('src.property'), 'property'))
+var RequestInfo = require('./RequestInfo.js')
 
 function Manager () {}
 
@@ -25,12 +25,12 @@ Manager.prototype.init = function (globalContext) {
 Manager.prototype.listenBusinessEvent = function (handler) {
   handler.globalContext = this.globalContext
   const businessEvent = this.globalContext['businessEvent']
-  const self = this
+  const thisManager = this
 
   businessEvent.on(handler.eventName, (requestInfo) => {
     // console.log(` => listenBusinessEvent: handler is ${JSON.stringify(handler, null, 2)}`)
     handler.handle(requestInfo)
-    self.receiveAlert(handler.eventName, requestInfo)
+    thisManager.receiveAlert(handler.eventName, requestInfo)
   })
 }
 
@@ -47,7 +47,8 @@ Manager.prototype.startListen = function (protocol) {
 
 Manager.prototype.listenRequestEvent = function (protocol, handler) {
   handler.globalContext = this.globalContext
-  const self = this
+  const authService = this.globalContext['authService']
+  const thisManager = this
 
   const {
     req,
@@ -56,18 +57,24 @@ Manager.prototype.listenRequestEvent = function (protocol, handler) {
   } = protocol
   let requestInfo = new RequestInfo()
 
-  if (socket != undefined) {
-    socket.on(handler.eventName, (packetContent) => {
+  // client request
+  if (socket !== undefined) {
+    socket.on(handler.eventName, (packet) => {
+      if (authService.isAuthenticated(packet) === false) {
+        console.warn(`${handler.eventName}: token validation fail`)
+        return
+      }
       requestInfo.socket = socket
-      requestInfo.packetContent = packetContent
+      requestInfo.packet = packet
       handler.handle(requestInfo)
-      self.receiveAlert(handler.eventName, requestInfo)
+      thisManager.receiveAlert(handler.eventName, requestInfo)
     })
-  } else if (req != undefined && res != undefined) {
+  // internal service request
+  } else if (req !== undefined && res !== undefined) {
     requestInfo.req = req
     requestInfo.res = res
     handler.handle(requestInfo)
-    self.receiveAlert(handler.eventName, requestInfo)
+    thisManager.receiveAlert(handler.eventName, requestInfo)
   }
 }
 
