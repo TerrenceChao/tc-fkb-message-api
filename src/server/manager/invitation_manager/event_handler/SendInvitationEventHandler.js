@@ -32,7 +32,7 @@ SendInvitationEventHandler.prototype.handle = function (requestInfo) {
   Promise.resolve(storageService.getChannelInfo({ chid }))
     .then(channelInfo => this.createAndGetInvitations(channelInfo, requestInfo),
       err => this.alertException(err.message, requestInfo))
-    .then(invitations => this.sendInvitations(invitations, requestInfo),
+    .then(invitationList => this.sendInvitations(invitationList, requestInfo),
       err => this.alertException(err.message, requestInfo))
 }
 
@@ -47,7 +47,7 @@ SendInvitationEventHandler.prototype.createAndGetInvitations = async function (c
   var invitees = _.pullAll(newInvitees, inviteesHasBeenInvited)
   var inviData = this.getInvitationCreateionData(channelInfo)
 
-  var invitations = await storageService.invitationMultiCreated(
+  var invitationList = await storageService.invitationMultiCreated(
     inviter,
     invitees,
     inviData.header,
@@ -55,7 +55,7 @@ SendInvitationEventHandler.prototype.createAndGetInvitations = async function (c
     inviData.sensitive
   )
 
-  return invitations
+  return invitationList
 }
 
 SendInvitationEventHandler.prototype.getInvitationCreateionData = function (channelInfo) {
@@ -73,10 +73,10 @@ SendInvitationEventHandler.prototype.getInvitationCreateionData = function (chan
   }
 }
 
-SendInvitationEventHandler.prototype.sendInvitations = function (invitations, requestInfo) {
+SendInvitationEventHandler.prototype.sendInvitations = function (invitationList, requestInfo) {
   var businessEvent = this.globalContext['businessEvent']
 
-  invitations.forEach(invitation => {
+  invitationList.forEach(invitation => {
     _.unset(invitation, 'sensitive')
 
     var resInfo = new ResponseInfo()

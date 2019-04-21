@@ -1,6 +1,7 @@
 var config = require('config')
 var util = require('util')
 var path = require('path')
+var _ = require('lodash')
 
 const {
   TO,
@@ -29,7 +30,7 @@ GetInvitationListEventHandler.prototype.handle = async function (requestInfo) {
 
   Promise.resolve(this.getInvitationList(requestInfo))
     .then(invitationList => this.sendInvitationList(invitationList, requestInfo))
-    .catch(err => this.alertException(err, requestInfo))
+    .catch(err => this.alertException(err.message, requestInfo))
 }
 
 GetInvitationListEventHandler.prototype.getInvitationList = async function (requestInfo) {
@@ -54,6 +55,10 @@ GetInvitationListEventHandler.prototype.getInvitationList = async function (requ
 GetInvitationListEventHandler.prototype.sendInvitationList = function (invitationList, requestInfo) {
   var businessEvent = this.globalContext['businessEvent']
   var packet = requestInfo.packet
+
+  invitationList.forEach(invitation => {
+    _.unset(invitation, 'sensitive')
+  })
 
   var resInfo = new ResponseInfo()
     .assignProtocol(requestInfo)

@@ -41,8 +41,8 @@ CreateChannelEventHandler.prototype.handle = async function (requestInfo) {
   if (channelInfo == null) {
     resInfo = this.packException(packet, resInfo)
   } else {
-    resInfo = this.pack(channelInfo, resInfo)
     socketServer.of('/').adapter.remoteJoin(socket.id, channelInfo.ciid)
+    resInfo = this.pack(channelInfo, resInfo)
   }
 
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
@@ -50,8 +50,8 @@ CreateChannelEventHandler.prototype.handle = async function (requestInfo) {
 
 CreateChannelEventHandler.prototype.pack = function (channelInfo, responseInfo) {
   return responseInfo.setHeader({
-    to: TO.CHANNEL,
-    receiver: channelInfo.ciid,
+    to: TO.USER,
+    receiver: channelInfo.creator,
     responseEvent: RESPONSE_EVENTS.CHANNEL_CREATED
   }).setPacket({
     msgCode: `channel: ${channelInfo.name} is created`,

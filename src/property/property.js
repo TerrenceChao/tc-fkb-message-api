@@ -102,6 +102,7 @@ const BUSINESS_EVENTS = {
   GET_CONVERSATION: EVENTS.GET_CONVERSATION,
 
   // InvitationManager
+  GET_INVITATION_LIST: EVENTS.GET_INVITATION_LIST,
   DEAL_WITH_INVITATION: EVENTS.DEAL_WITH_INVITATION,
 
   // UserManager
@@ -115,20 +116,23 @@ const BUSINESS_EVENTS = {
 
 // Client side (respose to client's event)
 const RESPONSE_EVENTS = {
-  // Personal info
+  // Personal info (to.USER)
   PERSONAL_INFO: 'personal_info',
   EXCEPTION_ALERT: 'exception_alert',
-  // Personal info: Invitation (realtime)
-  INVITATION_FROM_CHANNEL_TO_ME: 'invitation_from_channel_to_me',
-  // Personal info: Invitation (non-realtime)
-  INVITATION_LIST_FROM_CHANNEL: 'invitation_list_from_channel',
 
-  // Channel
+  // Invitation (realtime) (to.USER)
+  INVITATION_FROM_CHANNEL_TO_ME: 'invitation_from_channel_to_me',
+  // Invitation (non-realtime) (to.USER)
+  INVITATION_LIST_FROM_CHANNEL: 'invitation_list_from',
+
+  // Channel (to.USER)
   CHANNEL_LIST: 'channel_list',
   CHANNEL_CREATED: 'channel_created',
   CHANNEL_REMOVED: 'channel_removed',
-  // Channel: Conversation
+
+  // Channel: Conversation (to.USER)
   CONVERSATION_LIST: 'conversation_list',
+  // (to.CHANNEL)
   CONVERSATION_FROM_CHANNEL: 'conversation_from_channel',
 }
 

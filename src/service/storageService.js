@@ -87,7 +87,12 @@ StorageService.prototype.getReceivedInvitationList = async function (uid, limit 
     iid: 'mbnht594EokdMvfht54elwTsd98',
     inviter: 'ruby',
     invitee: 'me',
-    header: {},
+    header: {
+      requestEvent: 'req_invitation_deal_with_invitation',
+      data: {
+        channelName: 'Night Bar'
+      }
+    },
     content: 'HTML string',
     sensitive: {
       chid: 'chid: sdfghjklcbvghikliuyuii7g',
@@ -98,7 +103,12 @@ StorageService.prototype.getReceivedInvitationList = async function (uid, limit 
     iid: '9kjnbvcdrtyuiljhgtloytfghjk',
     inviter: 'summer',
     invitee: 'me',
-    header: {},
+    header: {
+      requestEvent: 'req_invitation_deal_with_invitation',
+      data: {
+        channelName: 'Room 18'
+      }
+    },
     content: 'another HTML string',
     sensitive: {
       chid: 'chid: aert5hewinaslgsi584waesr',
@@ -207,15 +217,17 @@ StorageService.prototype.getUserChannelInfoList = async function (uid, limit = 1
     invitees: [],
     members: ['uidE', 'uidF']
   }] || []
-  // throw Exception OR return null if not found
+  // throw new Error(`get user's channel list FAIL. user:${uid}`)
 }
 
 StorageService.prototype.channelJoined = async function (uid, chid) {
+  // In channelInfo(chid): remove uid from invitees,append uid to members.
   return true
   // throw new Error(`join channel: ${chid} fail. uid: ${uid}`)
 }
 
 StorageService.prototype.channelLeaved = async function (uid, chid) {
+  // In channelInfo(chid): remove uid from members
   return true || false
 }
 
@@ -251,6 +263,7 @@ StorageService.prototype.getConversationList = async function (ciid, limit = 10,
     created_at: Date.now()
   }
   ] || []
+  // throw new Error(`get conversations of channel: ${ciid} FAIL`)
 }
 
 /**

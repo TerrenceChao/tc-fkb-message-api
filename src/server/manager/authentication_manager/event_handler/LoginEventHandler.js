@@ -40,12 +40,13 @@ LoginEventHandler.prototype.handle = async function (requestInfo) {
   businessEvent.emit(EVENTS.USER_ONLINE, requestInfo)
   businessEvent.emit(EVENTS.CHANNEL_ONLINE, requestInfo)
 
-  // get user's channel list
+  packet.inviType = 'received'
+  businessEvent.emit(EVENTS.GET_INVITATION_LIST, requestInfo)
+
+  // get user's channel list & belonged conversations
   Promise.resolve(storageService.getUserChannelInfoList(packet.uid, packet.chanLimit))
     .then(channelInfoList => this.sendChannelInfoAndConversations(requestInfo, channelInfoList))
-    .catch(() => this.alertException(`get user's channel list FAIL`, requestInfo))
-
-  this.sendReceivedInvitations(requestInfo)
+    .catch(err => this.alertException(err.message, requestInfo))
 }
 
 LoginEventHandler.prototype.sendChannelInfoAndConversations = function (requestInfo, userChannelInfoList) {
@@ -62,8 +63,8 @@ LoginEventHandler.prototype.sendChannelInfoAndConversations = function (requestI
     delete chInfo.ciid
 
     Promise.resolve(storageService.getConversationList(ciid, convLimit))
-      .then(conversations => {
-        chInfo.conversations = conversations
+      .then(conversationList => {
+        chInfo.conversations = conversationList
 
         var resInfo = new ResponseInfo()
           .assignProtocol(requestInfo)
@@ -79,37 +80,8 @@ LoginEventHandler.prototype.sendChannelInfoAndConversations = function (requestI
 
         businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
       })
-      .catch(() => this.alertException(`get conversations of channel: ${ciid} FAIL`, requestInfo))
+      .catch(err => this.alertException(err.message, requestInfo))
   })
-}
-
-LoginEventHandler.prototype.sendReceivedInvitations = function (requestInfo) {
-  var storageService = this.globalContext['storageService']
-  var businessEvent = this.globalContext['businessEvent']
-
-  var packet = requestInfo.packet
-  var uid = packet.uid
-  var inviLimit = packet.inviLimit
-
-  Promise.resolve(storageService.getReceivedInvitationList(uid, inviLimit))
-    .then(invitationList => {
-      var resInfo = new ResponseInfo()
-        .assignProtocol(requestInfo)
-        .setHeader({
-          to: TO.USER,
-          receiver: uid,
-          responseEvent: RESPONSE_EVENTS.INVITATION_LIST_FROM_CHANNEL
-        })
-        .setPacket({
-          msgCode: `invitation list`,
-          data: invitationList
-        })
-
-      businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
-    })
-    .catch(() => {
-      this.alertException(`get invitation(s) FAIL`, requestInfo)
-    })
 }
 
 LoginEventHandler.prototype.isValid = function (requestInfo) {
