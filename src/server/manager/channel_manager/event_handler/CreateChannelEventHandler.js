@@ -28,8 +28,15 @@ CreateChannelEventHandler.prototype.handle = function (requestInfo) {
   var uid = requestInfo.packet.uid
   var channelName = requestInfo.packet.channelName
 
-  // 待優化：client 可以自定義 ciid, chid 先建立 channel, 事後再透過 DB 建立紀錄
-  // [NOTE] 那如果沒接收到 DB 建立成功的訊息？
+  /**
+   * 待優化？
+   * client 可以自定義 ciid, chid 先建立 channel, 事後再透過 DB 建立紀錄
+   * [NOTE] 那如果沒接收到 DB 建立成功的訊息？
+   * 
+   * 結論：
+   * create channel 時，此時尚未有其他成員，不會對訊息交換有效能上的拖累。
+   * 穩定的將 channel 建立好即可。
+   */
 
   Promise.resolve(storageService.channelInfoCreated(uid, channelName))
     .then(newChannelInfo => this.enterChannel(newChannelInfo, requestInfo),

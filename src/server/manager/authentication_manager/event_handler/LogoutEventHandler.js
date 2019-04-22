@@ -25,10 +25,16 @@ LogoutEventHandler.prototype.handle = function (requestInfo) {
   businessEvent.emit(EVENTS.USER_OFFLINE, requestInfo)
   businessEvent.emit(EVENTS.CHANNEL_OFFLINE, requestInfo)
 
-  // 待優化：在 UserInChannel(db table) 可能需要更新 user 所擁有的 channelInfo(s) 中, 
-  // 其每個 channel 最新 conversation 的 datetime. 
-  // user login 時需要載入的前幾個 channelInfo(s), 是由每個 channel 
-  // 最後一則 conversation 的 datetime 的順序 (desc) 來排序的。
+  /**
+   * 待優化：
+   * 在 login 期間 user 所瀏覽過 (點開看過) 的 channel(s), 需要將該 channel(s) 最後一次被 user 
+   * 瞥見訊息的時間，更新/紀錄在 table "UserInChannel" (從聊天室 A 切換到其他頁面的那個時間點, 
+   * 將離開聊天室 A 的 "時間" 紀錄下來，當作聊天室 A 的 last glimpse time) 。
+   * user login 期間將所有房間的 last glimpse time(s) 暫時紀錄於 client 端，logout 時將這些
+   * 各個房間的 last_glimpse(s) 更新回 database。
+   * 當下次 user login 時，需要透過每個 channel 最後一則 conversation 的 datetime 順序 (desc)
+   * 來載入前幾個 channelInfo(s), 此時和 last_glimpse 比較，就會知道哪些屬於未讀訊息了
+   */
 }
 
 LogoutEventHandler.prototype.isValid = function (requestInfo) {
