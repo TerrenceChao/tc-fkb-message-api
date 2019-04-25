@@ -44,8 +44,8 @@ JoinChannelEventHandler.prototype.handle = function (requestInfo) {
 
   // channelJoined: refresh channelInfo FIRST
   Promise.resolve(storageService.channelJoined(uid, chid))
-    .then(confirm => storageService.getChannelInfo(chInfoQuery),
-      err => this.alertException(err.message, requestInfo))
+    // .then(confirm => storageService.getChannelInfo(chInfoQuery),
+    //   err => this.alertException(err.message, requestInfo))
     .then(refreshedChannelInfo => this.executeJoin(refreshedChannelInfo, requestInfo),
       err => this.alertException(err.message, requestInfo))
 }

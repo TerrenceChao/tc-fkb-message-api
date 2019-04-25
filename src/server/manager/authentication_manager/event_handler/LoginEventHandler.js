@@ -36,6 +36,15 @@ LoginEventHandler.prototype.handle = async function (requestInfo) {
     return
   }
 
+  try {
+    var user = await storageService.getUser(packet.uid)
+    if (user == null) {
+      await storageService.createUser(packet.uid)
+    }
+  } catch (err) {
+    this.alertException(err.message, requestInfo)
+  }
+
   // Initial: user makes connections to self & channel
   businessEvent.emit(EVENTS.USER_ONLINE, requestInfo)
   businessEvent.emit(EVENTS.CHANNEL_ONLINE, requestInfo)

@@ -48,8 +48,8 @@ LeaveChannelEventHandler.prototype.handle = function (requestInfo) {
 
   // channelLeaved: refresh channelInfo FIRST
   Promise.resolve(storageService.channelLeaved(uid, chid))
-    .then(confirm => storageService.getChannelInfo(chInfoQuery),
-      err => this.alertException(err.message, requestInfo))
+    // .then(confirm => storageService.getChannelInfo(chInfoQuery),
+    //   err => this.alertException(err.message, requestInfo))
     .then(refreshedChannelInfo => this.executeLeave(refreshedChannelInfo, requestInfo),
       err => this.alertException(err.message, requestInfo))
     .then(refreshedChannelInfo => {

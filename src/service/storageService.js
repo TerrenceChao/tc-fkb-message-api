@@ -1,43 +1,35 @@
 var config = require('config')
 var path = require('path')
 
-// const { cache } = require(path.join(config.get('cache'), 'cache'));
-// const {
-//   repository
-// } = require(path.join(config.get('database'), 'repository'))
+const {
+  userRepository,
+  invitationRepository,
+  channelInfoRepository,
+  conversationRepository
+} = require(path.join(config.get('src.repository'), 'repository'))
 
-function StorageService () {}
 
-//   var invitations = []
-//   invitations = invitees.map(invi => {
-//     return {
-//       // Avoid creating repeat items
-//       iid: `${invi}.encrypt(${chid}, ${invi}, secret?)`,
-//       inviter,
-//       invitee: invi,
-//       header,
-//       content,
-//       sensitive,
-//       create_at: Date.now()
-//     }
-//   })
+function logger(err) {
+  console.error(`database error: ${err.message}`)
+}
 
-//   /**
-//    * DB insert multiple rows using self-defiend iid (invitation ID):
-//    *      e.g. bcrypt
-//    * 1. craete InvitationOfChannel(schema):
-//    *      Model.insertMany(invitations)
-//    * 2. for 'channelInfo': insert invitee = 'uid' (type string or Array) into channelInfo(schema)
-//    *      Model.update(...)
-//    * 3. for 'invitee': insert 'iid' into UserInChannel.received_invitations(schema)
-//    *      Model.update(...)
-//    * 4. for 'inviter': insert 'iid' into UserInChannel.sent_invitations(schema):
-//    *      Model.update(...)
-//    * 5. note: what if failed ?
-//    */
+function StorageService() { }
 
-//   return invitations || []
-// }
+StorageService.prototype.getUser = async function (uid) {
+  return Promise.resolve(userRepository.findById(uid))
+    .catch(err => {
+      logger(err)
+      return Promise.reject(err)
+    })
+}
+
+StorageService.prototype.createUser = async function (uid) {
+  return Promise.resolve(userRepository.create(uid)) // return true
+    .catch(err => {
+      logger(err)
+      return Promise.reject(err)
+    })
+}
 
 StorageService.prototype.invitationMultiCreated = async function (
   inviter,
@@ -46,269 +38,187 @@ StorageService.prototype.invitationMultiCreated = async function (
   content,
   sensitive
 ) {
-  return [{
-    iid: 'mbnht594EokdMvfht54elwTsd98',
-    inviter,
-    invitee: invitees[0] || 'invitee?',
-    header,
-    content,
-    sensitive,
-    create_at: Date.now()
-  }, {
-    iid: 'vfgty78iolkmnhgtrfdcvbhjkjmn',
-    inviter,
-    invitee: invitees[1] || 'invitee?',
-    header,
-    content,
-    sensitive,
-    create_at: Date.now()
-  }]
-  // throw new Error(`create invitation(s) fail`)
+  if (!Array.isArray(invitees)) {
+    throw new TypeError(`param 'invitees' is not an array`)
+  }
+
+  return Promise.all(invitees.map(async (invitee) => {
+    var invitation = await invitationRepository.create(inviter, invitee, header, content, sensitive)
+    await userRepository.recordInvitation(invitation.iid, inviter, invitee) // return true
+
+    return invitation
+  }))
+    .catch(err => {
+      logger(err)
+      return Promise.reject(new Error(`create invitation(s) fail`))
+    })
 }
 
 StorageService.prototype.getInvitation = async function (iid) {
-  return {
-    iid: 'mbnht594EokdMvfht54elwTsd98',
-    inviter: 'inviter?',
-    invitee: 'invitee?',
-    header: {},
-    content: 'HTML string',
-    sensitive: {
-      chid: 'chid: aert5hewinaslgsi584waesr',
-      ciid: 'ciid B'
-    },
-    create_at: Date.now()
+  try {
+    return await invitationRepository.findById(iid)
+  } catch (err) {
+    logger(err)
+    throw new Error(`invitation ID(iid) is invalid`)
   }
-  // throw new Error(`invitation ID(iid) is invalid`)
 }
 
 StorageService.prototype.getReceivedInvitationList = async function (uid, limit = 10, skip = 0) {
-  // get invitations where "invitee" is uid
-  return [{
-    iid: 'mbnht594EokdMvfht54elwTsd98',
-    inviter: 'ruby',
-    invitee: 'me',
-    header: {
-      requestEvent: 'req_invitation_deal_with_invitation',
-      data: {
-        channelName: 'Night Bar'
-      }
-    },
-    content: 'HTML string',
-    sensitive: {
-      chid: 'chid: sdfghjklcbvghikliuyuii7g',
-      ciid: 'ciid A'
-    },
-    create_at: Date.now()
-  }, {
-    iid: '9kjnbvcdrtyuiljhgtloytfghjk',
-    inviter: 'summer',
-    invitee: 'me',
-    header: {
-      requestEvent: 'req_invitation_deal_with_invitation',
-      data: {
-        channelName: 'Room 18'
-      }
-    },
-    content: 'another HTML string',
-    sensitive: {
-      chid: 'chid: aert5hewinaslgsi584waesr',
-      ciid: 'ciid B'
-    },
-    create_at: Date.now()
-  }] || []
-  // throw new Error(`invitationList(received) is null`)
+  try {
+    var inviteIds = await userRepository.getReceivedInvitationIds(uid, limit, skip, 'DESC')
+    var invitationList = await invitationRepository.getListByIds(inviteIds) // (inviteIds, uid, limit, skip, 'DESC')
+    return invitationList
+    
+  } catch (err) {
+    logger(err)
+    throw new Error(`invitationList(received) is null`)
+  }
 }
 
 StorageService.prototype.getSentInvitationList = async function (uid, limit = 10, skip = 0) {
-  // get invitations where "inviter" is uid
-  return [{
-    iid: 'fyjael5845givsydgvldygrfila',
-    inviter: 'me',
-    invitee: 'william',
-    header: {
-      requestEvent: 'req_invitation_deal_with_invitation',
-      data: {
-        channelName: 'Night Bar'
-      }
-    },
-    content: 'HTML string',
-    sensitive: {
-      chid: 'chid: cgh78oluiuefhwrbjsdhfvbas',
-      ciid: 'ciid C'
-    },
-    create_at: Date.now()
-  }, {
-    iid: 'l8hnadfvbwritgbsi5rgtbirwas',
-    inviter: 'me',
-    invitee: 'cathy',
-    header: {
-      requestEvent: 'req_invitation_deal_with_invitation',
-      data: {
-        channelName: 'Room 18'
-      }
-    },
-    content: 'another HTML string',
-    sensitive: {
-      chid: 'chid: fguiodbfmjuytfghjkemngfgh',
-      ciid: 'ciid D'
-    },
-    create_at: Date.now()
-  }] || []
-  // throw new Error(`invitationList(sent) is null`)
-}
-
-StorageService.prototype.getInvitationThenRemoved = async function (iid) {
-  /**
-   * Database:
-   * 1. query and get (copied obj)
-   * 2. for 'inviter': pull element(iid) from UserInChannel.sent_invitations(schema)
-   * 3. for 'invitee': pull element(iid) from UserInChannel.received_invitations(schema)
-   * 4. for 'channelInfo': pull element(uid) from ChannelInfo.invitee(schema)
-   * 5. remove InvitationOfChannel(schema)
-   * 6. return (copied obj)
-   */
-  return {
-    iid: 'mbnht594EokdMvfht54elwTsd98',
-    inviter: 'inviter?',
-    invitee: 'invitee?',
-    header: {},
-    content: 'HTML string',
-    sensitive: {
-      chid: 'chid: aert5hewinaslgsi584waesr',
-      ciid: 'ciid B'
-    },
-    create_at: Date.now()
-  } || false
+  return Promise.resolve(userRepository.getSentInvitationIds(uid, limit, skip, 'DESC'))
+    .then(inviteIds => invitationRepository.getListByIds(inviteIds)) //  (inviteIds, uid, limit, skip, 'DESC')
+    .catch(err => {
+      logger(err)
+      return Promise.reject(new Error(`invitationList(sent) is null`))
+    })
 }
 
 StorageService.prototype.invitationRemoved = async function (iid) {
-  /**
-   * Database:
-   * 1. query and get (copied obj)
-   * 2. for 'inviter': pull element(iid) from UserInChannel.sent_invitations(schema)
-   * 3. for 'invitee': pull element(iid) from UserInChannel.received_invitations(schema)
-   * 4. for 'channelInfo': pull element(uid) from ChannelInfo.invitee(schema)
-   * 5. remove InvitationOfChannel(schema)
-   */
-  return true
-  // throw new Error(`remove invitation: ${iid} fail`)
+  try {
+    var invitation = await invitationRepository.getById(iid)
+    // remove the iid(s) ref in User
+    await userRepository.deleteInvitation(
+      invitation.iid,
+      invitation.inviter,
+      invitation.invitee
+    ) // return true
+    return await invitationRepository.removeById(iid) // return true
+
+  } catch (err) {
+    logger(err)
+    throw new Error(`remove invitation: ${iid} fail`)
+  }
 }
 
-// for channel
-// 'return null' if channelInfo had has been created.
 StorageService.prototype.channelInfoCreated = async function (uid, channelName) {
-  // ciid saved in local storage (for frontend)
-  return {
-    ciid: 'ciid B',
-    creator: uid,
-    chid: 'chid:l4ehfuvljifgbudvzsugkurliLO4U*T&IYEOW*UGY',
-    name: 'Room 18',
-    invitees: [],
-    members: [uid]
-  } || null
-  // throw new Error(`channel: ${channelName} is failed to create or has been created`)
+  // ciid will be saved in local storage (for frontend)
+  try {
+    var channelInfo = await channelInfoRepository.create(uid, channelName)
+    // add channel ref(channel record) in User
+    await userRepository.appendChannelRecord({
+      ciid: channelInfo.ciid,
+      chid: channelInfo.chid,
+      joined_at: Date.now(),
+      last_glimpse: Date.now()
+    })
+
+    return channelInfo
+    
+  } catch (err) {
+    logger(err)
+    throw new Error(`channel: ${channelName} is failed to create or has been created`)
+  }
 }
 
 StorageService.prototype.getAllChannelIds = async function (uid) {
-  // return ciid !!! (for internal)
-  return ['ciid chPub', 'ciid chGasStation', 'ciid chHospital', 'ciid B'] || []
-  // throw new Error(`fail to get user's all channel ciid(s). user: ${uid}`)
+  // get ciid(s) !!! (for internal online/offline procedure)
+  return Promise.resolve(userRepository.getChannelRecords(uid)) // (uid, limit, skip, 'DESC')
+    .then(channelRecords => channelRecords.map(chRecord => chRecord.ciid))
+    .catch(err => {
+      logger(err)
+      return Promise.reject(new Error(`fail to get user's all channel ciid(s). user: ${uid}`))
+    })
 }
 
-StorageService.prototype.getChannelInfo = async function (queryCondition) {
-  // ciid?? saved in local storage (for frontend)
-  return {
-    ciid: 'ciid B',
-    creator: 'someone',
-    chid: 'chid:l4ehfuvljifgbudvzsugkurliLO4U*T&IYEOW*UGY',
-    name: 'Room 18',
-    invitees: [],
-    members: ['uidA', 'uidB', 'uidC']
+StorageService.prototype.getChannelInfo = async function (query) {
+  // ciid will be saved in local storage (for frontend)
+  try {
+    return await channelInfoRepository.find(query)
+
+  } catch (err) {
+    logger(err)
+    throw new Error(`couldn't get channel info with: ${JSON.stringify(query, null, 2)}`)
   }
-  // throw new Error(`couldn't get channel info with: ${JSON.stringify(queryCondition, null, 2)}`)
 }
 
 StorageService.prototype.getUserChannelInfoList = async function (uid, limit = 10, skip = 0) {
   // order by conversation's 'created_at' DESC
-  return [{
-    ciid: 'ciid B',
-    creator: 'someone',
-    chid: 'chid:l4ehfuvljifgbudvzsugkurliLO4U*T&IYEOW*UGY',
-    name: 'Room 18',
-    invitees: [],
-    members: ['uidA', 'uidB', 'uidC']
-  }, {
-    ciid: 'ciid A',
-    creator: 'WHO?',
-    chid: 'chid:ijmlYIOUYGVUYBK>DFRUTYIHUJNJKTSARFDCVSBUN',
-    name: 'Night Bar',
-    invitees: [],
-    members: ['uidE', 'uidF']
-  }] || []
-  // throw new Error(`get user's channel list FAIL. user:${uid}`)
+  return Promise.resolve(userRepository.getChannelRecords(uid)) // (uid, limit, skip, 'DESC')
+    .then(channelRecords => channelRecords.map(chRecord => chRecord.ciid))
+    // the latest news should comes from channelInfo, not user self
+    .then(ciids => channelInfoRepository.getListByIds(ciids, limit, skip, 'DESC'))
+    .catch(err => {
+      logger(err)
+      return Promise.reject(new Error(`get user's channel list FAIL. user:${uid}`))
+    })
 }
 
 StorageService.prototype.channelJoined = async function (uid, chid) {
-  // In channelInfo(chid): remove uid from invitees, append uid to members.
-  return true
-  // throw new Error(`join channel: ${chid} fail. uid: ${uid}`)
+  try {
+    // In channelInfo(chid): remove uid from invitees, append uid to members.
+    var channelInfo = await channelInfoRepository.appendMemberAndReturn(chid, uid)
+    // add channel ref(channel record) in User
+    await userRepository.appendChannelRecord({
+      ciid: channelInfo.ciid,
+      chid: channelInfo.chid,
+      joined_at: Date.now(),
+      last_glimpse: Date.now()
+    })
+    return channelInfo
+
+  } catch (err) {
+    logger(err)
+    throw new Error(`join channel: ${chid} fail. uid: ${uid}`)
+  }
 }
 
 StorageService.prototype.channelLeaved = async function (uid, chid) {
-  // In channelInfo(chid): remove uid from members
-  return true || false
-  // throw new Error(`leave channel: ${chid} fail. uid: ${uid}`)
+  try {
+    // In channelInfo(chid): remove uid from members
+    var channelInfo = await channelInfoRepository.removeMemberAndReturn(chid, uid)
+    // remove channel ref(channel record) in User
+    await userRepository.removeChannelRecord({
+      ciid: channelInfo.ciid,
+      chid: channelInfo.chid
+    })
+    return channelInfo
+
+  } catch (err) {
+    logger(err)
+    throw new Error(`leave channel: ${chid} fail. uid: ${uid}`)
+  }
 }
 
-StorageService.prototype.channelInfoRemoved = async function (queryCondition) {
-  return true || false
-  // throw new Error(`channel: ${queryCondition.chid} is failed to remove`)
+StorageService.prototype.channelInfoRemoved = async function (query) {
+  try {
+    var channelInfo = await channelInfoRepository.find(query)
+    await conversationRepository.removeByCiid(channelInfo.ciid) // return true
+    await channelInfoRepository.removeById(channelInfo.ciid) // return true
+    return true
+
+  } catch (err) {
+    logger(err)
+    throw new Error(`channel: ${query.chid} is failed to remove`)
+  }
 }
 
 // for channel => conversations
-StorageService.prototype.conversationCreated = function (ciid, uid, content, type, datetime) {
-  return true || false
-  // throw new Error(`conversation in channelInfo(ciid): ${ciid} is failed to created`)
+StorageService.prototype.conversationCreated = async function (ciid, uid, content, type, datetime) {
+  return Promise.resolve(conversationRepository.create(ciid, uid, content, type, datetime))
+    .catch(err => {
+      logger(err)
+      return Promise.reject(new Error(`conversation in channelInfo(ciid): ${ciid} is failed to created`))
+    })
 }
 
 StorageService.prototype.getConversationList = async function (ciid, limit = 10, skip = 0) {
-  return [{
-    ciid,
-    sender: 'Eason',
-    content: 'this is a messaging service',
-    type: 'text',
-    datetime: Date.now(),
-    // created_at: '發送時間和 DB 建立 record 時間會有落差'
-  },
-  {
-    ciid,
-    sender: 'Billy',
-    content: 'Today is a sunny day',
-    type: 'text',
-    datetime: Date.now(),
-    // created_at: '發送時間和 DB 建立 record 時間會有落差'
-  },
-  {
-    ciid,
-    sender: 'Jessica',
-    content: 'Hello world',
-    type: 'text',
-    datetime: Date.now(),
-    // created_at: '發送時間和 DB 建立 record 時間會有落差'
-  }
-  ] || []
-  // throw new Error(`get conversations in channel(ciid): ${ciid} FAIL`)
+  return Promise.resolve(conversationRepository.getListByCiid(ciid, limit, skip, 'DESC'))
+    .catch(err => {
+      logger(err)
+      return Promise.reject(new Error(`get conversations in channel(ciid): ${ciid} FAIL`))
+    })
 }
-
-/**
- * ===================================================
- * for compete/release lock:
- * record in redis/cache, to lock specify resource.
- * ===================================================
- */
-// StorageService.prototype.competeLock = function() { }
-// StorageService.prototype.releaseLock = function() { }
 
 module.exports = {
   storageService: new StorageService()
