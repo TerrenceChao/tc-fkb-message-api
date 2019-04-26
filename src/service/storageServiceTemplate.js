@@ -57,6 +57,17 @@ StorageServiceTemplate.prototype.createUser = async function (uid) {
   // throw err
 }
 
+StorageServiceTemplate.prototype.updateLastGlimpse = async function (uid, jsonGlimpses) {
+  // assume "jsonObjCopy" is "jsonGlimpses"
+  var jsonObjCopy = {
+    ciidA: Date.now(),
+    ciidB: Date.now(),
+    ciidC: Date.now()
+  }
+
+  return true
+}
+
 StorageServiceTemplate.prototype.invitationMultiCreated = async function (
   inviter,
   invitees,

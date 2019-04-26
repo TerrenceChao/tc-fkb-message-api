@@ -15,7 +15,7 @@ function LogoutEventHandler () {
 
 LogoutEventHandler.prototype.eventName = EVENTS.LOGOUT
 
-LogoutEventHandler.prototype.handle = function (requestInfo) {
+LogoutEventHandler.prototype.handle = async function (requestInfo) {
   if (!this.isValid(requestInfo)) {
     console.warn(`${this.eventName}: request info is invalid.`)
     return
@@ -35,12 +35,23 @@ LogoutEventHandler.prototype.handle = function (requestInfo) {
    * 當下次 user login 時，需要透過每個 channel 最後一則 conversation 的 datetime 順序 (desc)
    * 來載入前幾個 channelInfo(s), 此時和 last_glimpse 比較，就會知道哪些屬於未讀訊息了
    */
+  var storageService = this.globalContext['storageService']
+  var packet = requestInfo.packet
+  var uid = packet.uid
+  var config = packet.config
+
+  try {
+    await storageService.updateLastGlimpse(uid, config.glimpses)
+  } catch (err) {
+    console.log(err.message)
+  }
 }
 
 LogoutEventHandler.prototype.isValid = function (requestInfo) {
   var packet = requestInfo.packet
   return packet !== undefined &&
-    typeof packet.uid === 'string'
+    typeof packet.uid === 'string' &&
+    typeof packet.config === 'object'
 }
 
 module.exports = {

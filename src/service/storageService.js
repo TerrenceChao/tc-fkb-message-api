@@ -1,10 +1,10 @@
 var config = require('config')
 var path = require('path')
 
-const userRepository = require(path.join(config.get('src.repository'), 'userRepository'))
-const invitationRepository = require(path.join(config.get('src.repository'), 'invitationRepository'))
-const channelInfoRepository = require(path.join(config.get('src.repository'), 'channelInfoRepository'))
-const conversationRepository = require(path.join(config.get('src.repository'), 'conversationRepository'))
+const userRepository = require(path.join(config.get('src.repository'), 'nosql', 'userRepository'))
+const invitationRepository = require(path.join(config.get('src.repository'), 'nosql', 'invitationRepository'))
+const channelInfoRepository = require(path.join(config.get('src.repository'), 'nosql', 'channelInfoRepository'))
+const conversationRepository = require(path.join(config.get('src.repository'), 'nosql', 'conversationRepository'))
 
 function logger (err) {
   console.error(`database error: ${err.message}`)
@@ -22,6 +22,14 @@ StorageService.prototype.getUser = async function (uid) {
 
 StorageService.prototype.createUser = async function (uid) {
   return Promise.resolve(userRepository.create(uid)) // return true
+    .catch(err => {
+      logger(err)
+      return Promise.reject(err)
+    })
+}
+
+StorageService.prototype.updateLastGlimpse = async function (uid, jsonGlimpses) {
+  return Promise.resolve(userRepository.updateLastGlimpse(uid, jsonGlimpses)) // return true
     .catch(err => {
       logger(err)
       return Promise.reject(err)
@@ -63,7 +71,7 @@ StorageService.prototype.getInvitation = async function (iid) {
 StorageService.prototype.getReceivedInvitationList = async function (uid, limit = 10, skip = 0) {
   try {
     var inviteIds = await userRepository.getReceivedInvitationIds(uid, limit, skip, 'DESC')
-    var invitationList = await invitationRepository.getListByIds(inviteIds) // (inviteIds, uid, limit, skip, 'DESC')
+    var invitationList = await invitationRepository.getListByIds(inviteIds) // (inviteIds, limit, skip, 'DESC')
     return invitationList
   } catch (err) {
     logger(err)
@@ -73,7 +81,7 @@ StorageService.prototype.getReceivedInvitationList = async function (uid, limit 
 
 StorageService.prototype.getSentInvitationList = async function (uid, limit = 10, skip = 0) {
   return Promise.resolve(userRepository.getSentInvitationIds(uid, limit, skip, 'DESC'))
-    .then(inviteIds => invitationRepository.getListByIds(inviteIds)) //  (inviteIds, uid, limit, skip, 'DESC')
+    .then(inviteIds => invitationRepository.getListByIds(inviteIds)) //  (inviteIds, limit, skip, 'DESC')
     .catch(err => {
       logger(err)
       return Promise.reject(new Error(`invitationList(sent) is null`))
@@ -82,7 +90,7 @@ StorageService.prototype.getSentInvitationList = async function (uid, limit = 10
 
 StorageService.prototype.invitationRemoved = async function (iid) {
   try {
-    var invitation = await invitationRepository.getById(iid)
+    var invitation = await invitationRepository.findById(iid)
     // remove the iid(s) ref in User
     await userRepository.deleteInvitation(
       invitation.iid,
