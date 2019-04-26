@@ -269,13 +269,27 @@ StorageServiceTemplate.prototype.getUserChannelInfoList = async function (uid, l
 
 StorageServiceTemplate.prototype.channelJoined = async function (uid, chid) {
   // In channelInfo(chid): remove uid from invitees, append uid to members.
-  return true
+  return {
+    ciid: 'ciid A',
+    creator: 'WHO?',
+    chid: 'chid:ijmlYIOUYGVUYBK>DFRUTYIHUJNJKTSARFDCVSBUN',
+    name: 'Night Bar',
+    invitees: [],
+    members: ['uidE', 'uidF']
+  }
   // throw new Error(`join channel: ${chid} fail. uid: ${uid}`)
 }
 
 StorageServiceTemplate.prototype.channelLeaved = async function (uid, chid) {
   // In channelInfo(chid): remove uid from members
-  return true || false
+  return {
+    ciid: 'ciid A',
+    creator: 'WHO?',
+    chid: 'chid:ijmlYIOUYGVUYBK>DFRUTYIHUJNJKTSARFDCVSBUN',
+    name: 'Night Bar',
+    invitees: [],
+    members: ['uidE', 'uidF']
+  }
   // throw new Error(`leave channel: ${chid} fail. uid: ${uid}`)
 }
 
