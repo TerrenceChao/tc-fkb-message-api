@@ -1,12 +1,10 @@
 var config = require('config')
 var path = require('path')
 
-const {
-  userRepository,
-  invitationRepository,
-  channelInfoRepository,
-  conversationRepository
-} = require(path.join(config.get('src.repository'), 'repository'))
+const userRepository = require(path.join(config.get('src.repository'), 'userRepository'))
+const invitationRepository = require(path.join(config.get('src.repository'), 'invitationRepository'))
+const channelInfoRepository = require(path.join(config.get('src.repository'), 'channelInfoRepository'))
+const conversationRepository = require(path.join(config.get('src.repository'), 'conversationRepository'))
 
 function logger (err) {
   console.error(`database error: ${err.message}`)
