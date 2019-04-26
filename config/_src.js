@@ -16,6 +16,7 @@ module.exports = function (root) {
     connectionManager: path.join(manager, 'connection_manager'),
     authenticationManager: path.join(manager, 'authentication_manager'),
     channelManager: path.join(manager, 'channel_manager'),
+    conversationManager: path.join(manager, 'conversation_manager'),
     invitationManager: path.join(manager, 'invitation_manager'),
     userManager: path.join(manager, 'user_manager'),
     messageManager: path.join(manager, 'message_manager'),
@@ -23,6 +24,7 @@ module.exports = function (root) {
     connectionEventHandler: path.join(manager, 'connection_manager', 'event_handler'),
     authenticationEventHandler: path.join(manager, 'authentication_manager', 'event_handler'),
     channelEventHandler: path.join(manager, 'channel_manager', 'event_handler'),
+    conversationEventHandler: path.join(manager, 'conversation_manager', 'event_handler'),
     invitationEventHandler: path.join(manager, 'invitation_manager', 'event_handler'),
     userEventHandler: path.join(manager, 'user_manager', 'event_handler'),
     messageEventHandler: path.join(manager, 'message_manager', 'event_handler')

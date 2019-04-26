@@ -22,15 +22,17 @@ module.exports = function (root) {
       connectionManager: path.join(managerInUnit, 'connection_manager'),
       authenticationManager: path.join(managerInUnit, 'authentication_manager'),
       channelManager: path.join(managerInUnit, 'channel_manager'),
+      conversationManager: path.join(managerInUnit, 'conversation_manager'),
       invitationManager: path.join(managerInUnit, 'invitation_manager'),
       userManager: path.join(managerInUnit, 'user_manager'),
       messageManager: path.join(managerInUnit, 'message_manager'),
 
-      connectionEventHandler: path.join(managerInUnit, 'connectionanager', 'event_handler'),
+      connectionEventHandler: path.join(managerInUnit, 'connection_manager', 'event_handler'),
       authenticationEventHandler: path.join(managerInUnit, 'authentication_manager', 'event_handler'),
-      channelEventHandler: path.join(managerInUnit, 'channelanager', 'event_handler'),
+      channelEventHandler: path.join(managerInUnit, 'channel_manager', 'event_handler'),
+      conversationEventHandler: path.join(managerInUnit, 'conversation_manager', 'event_handler'),
       invitationEventHandler: path.join(managerInUnit, 'invitation_manager', 'event_handler'),
-      userEventHandler: path.join(managerInUnit, 'useranager', 'event_handler'),
+      userEventHandler: path.join(managerInUnit, 'user_manager', 'event_handler'),
       messageEventHandler: path.join(managerInUnit, 'message_manager', 'event_handler')
     }
   }

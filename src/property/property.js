@@ -25,14 +25,17 @@ const EVENTS = {
   CHANNEL_ONLINE: 'req_channel_channel_online',
   CHANNEL_OFFLINE: 'req_channel_channel_offline',
   GET_CHANNEL_LIST: 'req_channel_get_channel_list',
-  COMPETE_LOCK: 'req_channel_compete_lock',
-  RELEASE_LOCK: 'req_channel_release_lock',
   CREATE_CHANNEL: 'req_channel_create_channel',
   JOIN_CHANNEL: 'req_channel_join_channel',
   LEAVE_CHANNEL: 'req_channel_leave_channel',
   REMOVE_CHANNEL: 'req_channel_remove_channel',
-  SEND_CONVERSATION: 'req_channel_send_conversation',
-  GET_CONVERSATION: 'req_channel_get_conversation',
+
+  // ConversationManager
+  COMPETE_LOCK: 'req_conversation_compete_lock',
+  RELEASE_LOCK: 'req_conversation_release_lock',
+  SEND_CONVERSATION: 'req_conversation_send_conversation',
+  GET_CONVERSATION: 'req_conversation_get_conversation',
+  // MARK_AS_READ: 'req_conversation_mark_as_read',
 
   // InvitationManager
   GET_INVITATION_LIST: 'req_invitation_get_invitation_list',
@@ -43,6 +46,7 @@ const EVENTS = {
   // UserManager
   USER_ONLINE: 'req_user_user_online',
   USER_OFFLINE: 'req_user_user_offline',
+  // CONFIG_SETTING: '?'
 
   // MessageManager
   SERVER_PUSH: 'req_message_server_push',
@@ -59,14 +63,15 @@ const REQUEST_EVENTS = {
 
   // ChannelManager
   GET_CHANNEL_LIST: EVENTS.GET_CHANNEL_LIST,
-  COMPETE_LOCK: EVENTS.COMPETE_LOCK,
-  RELEASE_LOCK: EVENTS.RELEASE_LOCK,
   CREATE_CHANNEL: EVENTS.CREATE_CHANNEL,
 
   // [NOTE]: Will be keeped if there's invitation implementation. Otherwise will be removed
   JOIN_CHANNEL: EVENTS.JOIN_CHANNEL,
-
   LEAVE_CHANNEL: EVENTS.LEAVE_CHANNEL,
+
+  // ConversationManager
+  COMPETE_LOCK: EVENTS.COMPETE_LOCK,
+  RELEASE_LOCK: EVENTS.RELEASE_LOCK,
   SEND_CONVERSATION: EVENTS.SEND_CONVERSATION,
   GET_CONVERSATION: EVENTS.GET_CONVERSATION,
 
@@ -95,9 +100,11 @@ const BUSINESS_EVENTS = {
   // ChannelManager
   CHANNEL_ONLINE: EVENTS.CHANNEL_ONLINE,
   CHANNEL_OFFLINE: EVENTS.CHANNEL_OFFLINE,
-  RELEASE_LOCK: EVENTS.RELEASE_LOCK,
   JOIN_CHANNEL: EVENTS.JOIN_CHANNEL,
   REMOVE_CHANNEL: EVENTS.REMOVE_CHANNEL,
+
+  // ConversationManager
+  RELEASE_LOCK: EVENTS.RELEASE_LOCK,
   SEND_CONVERSATION: EVENTS.SEND_CONVERSATION,
   GET_CONVERSATION: EVENTS.GET_CONVERSATION,
 
@@ -134,10 +141,10 @@ const RESPONSE_EVENTS = {
   // Channel (non-realtime) (to.USER)
   CHANNEL_LIST: 'channel_list',
 
-  // Channel: Conversation (realtime) (to.CHANNEL)
+  // Conversation (realtime) (to.CHANNEL)
   CONVERSATION_FROM_CHANNEL: 'conversation_from_channel',
-  // Channel: Conversation (non-realtime) (to.USER)
-  CONVERSATION_LIST: 'conversation_list',
+  // Conversation (non-realtime) (to.USER)
+  CONVERSATION_LIST: 'conversation_list'
 }
 
 module.exports = {
