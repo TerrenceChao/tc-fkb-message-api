@@ -1,7 +1,7 @@
 
 function ChannelInfoRepository () {}
 
-ChannelInfoRepository.prototype.create = async function (uid, channelName) {
+ChannelInfoRepository.prototype.create = async function (uid, channel_name) {
 
 }
 
