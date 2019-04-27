@@ -22,8 +22,8 @@ LogoutEventHandler.prototype.handle = async function (requestInfo) {
   }
 
   var businessEvent = this.globalContext['businessEvent']
-  businessEvent.emit(EVENTS.USER_OFFLINE, requestInfo)
   businessEvent.emit(EVENTS.CHANNEL_OFFLINE, requestInfo)
+  businessEvent.emit(EVENTS.USER_OFFLINE, requestInfo)
 
   /**
    * 待優化：

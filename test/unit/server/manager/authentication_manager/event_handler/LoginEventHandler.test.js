@@ -12,7 +12,4 @@ const TOKEN = config.get('auth.token')
 
 describe('LoginEventHandler test', () => {
 
-  beforeEach(() => {
-
-  })
 })
