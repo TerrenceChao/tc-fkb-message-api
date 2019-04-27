@@ -39,6 +39,8 @@ function StorageServiceTemplate () {}
 //   return invitations || []
 // }
 
+const TESTED_UID = 'xxx-xxx-xxx'
+
 StorageServiceTemplate.prototype.getUser = async function (uid) {
   var user = {
     uid,
@@ -78,7 +80,7 @@ StorageServiceTemplate.prototype.invitationMultiCreated = async function (
   return [{
     iid: 'mbnht594EokdMvfht54elwTsd98',
     inviter,
-    invitee: invitees[0] || 'invitee?',
+    invitee: TESTED_UID || invitees[0] || 'invitee?',
     header,
     content,
     sensitive,
@@ -99,7 +101,7 @@ StorageServiceTemplate.prototype.getInvitation = async function (iid) {
   return {
     iid: 'mbnht594EokdMvfht54elwTsd98',
     inviter: 'inviter?',
-    invitee: 'invitee?',
+    invitee: TESTED_UID,
     header: {},
     content: 'HTML string',
     sensitive: {
@@ -116,7 +118,7 @@ StorageServiceTemplate.prototype.getReceivedInvitationList = async function (uid
   return [{
     iid: 'mbnht594EokdMvfht54elwTsd98',
     inviter: 'ruby',
-    invitee: 'me',
+    invitee: TESTED_UID,
     header: {
       requestEvent: 'req_invitation_deal_with_invitation',
       data: {
@@ -132,7 +134,7 @@ StorageServiceTemplate.prototype.getReceivedInvitationList = async function (uid
   }, {
     iid: '9kjnbvcdrtyuiljhgtloytfghjk',
     inviter: 'summer',
-    invitee: 'me',
+    invitee: TESTED_UID,
     header: {
       requestEvent: 'req_invitation_deal_with_invitation',
       data: {
@@ -153,7 +155,7 @@ StorageServiceTemplate.prototype.getSentInvitationList = async function (uid, li
   // get invitations where "inviter" is uid
   return [{
     iid: 'fyjael5845givsydgvldygrfila',
-    inviter: 'me',
+    inviter: TESTED_UID,
     invitee: 'william',
     header: {
       requestEvent: 'req_invitation_deal_with_invitation',
@@ -169,7 +171,7 @@ StorageServiceTemplate.prototype.getSentInvitationList = async function (uid, li
     create_at: Date.now()
   }, {
     iid: 'l8hnadfvbwritgbsi5rgtbirwas',
-    inviter: 'me',
+    inviter: TESTED_UID,
     invitee: 'cathy',
     header: {
       requestEvent: 'req_invitation_deal_with_invitation',
@@ -230,11 +232,11 @@ StorageServiceTemplate.prototype.channelInfoCreated = async function (uid, chann
   // ciid saved in local storage (for frontend)
   return {
     ciid: 'ciid B',
-    creator: uid,
+    creator: TESTED_UID,
     chid: 'chid:l4ehfuvljifgbudvzsugkurliLO4U*T&IYEOW*UGY',
     name: 'Room 18',
     invitees: [],
-    members: [uid]
+    members: [TESTED_UID]
   } || null
   // throw new Error(`channel: ${channelName} is failed to create or has been created`)
 }
@@ -249,11 +251,11 @@ StorageServiceTemplate.prototype.getChannelInfo = async function (queryCondition
   // ciid?? saved in local storage (for frontend)
   return {
     ciid: 'ciid B',
-    creator: 'someone',
+    creator: TESTED_UID,
     chid: 'chid:l4ehfuvljifgbudvzsugkurliLO4U*T&IYEOW*UGY',
     name: 'Room 18',
     invitees: [],
-    members: ['uidA', 'uidB', 'uidC']
+    members: [TESTED_UID, 'uidA', 'uidB', 'uidC']
   }
   // throw new Error(`couldn't get channel info with: ${JSON.stringify(queryCondition, null, 2)}`)
 }
@@ -266,14 +268,14 @@ StorageServiceTemplate.prototype.getUserChannelInfoList = async function (uid, l
     chid: 'chid:l4ehfuvljifgbudvzsugkurliLO4U*T&IYEOW*UGY',
     name: 'Room 18',
     invitees: [],
-    members: ['uidA', 'uidB', 'uidC']
+    members: [TESTED_UID, 'uidA', 'uidB', 'uidC']
   }, {
     ciid: 'ciid A',
     creator: 'WHO?',
     chid: 'chid:ijmlYIOUYGVUYBK>DFRUTYIHUJNJKTSARFDCVSBUN',
     name: 'Night Bar',
     invitees: [],
-    members: ['uidE', 'uidF']
+    members: [TESTED_UID, 'uidE', 'uidF']
   }] || []
   // throw new Error(`get user's channel list FAIL. user:${uid}`)
 }
@@ -281,12 +283,12 @@ StorageServiceTemplate.prototype.getUserChannelInfoList = async function (uid, l
 StorageServiceTemplate.prototype.channelJoined = async function (uid, chid) {
   // In channelInfo(chid): remove uid from invitees, append uid to members.
   return {
-    ciid: 'ciid A',
+    ciid: 'ciid B',
     creator: 'WHO?',
     chid: 'chid:ijmlYIOUYGVUYBK>DFRUTYIHUJNJKTSARFDCVSBUN',
     name: 'Night Bar',
     invitees: [],
-    members: ['uidE', 'uidF']
+    members: [TESTED_UID, 'uidE', 'uidF']
   }
   // throw new Error(`join channel: ${chid} fail. uid: ${uid}`)
 }
@@ -294,12 +296,12 @@ StorageServiceTemplate.prototype.channelJoined = async function (uid, chid) {
 StorageServiceTemplate.prototype.channelLeaved = async function (uid, chid) {
   // In channelInfo(chid): remove uid from members
   return {
-    ciid: 'ciid A',
+    ciid: 'ciid B',
     creator: 'WHO?',
     chid: 'chid:ijmlYIOUYGVUYBK>DFRUTYIHUJNJKTSARFDCVSBUN',
     name: 'Night Bar',
     invitees: [],
-    members: ['uidE', 'uidF']
+    members: [TESTED_UID, 'uidE', 'uidF']
   }
   // throw new Error(`leave channel: ${chid} fail. uid: ${uid}`)
 }

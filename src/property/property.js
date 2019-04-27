@@ -128,9 +128,9 @@ const RESPONSE_EVENTS = {
   EXCEPTION_ALERT: 'exception_alert',
 
   // Invitation (realtime) (to.USER)
-  INVITATION_FROM_CHANNEL_TO_ME: 'invitation_from_channel_to_me',
+  INVITATION_TO_ME: 'invitation_to_me',
   // Invitation (non-realtime) (to.USER)
-  INVITATION_LIST_FROM_CHANNEL: 'invitation_list_from',
+  INVITATION_LIST: 'invitation_list',
 
   // Channel (realtime) (to.USER)
   CHANNEL_CREATED: 'channel_created',

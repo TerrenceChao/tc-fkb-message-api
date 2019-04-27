@@ -6,7 +6,7 @@ const {
 } = require(path.join(config.get('src.service'), 'authService'))
 const {
   storageService
-} = require(path.join(config.get('src.service'), 'storageService'))
+} = require(path.join(config.get('src.service'), 'storageServiceTemplate'))
 
 module.exports = {
   businessEvent: new EventEmitter(),
