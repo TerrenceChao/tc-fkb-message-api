@@ -42,7 +42,7 @@ GetChannelListEventHandler.prototype.sendChInfoListBelongedUser = function (user
     .assignProtocol(requestInfo)
     .setHeader({
       to: TO.USER,
-      receiver: uid,
+      receiver: requestInfo.packet.uid,
       responseEvent: RESPONSE_EVENTS.CHANNEL_LIST
     })
     .setPacket({
