@@ -42,7 +42,7 @@ LoginEventHandler.prototype.handle = async function (requestInfo) {
       await storageService.createUser(packet.uid)
     }
   } catch (err) {
-    this.alertException(err.message, requestInfo)
+    console.error(err.message)
     return
   }
 
