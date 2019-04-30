@@ -43,6 +43,7 @@ LoginEventHandler.prototype.handle = async function (requestInfo) {
     }
   } catch (err) {
     this.alertException(err.message, requestInfo)
+    return
   }
 
   // Initial: user makes connections to self & channel
