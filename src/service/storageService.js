@@ -21,7 +21,7 @@ StorageService.prototype.getUser = async function (uid) {
 }
 
 StorageService.prototype.createUser = async function (uid) {
-  return Promise.resolve(userRepository.create(uid)) // return true
+  return Promise.resolve(userRepository.create(uid)) // return user
     .catch(err => {
       logger(err)
       return Promise.reject(err)
@@ -136,7 +136,7 @@ StorageService.prototype.getAllChannelIds = async function (uid) {
 StorageService.prototype.getChannelInfo = async function (query) {
   // ciid will be saved in local storage (for frontend)
   try {
-    return await channelInfoRepository.find(query)
+    return await channelInfoRepository.findOne(query)
   } catch (err) {
     logger(err)
     throw new Error(`couldn't get channel info with: ${JSON.stringify(query, null, 2)}`)
@@ -149,7 +149,7 @@ StorageService.prototype.getUserChannelInfoList = async function (uid, limit = 1
     // the latest news should comes from channelInfo(channelInfo.latestSpoke), not user self
     .then(async channelRecords => {
       var ciids = channelRecords.map(chRecord => chRecord.ciid)
-      var channelInfoList = await channelInfoRepository.getListByIds(ciids, limit, skip, 'DESC')
+      var channelInfoList = await channelInfoRepository.getListByCiids(ciids, limit, skip, 'DESC')
 
       return channelInfoList.map(channelInfo => {
         var chRecord = channelRecords.find(chRecord => chRecord.ciid === channelInfo.ciid)
@@ -201,9 +201,9 @@ StorageService.prototype.channelLeaved = async function (uid, chid) {
 
 StorageService.prototype.channelInfoRemoved = async function (query) {
   try {
-    var channelInfo = await channelInfoRepository.find(query)
-    await conversationRepository.removeByCiid(channelInfo.ciid) // return true
-    await channelInfoRepository.removeById(channelInfo.ciid) // return true
+    var channelInfo = await channelInfoRepository.findOne(query)
+    await conversationRepository.removeListByCiid(channelInfo.ciid) // return true
+    await channelInfoRepository.removeByCiid(channelInfo.ciid) // return true
     return true
   } catch (err) {
     logger(err)

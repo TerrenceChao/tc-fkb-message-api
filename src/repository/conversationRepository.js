@@ -5,11 +5,11 @@ ConversationRepository.prototype.create = async function (ciid, uid, content, ty
 
 }
 
-ConversationRepository.prototype.getListByCiid = async function (ciid, limit, skip, sort = 'DESC') {
+ConversationRepository.prototype.getListByCiid = async function (ciid, limit, skip = 0, sort = 'DESC') {
 
 }
 
-ConversationRepository.prototype.removeByCiid = async function (ciid) {
+ConversationRepository.prototype.removeListByCiid = async function (ciid) {
 
 }
 

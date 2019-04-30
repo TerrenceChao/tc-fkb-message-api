@@ -9,7 +9,7 @@ InvitationRepository.prototype.findById = async function (iid) {
 
 }
 
-InvitationRepository.prototype.getListByIds = async function (iidList, limit, skip, sort = 'DESC') {
+InvitationRepository.prototype.getListByIds = async function (iidList, limit, skip = 0, sort = 'DESC') {
 
 }
 

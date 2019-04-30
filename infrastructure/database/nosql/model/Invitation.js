@@ -31,4 +31,8 @@ const InvitationSchema = new mongoose.Schema({
 
 InvitationSchema.plugin(mongodbErrorHandler)
 
+InvitationSchema.virtual('iid').get(function () {
+  return this._id
+})
+
 module.exports = mongoose.model('Invitation', InvitationSchema)

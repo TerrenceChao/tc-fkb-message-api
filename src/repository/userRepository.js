@@ -21,11 +21,11 @@ UserRepository.prototype.deleteInvitation = async function (iid, inviter, invite
 
 }
 
-UserRepository.prototype.getReceivedInvitationIds = async function (uid, limit, skip, sort = 'DESC') {
+UserRepository.prototype.getReceivedInvitationIds = async function (uid, limit, skip = 0, sort = 'DESC') {
 
 }
 
-UserRepository.prototype.getSentInvitationIds = async function (uid, limit, skip, sort = 'DESC') {
+UserRepository.prototype.getSentInvitationIds = async function (uid, limit, skip = 0, sort = 'DESC') {
 
 }
 
@@ -37,7 +37,7 @@ UserRepository.prototype.removeChannelRecord = async function (ciid, chid) {
 
 }
 
-UserRepository.prototype.getChannelRecords = async function (uid, limit = null, skip = null, sort = 'DESC') {
+UserRepository.prototype.getChannelRecords = async function (uid) {
 
 }
 

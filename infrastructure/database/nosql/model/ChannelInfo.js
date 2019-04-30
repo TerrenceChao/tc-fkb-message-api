@@ -3,13 +3,7 @@ const mongodbErrorHandler = require('mongoose-mongodb-errors')
 
 const ChannelInfoSchema = new mongoose.Schema({
   ciid: {
-    type: String,
-    required: true,
-    unique: true
-  },
-  //considering: string OR ObjectId
-  chid: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: mongoose.Schema.Types.String,
     required: true,
     unique: true
   },
@@ -32,7 +26,7 @@ const ChannelInfoSchema = new mongoose.Schema({
     ref: 'User',
     required: true
   }],
-  //considering: Date OR int64
+  // considering: Date OR int64
   latestSpoke: {
     type: Date,
     required: true
@@ -50,5 +44,9 @@ const ChannelInfoSchema = new mongoose.Schema({
 })
 
 ChannelInfoSchema.plugin(mongodbErrorHandler)
+
+ChannelInfoSchema.virtual('chid').get(function () {
+  return this._id
+})
 
 module.exports = mongoose.model('ChannelInfo', ChannelInfoSchema)

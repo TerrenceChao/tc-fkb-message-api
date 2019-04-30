@@ -1,15 +1,14 @@
-
 function ChannelInfoRepository () {}
 
-ChannelInfoRepository.prototype.create = async function (uid, channel_name) {
+ChannelInfoRepository.prototype.create = async function (uid, channelName) {
 
 }
 
-ChannelInfoRepository.prototype.find = async function (query) {
+ChannelInfoRepository.prototype.findOne = async function (query) {
 
 }
 
-ChannelInfoRepository.prototype.getListByIds = async function (ciids, limit, skip, sort = 'DESC') {
+ChannelInfoRepository.prototype.getListByCiids = async function (ciids, limit, skip = 0, sort = 'DESC') {
 
 }
 
@@ -21,7 +20,7 @@ ChannelInfoRepository.prototype.removeMemberAndReturn = async function (chid, ui
 
 }
 
-ChannelInfoRepository.prototype.removeById = async function (ciid) {
+ChannelInfoRepository.prototype.removeByCiid = async function (ciid) {
 
 }
 
