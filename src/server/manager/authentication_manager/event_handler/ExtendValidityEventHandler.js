@@ -55,6 +55,8 @@ ExtendValidityEventHandler.prototype.handle = async function (requestInfo) {
   // await storageService.saveUserValidateInfo(packet.uid, newSecret)
 
   // this.sendValidationToUser(token, refreshToken, requestInfo)
+
+  // storageService.removeUserValidateInfo(packet.uid, secret)
 }
 
 ExtendValidityEventHandler.prototype.sendValidationToUser = function (token, refreshToken, requestInfo) {
