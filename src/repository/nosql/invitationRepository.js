@@ -17,6 +17,4 @@ InvitationRepository.prototype.removeById = async function (iid) {
 
 }
 
-module.exports = {
-  invitationRepository: new InvitationRepository()
-}
+module.exports = new InvitationRepository()

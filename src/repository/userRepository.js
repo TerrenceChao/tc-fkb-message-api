@@ -29,7 +29,7 @@ UserRepository.prototype.getSentInvitationIds = async function (uid, limit, skip
 
 }
 
-UserRepository.prototype.appendChannelRecord = async function (ciid, chid, joined_at = null, last_glimpse = null) {
+UserRepository.prototype.appendChannelRecord = async function (ciid, chid, joinedAt = null, lastGlimpse = null) {
 
 }
 
@@ -41,6 +41,4 @@ UserRepository.prototype.getChannelRecords = async function (uid, limit = null, 
 
 }
 
-module.exports = {
-  userRepository: new UserRepository()
-}
+module.exports = new UserRepository()

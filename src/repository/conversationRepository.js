@@ -13,6 +13,4 @@ ConversationRepository.prototype.removeByCiid = async function (ciid) {
 
 }
 
-module.exports = {
-  conversationRepository: new ConversationRepository()
-}
+module.exports = new ConversationRepository()

@@ -25,10 +25,8 @@ ChannelInfoRepository.prototype.removeById = async function (ciid) {
 
 }
 
-ChannelInfoRepository.prototype.updateLatestSpoke = async function (ciid, latest_spoke) {
+ChannelInfoRepository.prototype.updateLatestSpoke = async function (ciid, latestSpoke) {
 
 }
 
-module.exports = {
-  channelInfoRepository: new ChannelInfoRepository()
-}
+module.exports = new ChannelInfoRepository()

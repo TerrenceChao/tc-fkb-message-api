@@ -29,9 +29,9 @@ function StorageServiceTemplate () {}
 //    *      Model.insertMany(invitations)
 //    * 2. for 'channelInfo': insert invitee = 'uid' (type string or Array) into channelInfo(schema)
 //    *      Model.update(...)
-//    * 3. for 'invitee': insert 'iid' into UserInChannel.received_invitations(schema)
+//    * 3. for 'invitee': insert 'iid' into UserInChannel.receivedInvitations(schema)
 //    *      Model.update(...)
-//    * 4. for 'inviter': insert 'iid' into UserInChannel.sent_invitations(schema):
+//    * 4. for 'inviter': insert 'iid' into UserInChannel.sentInvitations(schema):
 //    *      Model.update(...)
 //    * 5. note: what if failed ?
 //    */
@@ -44,11 +44,11 @@ const TESTED_UID = 'xxx-xxx-xxx'
 StorageServiceTemplate.prototype.getUser = async function (uid) {
   var user = {
     uid,
-    received_invitations: [],
-    sent_invitations: [],
-    channel_records: {}, // OR [] ???
-    updated_at: Date.now(),
-    created_at: Date.now(),
+    receivedInvitations: [],
+    sentInvitations: [],
+    channelRecords: {}, // OR [] ???
+    updatedAt: Date.now(),
+    createdAt: Date.now(),
   }
   return user
   // throw err
@@ -193,8 +193,8 @@ StorageServiceTemplate.prototype.getSentInvitationList = async function (uid, li
 //   /**
 //    * Database:
 //    * 1. query and get (copied obj)
-//    * 2. for 'inviter': pull element(iid) from UserInChannel.sent_invitations(schema)
-//    * 3. for 'invitee': pull element(iid) from UserInChannel.received_invitations(schema)
+//    * 2. for 'inviter': pull element(iid) from UserInChannel.sentInvitations(schema)
+//    * 3. for 'invitee': pull element(iid) from UserInChannel.receivedInvitations(schema)
 //    * 4. for 'channelInfo': pull element(uid) from ChannelInfo.invitee(schema)
 //    * 5. remove InvitationOfChannel(schema)
 //    * 6. return (copied obj)
@@ -217,8 +217,8 @@ StorageServiceTemplate.prototype.invitationRemoved = async function (iid) {
   /**
    * Database:
    * 1. query and get (copied obj)
-   * 2. for 'inviter': pull element(iid) from UserInChannel.sent_invitations(schema)
-   * 3. for 'invitee': pull element(iid) from UserInChannel.received_invitations(schema)
+   * 2. for 'inviter': pull element(iid) from UserInChannel.sentInvitations(schema)
+   * 3. for 'invitee': pull element(iid) from UserInChannel.receivedInvitations(schema)
    * 4. for 'channelInfo': pull element(uid) from ChannelInfo.invitee(schema)
    * 5. remove InvitationOfChannel(schema)
    */
@@ -261,7 +261,7 @@ StorageServiceTemplate.prototype.getChannelInfo = async function (queryCondition
 }
 
 StorageServiceTemplate.prototype.getUserChannelInfoList = async function (uid, limit = 10, skip = 0) {
-  // order by conversation's 'created_at' DESC
+  // order by conversation's 'createdAt' DESC
   return [{
     ciid: 'ciid B',
     creator: 'someone',
@@ -324,7 +324,7 @@ StorageServiceTemplate.prototype.getConversationList = async function (ciid, lim
     content: 'this is a messaging service',
     type: 'text',
     datetime: Date.now(),
-    // created_at: '發送時間和 DB 建立 record 時間會有落差'
+    // createdAt: '發送時間和 DB 建立 record 時間會有落差'
   },
   {
     ciid,
@@ -332,7 +332,7 @@ StorageServiceTemplate.prototype.getConversationList = async function (ciid, lim
     content: 'Today is a sunny day',
     type: 'text',
     datetime: Date.now(),
-    // created_at: '發送時間和 DB 建立 record 時間會有落差'
+    // createdAt: '發送時間和 DB 建立 record 時間會有落差'
   },
   {
     ciid,
@@ -340,7 +340,7 @@ StorageServiceTemplate.prototype.getConversationList = async function (ciid, lim
     content: 'Hello world',
     type: 'text',
     datetime: Date.now(),
-    // created_at: '發送時間和 DB 建立 record 時間會有落差'
+    // createdAt: '發送時間和 DB 建立 record 時間會有落差'
   }
   ] || []
   // throw new Error(`get conversations in channel(ciid): ${ciid} FAIL`)
