@@ -1,5 +1,6 @@
 var config = require('config')
 var path = require('path')
+const uuidv4 = require('uuid/v4')
 const express = require('express')
 const routeIndex = express.Router()
 const {
@@ -8,15 +9,18 @@ const {
 var RequestInfo = require(path.join(config.get('src.manager'), 'RequestInfo'))
 let globalContext = require(path.join(config.get('src.manager'), 'globalContext'))
 
+const TOKEN = config.get('auth.token')
+const REFRESH_TOKEN = config.get('auth.refreshToken')
 /**
  * ===========================================================
  * server push:
  * check main-app => src => services => messageService
  * ===========================================================
  */
+
 var authService = globalContext.authService
+var storageService = globalContext.storageService
 var businessEvent = globalContext.businessEvent
-const TOKEN = config.get('auth.token')
 
 routeIndex.get(`/index`, (req, res, next) => {
   var url = `${req.protocol}://${req.get('host')}/${req.originalUrl}`
@@ -28,11 +32,29 @@ routeIndex.get(`/index`, (req, res, next) => {
   })
 })
 
-routeIndex.get(`/${BUSINESS_EVENTS.AUTHENTICATE}`, (req, res, next) => {
-  var token = authService.obtainAuthorization(req.headers)
-  res.send({
-    [TOKEN]: token
-  })
+routeIndex.get(`/${BUSINESS_EVENTS.AUTHENTICATE}`, async (req, res, next) => {
+  try {
+    var token = authService.obtainAuthorization(req.headers)
+    // var secret = uuidv4()
+    // var refreshToken = authService.obtainValidCert(req.headers, secret)
+    // await storageService.saveUserValidateInfo(req.headers.uid, secret)
+
+    res.send({
+      // [REFRESH_TOKEN]: refreshToken,
+      [TOKEN]: token
+    })
+  } catch (err) {
+    console.error(err.message)
+
+    var body = {
+      msgCode: `cannot get token`
+    }
+    res.writeHead(500, {
+      'Content-Length': Buffer.byteLength(body),
+      'Content-Type': 'text/plain'
+    })
+      .end(body)
+  }
 })
 
 routeIndex.post(`/${BUSINESS_EVENTS.SERVER_PUSH}`, (req, res, next) => {

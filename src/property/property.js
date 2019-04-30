@@ -20,6 +20,7 @@ const EVENTS = {
   AUTHENTICATE: 'req_authentication_authenticate',
   LOGIN: 'req_authentication_login',
   LOGOUT: 'req_authentication_logout',
+  EXTEND_VALIDITY: 'req_authentication_extend_validity',
 
   // ChannelManager
   CHANNEL_ONLINE: 'req_channel_channel_online',
@@ -60,6 +61,7 @@ const REQUEST_EVENTS = {
   // AuthenticationManager
   LOGIN: EVENTS.LOGIN,
   LOGOUT: EVENTS.LOGOUT,
+  EXTEND_VALIDITY: EVENTS.EXTEND_VALIDITY,
 
   // ChannelManager
   GET_CHANNEL_LIST: EVENTS.GET_CHANNEL_LIST,

@@ -2,11 +2,11 @@ var jwt = require('jsonwebtoken')
 var crypto = require('crypto')
 var config = require('config')
 
-var expiresInHours = config.get('auth.expiresIn')
+var expiresInEffectiveTime = config.get('auth.expiresIn')
 var algorithm = config.get('auth.algorithm')
-var authProperties = config.get('auth.authProperties')
+var accessProperties = config.get('auth.accessProperties')
 var properties = config.get('auth.properties')
-var authToken = config.get('auth.token')
+var accessToken = config.get('auth.token')
 
 /**
  * @private
@@ -27,7 +27,7 @@ function hasProperty (payload, token = false) {
       }
     })
   } else {
-    authProperties.forEach(prop => {
+    accessProperties.forEach(prop => {
       if (!payload.hasOwnProperty(prop)) {
         hasProp = false
       }
@@ -102,7 +102,7 @@ AuthService.prototype.obtainAuthorization = function (userPayload) {
   return jwt.sign(
     getPropertyWithoutToken(userPayload),
     secretGenerator(userPayload), {
-      expiresIn: expiresInHours
+      expiresIn: expiresInEffectiveTime
     }
   )
 }
@@ -114,7 +114,7 @@ AuthService.prototype.isAuthenticated = function (userPayload) {
   }
 
   try {
-    var verification = jwt.verify(userPayload[authToken], secretGenerator(userPayload))
+    var verification = jwt.verify(userPayload[accessToken], secretGenerator(userPayload))
 
     return isValid(verification, userPayload)
   } catch (err) {
