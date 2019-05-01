@@ -67,8 +67,7 @@ ChannelInfoRepository.prototype.appendMemberAndReturn = async function (chid, ui
   }
 
   var now = Date.now()
-  // 沒辦法用 getAttributes 取得指定的欄位
-  return ChannelInfo.findOneAndUpdate({
+  var refreshedChInfo = await ChannelInfo.findOneAndUpdate({
     _id: chid
   }, {
     '$pull': {
@@ -79,6 +78,8 @@ ChannelInfoRepository.prototype.appendMemberAndReturn = async function (chid, ui
     },
     updatedAt: now
   }, returnNewDoc)
+
+  return getAttributes(refreshedChInfo)
 }
 
 ChannelInfoRepository.prototype.removeMemberAndReturn = async function (chid, uid) {
@@ -87,8 +88,7 @@ ChannelInfoRepository.prototype.removeMemberAndReturn = async function (chid, ui
   }
 
   var now = Date.now()
-  // 沒辦法用 getAttributes 取得指定的欄位
-  return ChannelInfo.findOneAndUpdate({
+  var refreshedChInfo = await ChannelInfo.findOneAndUpdate({
     _id: chid
   }, {
     '$pull': {
@@ -96,6 +96,8 @@ ChannelInfoRepository.prototype.removeMemberAndReturn = async function (chid, ui
     },
     updatedAt: now
   }, returnNewDoc)
+
+  return getAttributes(refreshedChInfo)
 }
 
 ChannelInfoRepository.prototype.removeByCiid = async function (ciid) {
