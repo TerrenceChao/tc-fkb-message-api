@@ -9,7 +9,7 @@ InvitationRepository.prototype.findById = async function (iid) {
 
 }
 
-InvitationRepository.prototype.getListByIds = async function (iidList, limit, skip, sort = 'DESC') {
+InvitationRepository.prototype.getListByIds = async function (iidList, limit, skip = 0, sort = 'DESC') {
 
 }
 
@@ -17,6 +17,4 @@ InvitationRepository.prototype.removeById = async function (iid) {
 
 }
 
-module.exports = {
-  invitationRepository: new InvitationRepository()
-}
+module.exports = new InvitationRepository()

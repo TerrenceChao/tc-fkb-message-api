@@ -21,15 +21,15 @@ UserRepository.prototype.deleteInvitation = async function (iid, inviter, invite
 
 }
 
-UserRepository.prototype.getReceivedInvitationIds = async function (uid, limit, skip, sort = 'DESC') {
+UserRepository.prototype.getReceivedInvitationIds = async function (uid, limit, skip = 0, sort = 'DESC') {
 
 }
 
-UserRepository.prototype.getSentInvitationIds = async function (uid, limit, skip, sort = 'DESC') {
+UserRepository.prototype.getSentInvitationIds = async function (uid, limit, skip = 0, sort = 'DESC') {
 
 }
 
-UserRepository.prototype.appendChannelRecord = async function (ciid, chid, joined_at = null, last_glimpse = null) {
+UserRepository.prototype.appendChannelRecord = async function (ciid, chid, joinedAt = null, lastGlimpse = null) {
 
 }
 
@@ -37,10 +37,8 @@ UserRepository.prototype.removeChannelRecord = async function (ciid, chid) {
 
 }
 
-UserRepository.prototype.getChannelRecords = async function (uid, limit = null, skip = null, sort = 'DESC') {
+UserRepository.prototype.getChannelRecords = async function (uid) {
 
 }
 
-module.exports = {
-  userRepository: new UserRepository()
-}
+module.exports = new UserRepository()

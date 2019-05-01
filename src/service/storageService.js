@@ -21,7 +21,7 @@ StorageService.prototype.getUser = async function (uid) {
 }
 
 StorageService.prototype.createUser = async function (uid) {
-  return Promise.resolve(userRepository.create(uid)) // return true
+  return Promise.resolve(userRepository.create(uid)) // return user
     .catch(err => {
       logger(err)
       return Promise.reject(err)
@@ -70,7 +70,7 @@ StorageService.prototype.getInvitation = async function (iid) {
 
 StorageService.prototype.getReceivedInvitationList = async function (uid, limit = 10, skip = 0) {
   try {
-    var inviteIds = await userRepository.getReceivedInvitationIds(uid, limit, skip, 'DESC')
+    var inviteIds = await userRepository.getReceivedInvitationIds(uid, limit, skip)
     var invitationList = await invitationRepository.getListByIds(inviteIds) // (inviteIds, limit, skip, 'DESC')
     return invitationList
   } catch (err) {
@@ -80,7 +80,7 @@ StorageService.prototype.getReceivedInvitationList = async function (uid, limit 
 }
 
 StorageService.prototype.getSentInvitationList = async function (uid, limit = 10, skip = 0) {
-  return Promise.resolve(userRepository.getSentInvitationIds(uid, limit, skip, 'DESC'))
+  return Promise.resolve(userRepository.getSentInvitationIds(uid, limit, skip))
     .then(inviteIds => invitationRepository.getListByIds(inviteIds)) //  (inviteIds, limit, skip, 'DESC')
     .catch(err => {
       logger(err)
@@ -109,12 +109,13 @@ StorageService.prototype.channelInfoCreated = async function (uid, channelName) 
   try {
     var channelInfo = await channelInfoRepository.create(uid, channelName)
     // add channel ref(channel record) in User
-    await userRepository.appendChannelRecord({
-      ciid: channelInfo.ciid,
-      chid: channelInfo.chid,
-      joined_at: Date.now(),
-      last_glimpse: Date.now()
-    })
+    await userRepository.appendChannelRecord(
+      uid, {
+        ciid: channelInfo.ciid,
+        chid: channelInfo.chid,
+        joinedAt: Date.now(),
+        lastGlimpse: Date.now()
+      })
     return channelInfo
   } catch (err) {
     logger(err)
@@ -124,7 +125,7 @@ StorageService.prototype.channelInfoCreated = async function (uid, channelName) 
 
 StorageService.prototype.getAllChannelIds = async function (uid) {
   // get ciid(s) !!! (for internal online/offline procedure)
-  return Promise.resolve(userRepository.getChannelRecords(uid)) // (uid, limit, skip, 'DESC')
+  return Promise.resolve(userRepository.getChannelRecords(uid))
     .then(channelRecords => channelRecords.map(chRecord => chRecord.ciid))
     .catch(err => {
       logger(err)
@@ -135,7 +136,7 @@ StorageService.prototype.getAllChannelIds = async function (uid) {
 StorageService.prototype.getChannelInfo = async function (query) {
   // ciid will be saved in local storage (for frontend)
   try {
-    return await channelInfoRepository.find(query)
+    return await channelInfoRepository.findOne(query)
   } catch (err) {
     logger(err)
     throw new Error(`couldn't get channel info with: ${JSON.stringify(query, null, 2)}`)
@@ -143,16 +144,16 @@ StorageService.prototype.getChannelInfo = async function (query) {
 }
 
 StorageService.prototype.getUserChannelInfoList = async function (uid, limit = 10, skip = 0) {
-  // order by conversation's 'created_at' DESC
-  return Promise.resolve(userRepository.getChannelRecords(uid)) // (uid, limit, skip, 'DESC')
-    // the latest news should comes from channelInfo(channelInfo.latest_spoke), not user self
+  // order by conversation's 'createdAt' DESC
+  return Promise.resolve(userRepository.getChannelRecords(uid))
+    // the latest news should comes from channelInfo(channelInfo.latestSpoke), not user self
     .then(async channelRecords => {
       var ciids = channelRecords.map(chRecord => chRecord.ciid)
-      var channelInfoList = await channelInfoRepository.getListByIds(ciids, limit, skip, 'DESC')
+      var channelInfoList = await channelInfoRepository.getListByCiids(ciids, limit, skip, 'DESC')
 
       return channelInfoList.map(channelInfo => {
         var chRecord = channelRecords.find(chRecord => chRecord.ciid === channelInfo.ciid)
-        channelInfo.last_glimpse = chRecord.last_glimpse
+        channelInfo.lastGlimpse = chRecord.lastGlimpse
         return channelInfo
       })
     })
@@ -167,12 +168,13 @@ StorageService.prototype.channelJoined = async function (uid, chid) {
     // In channelInfo(chid): remove uid from invitees, append uid to members.
     var channelInfo = await channelInfoRepository.appendMemberAndReturn(chid, uid)
     // add channel ref(channel record) in User
-    await userRepository.appendChannelRecord({
-      ciid: channelInfo.ciid,
-      chid: channelInfo.chid,
-      joined_at: Date.now(),
-      last_glimpse: Date.now()
-    })
+    await userRepository.appendChannelRecord(
+      uid, {
+        ciid: channelInfo.ciid,
+        chid: channelInfo.chid,
+        joinedAt: Date.now(),
+        lastGlimpse: Date.now()
+      })
     return channelInfo
   } catch (err) {
     logger(err)
@@ -185,10 +187,11 @@ StorageService.prototype.channelLeaved = async function (uid, chid) {
     // In channelInfo(chid): remove uid from members
     var channelInfo = await channelInfoRepository.removeMemberAndReturn(chid, uid)
     // remove channel ref(channel record) in User
-    await userRepository.removeChannelRecord({
-      ciid: channelInfo.ciid,
-      chid: channelInfo.chid
-    })
+    await userRepository.removeChannelRecord(
+      uid, {
+        ciid: channelInfo.ciid,
+        chid: channelInfo.chid
+      })
     return channelInfo
   } catch (err) {
     logger(err)
@@ -198,9 +201,9 @@ StorageService.prototype.channelLeaved = async function (uid, chid) {
 
 StorageService.prototype.channelInfoRemoved = async function (query) {
   try {
-    var channelInfo = await channelInfoRepository.find(query)
-    await conversationRepository.removeByCiid(channelInfo.ciid) // return true
-    await channelInfoRepository.removeById(channelInfo.ciid) // return true
+    var channelInfo = await channelInfoRepository.findOne(query)
+    await conversationRepository.removeListByCiid(channelInfo.ciid) // return true
+    await channelInfoRepository.removeByCiid(channelInfo.ciid) // return true
     return true
   } catch (err) {
     logger(err)

@@ -25,6 +25,7 @@ module.exports = {
   app: require('./_app'),
   auth: require('./_auth'),
   adaptor: require('./_adaptor'),
+  database: require('./_database')(ROOT),
   src: require('./_src')(ROOT),
   test: require('./_test')(ROOT)
 }

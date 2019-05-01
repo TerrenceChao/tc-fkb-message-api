@@ -6,6 +6,11 @@ module.exports = function (root) {
   var unit = path.join(root, 'test', 'unit')
   var managerInUnit = path.join(unit, 'server', 'manager')
 
+  // connect to tested database
+  if (process.env.NODE_ENV === 'dev') {
+    require('./test/_database.test')(root)
+  }
+
   return {
     feature: {
       router: path.join(feature, 'router'),
