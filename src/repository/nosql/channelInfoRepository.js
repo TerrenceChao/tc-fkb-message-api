@@ -6,7 +6,7 @@ var ChannelInfo = require(path.join(config.get('database.nosql.model'), 'Channel
 
 function getAttributes (doc) {
   return {
-    chid: doc._id,
+    chid: doc._id.toString(),
     ciid: doc.ciid,
     name: doc.name,
     creator: doc.creator,

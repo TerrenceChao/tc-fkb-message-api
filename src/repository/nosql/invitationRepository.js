@@ -5,7 +5,7 @@ var Invitation = require(path.join(config.get('database.nosql.model'), 'Invitati
 
 function getAttributes (doc) {
   return {
-    iid: doc._id,
+    iid: doc._id.toString(),
     inviter: doc.inviter,
     invitee: doc.invitee,
     header: doc.header,
