@@ -6,17 +6,16 @@ module.exports = function (root) {
   var unit = path.join(root, 'test', 'unit')
   var managerInUnit = path.join(unit, 'server', 'manager')
 
-  // connect to tested database
-  if (process.env.NODE_ENV === 'dev') {
-    require('./test/_database.test')(root)
-  }
-
   return {
+    appRoot: root,
     feature: {
       router: path.join(feature, 'router'),
       server: path.join(feature, 'server')
     },
     mock,
+    mockConfig: {
+      database: path.join(mock, 'config', '_database.test')
+    },
     unit: {
       property: path.join(unit, 'property'),
       repository: path.join(unit, 'repository'),

@@ -22,10 +22,14 @@ mongoose.connect(HOST, {
   autoIndex: false
 })
 
-var db = mongoose.connection
-db.on('error', console.error.bind(console, '[TEST] connection error:'))
-db.once('open', () => {
+var nosqlDB = mongoose.connection
+nosqlDB.on('error', console.error.bind(console, '[TEST] connection error:'))
+nosqlDB.once('open', () => {
   console.log('[TEST] mongodb is connecting ...')
+})
+
+nosqlDB.once('disconnected', () => {
+  console.log('[TEST] mongodb is disconnected')
 })
 
 module.exports = function (root) {
