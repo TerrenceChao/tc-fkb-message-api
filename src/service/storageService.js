@@ -10,7 +10,7 @@ function logger (err) {
   console.error(`database error: ${err.message}`)
 }
 
-function StorageService () { }
+function StorageService () {}
 
 StorageService.prototype.getUser = async function (uid) {
   return Promise.resolve(userRepository.findById(uid))
@@ -125,7 +125,7 @@ StorageService.prototype.channelInfoCreated = async function (uid, channelName) 
 
 StorageService.prototype.getAllChannelIds = async function (uid) {
   // get ciid(s) !!! (for internal online/offline procedure)
-  return Promise.resolve(userRepository.getChannelRecords(uid))
+  return Promise.resolve(userRepository.getChannelRecordList(uid))
     .then(channelRecords => channelRecords.map(chRecord => chRecord.ciid))
     .catch(err => {
       logger(err)
@@ -145,7 +145,7 @@ StorageService.prototype.getChannelInfo = async function (query) {
 
 StorageService.prototype.getUserChannelInfoList = async function (uid, limit = 10, skip = 0) {
   // order by conversation's 'createdAt' DESC
-  return Promise.resolve(userRepository.getChannelRecords(uid))
+  return Promise.resolve(userRepository.getChannelRecordList(uid))
     // the latest news should comes from channelInfo(channelInfo.latestSpoke), not user self
     .then(async channelRecords => {
       var ciids = channelRecords.map(chRecord => chRecord.ciid)
@@ -221,8 +221,11 @@ StorageService.prototype.conversationCreated = async function (ciid, uid, conten
     })
 }
 
-StorageService.prototype.getConversationList = async function (ciid, limit = 10, skip = 0) {
-  return Promise.resolve(conversationRepository.getListByCiid(ciid, limit, skip, 'DESC'))
+StorageService.prototype.getConversationList = async function (uid, ciid, limit = 10, skip = 0) {
+  return Promise.resolve(userRepository.getChannelRecord(uid, {
+    ciid
+  }))
+    .then(chRecord => conversationRepository.getListByUserChannelRecord(chRecord, limit, skip, 'DESC'))
     .catch(err => {
       logger(err)
       return Promise.reject(new Error(`get conversations in channel(ciid): ${ciid} FAIL`))

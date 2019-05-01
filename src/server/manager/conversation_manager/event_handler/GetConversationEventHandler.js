@@ -27,7 +27,7 @@ GetConversationEventHandler.prototype.handle = function (requestInfo) {
   var storageService = this.globalContext['storageService']
   var packet = requestInfo.packet
 
-  Promise.resolve(storageService.getConversationList(packet.ciid, packet.convLimit, packet.convSkip))
+  Promise.resolve(storageService.getConversationList(packet.uid, packet.ciid, packet.convLimit, packet.convSkip))
     .then(conversationList => this.sendConversationList(conversationList, requestInfo),
       err => this.alertException(err.message, requestInfo))
 }

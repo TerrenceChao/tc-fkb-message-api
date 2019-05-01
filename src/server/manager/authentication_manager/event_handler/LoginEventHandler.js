@@ -70,7 +70,7 @@ LoginEventHandler.prototype.sendChannelInfoAndConversations = function (userChan
   userChannelInfoList.forEach(async (chInfo) => {
     var ciid = chInfo.ciid
 
-    Promise.resolve(storageService.getConversationList(ciid, convLimit))
+    Promise.resolve(storageService.getConversationList(uid, ciid, convLimit))
       .then(conversationList => {
         chInfo.conversations = conversationList
 

@@ -46,57 +46,73 @@ UserRepository.prototype.recordInvitation = async function (iid, inviter, invite
   // ])
   //   .catch(err => Promise.reject(err))
   var now = Date.now()
-  return User.bulkWrite([
-    {
-      updateOne: {
-        filter: { uid: inviter },
-        update: {
-          '$addToSet': { 'sentInvitations': mongoose.Types.ObjectId(iid) },
-          updatedAt: now
-        }
-      }
-    },
-    {
-      updateOne: {
-        filter: { uid: invitee },
-        update: {
-          '$addToSet': { 'receivedInvitations': mongoose.Types.ObjectId(iid) },
-          updatedAt: now
-        }
+  return User.bulkWrite([{
+    updateOne: {
+      filter: {
+        uid: inviter
+      },
+      update: {
+        '$addToSet': {
+          'sentInvitations': mongoose.Types.ObjectId(iid)
+        },
+        updatedAt: now
       }
     }
+  },
+  {
+    updateOne: {
+      filter: {
+        uid: invitee
+      },
+      update: {
+        '$addToSet': {
+          'receivedInvitations': mongoose.Types.ObjectId(iid)
+        },
+        updatedAt: now
+      }
+    }
+  }
   ])
     .then(res => res.modifiedCount)
 }
 
 UserRepository.prototype.deleteInvitation = async function (iid, inviter, invitee) {
   var now = Date.now()
-  return User.bulkWrite([
-    {
-      updateOne: {
-        filter: { uid: inviter },
-        update: {
-          '$pull': { 'sentInvitations': mongoose.Types.ObjectId(iid) },
-          updatedAt: now
-        }
-      }
-    },
-    {
-      updateOne: {
-        filter: { uid: invitee },
-        update: {
-          '$pull': { 'receivedInvitations': mongoose.Types.ObjectId(iid) },
-          updatedAt: now
-        }
+  return User.bulkWrite([{
+    updateOne: {
+      filter: {
+        uid: inviter
+      },
+      update: {
+        '$pull': {
+          'sentInvitations': mongoose.Types.ObjectId(iid)
+        },
+        updatedAt: now
       }
     }
+  },
+  {
+    updateOne: {
+      filter: {
+        uid: invitee
+      },
+      update: {
+        '$pull': {
+          'receivedInvitations': mongoose.Types.ObjectId(iid)
+        },
+        updatedAt: now
+      }
+    }
+  }
   ])
     .then(res => res.modifiedCount)
 }
 
 UserRepository.prototype.getReceivedInvitationIds = async function (uid, limit, skip = 0) {
   // $slice:[SKIP_VALUE, LIMIT_VALUE]}
-  return User.findOne({ uid })
+  return User.findOne({
+    uid
+  })
     .select('receivedInvitations')
     .where('1 = 1')
     .slice(skip, limit)
@@ -105,11 +121,28 @@ UserRepository.prototype.getReceivedInvitationIds = async function (uid, limit, 
 
 UserRepository.prototype.getSentInvitationIds = async function (uid, limit, skip = 0) {
   // $slice:[SKIP_VALUE, LIMIT_VALUE]}
-  return User.findOne({ uid })
+  return User.findOne({
+    uid
+  })
     .select('sentInvitations')
     .where('1 = 1')
     .slice(skip, limit)
     .then(doc => doc['sentInvitations'])
+}
+
+UserRepository.prototype.getChannelRecord = async function (uid, query) {
+  if (typeof query.chid !== 'string' && typeof query.ciid !== 'string') {
+    throw TypeError('UserRepository.getChannelRecord: param(s) of query is(are) wrong')
+  }
+
+  var doc = await User.findOne({
+    uid
+  })
+    .select('channelRecords')
+
+  return doc['channelRecords'].find(chRecord => {
+    return chRecord.chid === query.chid || chRecord.ciid === query.ciid
+  })
 }
 
 UserRepository.prototype.appendChannelRecord = async function (uid, record) {
@@ -117,26 +150,36 @@ UserRepository.prototype.appendChannelRecord = async function (uid, record) {
   record.joinedAt = (record.joinedAt == null) ? now : record.joinedAt
   record.lastGlimpse = (record.lastGlimpse == null) ? now : record.lastGlimpse
 
-  return User.updateOne({ uid }, {
-    '$addToSet': { 'channelRecords': record },
+  return User.updateOne({
+    uid
+  }, {
+    '$addToSet': {
+      'channelRecords': record
+    },
     updatedAt: now
   })
 }
 
 UserRepository.prototype.removeChannelRecord = async function (uid, record) {
-  if (typeof record.chid !== 'string' || typeof record.ciid !== 'string') {
-    throw TypeError('param(s) of record is(are) wrong')
+  if (typeof record.chid !== 'string' && typeof record.ciid !== 'string') {
+    throw TypeError('UserRepository.removeChannelRecord: param(s) of record is(are) wrong')
   }
 
   var now = Date.now()
-  return User.updateOne({ uid }, {
-    '$pull': { 'channelRecords': record },
+  return User.updateOne({
+    uid
+  }, {
+    '$pull': {
+      'channelRecords': record
+    },
     updatedAt: now
   })
 }
 
-UserRepository.prototype.getChannelRecords = async function (uid) {
-  return User.findOne({ uid })
+UserRepository.prototype.getChannelRecordList = async function (uid) {
+  return User.findOne({
+    uid
+  })
     .select('channelRecords')
     .then(doc => doc['channelRecords'])
 }

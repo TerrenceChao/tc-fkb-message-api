@@ -9,6 +9,10 @@ ConversationRepository.prototype.getListByCiid = async function (ciid, limit, sk
 
 }
 
+ConversationRepository.prototype.getListByUserChannelRecord = async function (chRecord, limit, skip = 0, sort = 'DESC') {
+
+}
+
 ConversationRepository.prototype.removeListByCiid = async function (ciid) {
 
 }

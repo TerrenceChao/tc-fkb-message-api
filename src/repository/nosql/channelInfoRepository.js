@@ -36,7 +36,7 @@ ChannelInfoRepository.prototype.create = async function (uid, channelName) {
 
 ChannelInfoRepository.prototype.findOne = async function (query) {
   if (typeof query.chid !== 'string' && typeof query.ciid !== 'string') {
-    throw TypeError('param(s) of query is(are) wrong')
+    throw TypeError('ChannelInfoRepository.findOne: param(s) of query is(are) wrong')
   }
 
   query._id = query.chid

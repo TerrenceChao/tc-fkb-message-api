@@ -317,7 +317,8 @@ StorageServiceTemplate.prototype.conversationCreated = function (ciid, uid, cont
   // throw new Error(`conversation in channelInfo(ciid): ${ciid} is failed to created`)
 }
 
-StorageServiceTemplate.prototype.getConversationList = async function (ciid, limit = 10, skip = 0) {
+StorageServiceTemplate.prototype.getConversationList = async function (uid, ciid, limit = 10, skip = 0) {
+  // get user's (uid) channelRecord & check the time of joinedAt, lastGlimpse
   return [{
     ciid,
     sender: 'Eason',

@@ -1,4 +1,3 @@
-
 function UserRepository () {}
 
 UserRepository.prototype.findById = async function (uid) {
@@ -21,23 +20,27 @@ UserRepository.prototype.deleteInvitation = async function (iid, inviter, invite
 
 }
 
-UserRepository.prototype.getReceivedInvitationIds = async function (uid, limit, skip = 0, sort = 'DESC') {
+UserRepository.prototype.getReceivedInvitationIds = async function (uid, limit, skip = 0) {
 
 }
 
-UserRepository.prototype.getSentInvitationIds = async function (uid, limit, skip = 0, sort = 'DESC') {
+UserRepository.prototype.getSentInvitationIds = async function (uid, limit, skip = 0) {
 
 }
 
-UserRepository.prototype.appendChannelRecord = async function (ciid, chid, joinedAt = null, lastGlimpse = null) {
+UserRepository.prototype.getChannelRecord = async function (uid, query) {
 
 }
 
-UserRepository.prototype.removeChannelRecord = async function (ciid, chid) {
+UserRepository.prototype.appendChannelRecord = async function (uid, record) {
 
 }
 
-UserRepository.prototype.getChannelRecords = async function (uid) {
+UserRepository.prototype.removeChannelRecord = async function (uid, record) {
+
+}
+
+UserRepository.prototype.getChannelRecordList = async function (uid) {
 
 }
 

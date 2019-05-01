@@ -43,6 +43,25 @@ ConversationRepository.prototype.getListByCiid = async function (ciid, limit, sk
   return list.map(doc => getAttributes(doc))
 }
 
+ConversationRepository.prototype.getListByUserChannelRecord = async function (chRecord, limit, skip = 0, sort = 'DESC') {
+  var {
+    ciid,
+    joinedAt
+  } = chRecord
+  var list = await Conversation.find({
+    ciid,
+    datetime: { $gte: joinedAt }
+  })
+    .sort({
+      datetime: sort.toLowerCase()
+    })
+    .select(['ciid', 'sender', 'content', 'type', 'datetime'])
+    .limit(limit)
+    .skip(skip)
+
+  return list.map(doc => getAttributes(doc))
+}
+
 ConversationRepository.prototype.removeListByCiid = async function (ciid) {
   var confirm = await Conversation.deleteMany({
     ciid
