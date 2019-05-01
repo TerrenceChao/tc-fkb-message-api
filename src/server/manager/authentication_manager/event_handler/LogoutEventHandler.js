@@ -27,8 +27,8 @@ LogoutEventHandler.prototype.handle = async function (requestInfo) {
 
   /**
    * 待優化：
-   * 在 login 期間 user 所瀏覽過 (點開看過) 的 channel(s), 需要將該 channel(s) 最後一次被 user 
-   * 瞥見訊息的時間，更新/紀錄在 table "UserInChannel" (從聊天室 A 切換到其他頁面的那個時間點, 
+   * 在 login 期間 user 所瀏覽過 (點開看過) 的 channel(s), 需要將該 channel(s) 最後一次被 user
+   * 瞥見訊息的時間，更新/紀錄在 table "UserInChannel" (從聊天室 A 切換到其他頁面的那個時間點,
    * 將離開聊天室 A 的 "時間" 紀錄下來，當作聊天室 A 的 last glimpse time) 。
    * user login 期間將所有房間的 last glimpse time(s) 暫時紀錄於 client 端，logout 時將這些
    * 各個房間的 lastGlimpse(s) 更新回 database。

@@ -39,9 +39,11 @@ SendConversationEventHandler.prototype.handle = async function (requestInfo) {
   }
 
   this.executeSend(datetime, requestInfo, responseHeader)
-  
+
   try {
-    await storageService.conversationCreated(ciid, uid, content, convType, datetime)
+    if (requestInfo.socket.rooms[ciid]) {
+      await storageService.conversationCreated(ciid, uid, content, convType, datetime)
+    }
   } catch (err) {
     this.alertException(err.message, requestInfo, responseHeader)
   }
@@ -69,7 +71,7 @@ SendConversationEventHandler.prototype.executeSend = function (datetime, request
         datetime
       }
     })
-  
+
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 }
 

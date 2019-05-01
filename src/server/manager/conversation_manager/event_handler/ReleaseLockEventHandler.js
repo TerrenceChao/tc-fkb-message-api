@@ -9,7 +9,7 @@ var EventHandler = require(path.join(config.get('src.manager'), 'EventHandler'))
 
 util.inherits(ReleaseLockEventHandler, EventHandler)
 
-function ReleaseLockEventHandler() {
+function ReleaseLockEventHandler () {
   this.name = arguments.callee.name
 }
 

@@ -54,7 +54,7 @@ ChannelOfflineEventHandler.prototype.broadcast = function (channelIds, requestIn
     .setPacket({
       msgCode: `user: ${requestInfo.packet.uid} is offline`
     })
-  
+
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 }
 
