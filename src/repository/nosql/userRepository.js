@@ -4,6 +4,15 @@ const mongoose = require('mongoose')
 
 var User = require(path.join(config.get('database.nosql.model'), 'User'))
 
+function reverseAndSlice (aryList, limit, skip = 0) {
+  var ary = []
+  aryList.forEach(element => {
+    ary.push(element)
+  })
+
+  return ary.reverse().slice(skip, skip + limit)
+}
+
 function UserRepository () {}
 
 UserRepository.prototype.findById = async function (uid) {
@@ -109,25 +118,21 @@ UserRepository.prototype.deleteInvitation = async function (iid, inviter, invite
 }
 
 UserRepository.prototype.getReceivedInvitationIds = async function (uid, limit, skip = 0) {
-  // $slice:[SKIP_VALUE, LIMIT_VALUE]}
   return User.findOne({
     uid
   })
     .select('receivedInvitations')
-    .where('1 = 1')
-    .slice(skip, limit)
     .then(doc => doc['receivedInvitations'])
+    .then(iidList => reverseAndSlice(iidList, limit, skip))
 }
 
 UserRepository.prototype.getSentInvitationIds = async function (uid, limit, skip = 0) {
-  // $slice:[SKIP_VALUE, LIMIT_VALUE]}
   return User.findOne({
     uid
   })
     .select('sentInvitations')
-    .where('1 = 1')
-    .slice(skip, limit)
     .then(doc => doc['sentInvitations'])
+    .then(iidList => reverseAndSlice(iidList, limit, skip))
 }
 
 UserRepository.prototype.getChannelRecord = async function (uid, query) {
