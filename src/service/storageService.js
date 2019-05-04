@@ -50,6 +50,7 @@ StorageService.prototype.invitationMultiCreated = async function (
   return Promise.all(invitees.map(async (invitee) => {
     var invitation = await invitationRepository.create(inviter, invitee, header, content, sensitive)
     await userRepository.recordInvitation(invitation.iid, inviter, invitee) // return true
+    await channelInfoRepository.appendInviteeAndReturn(sensitive.chid, invitee) // recorded in chInfo.invitees
 
     return invitation
   }))
@@ -97,6 +98,8 @@ StorageService.prototype.invitationRemoved = async function (iid) {
       invitation.inviter,
       invitation.invitee
     ) // return true
+    await channelInfoRepository.removeInviteeAndReturn(invitation.sensitive.chid, invitation.invitee)
+
     return await invitationRepository.removeById(iid) // return true
   } catch (err) {
     logger(err)

@@ -32,8 +32,9 @@ SendInvitationEventHandler.prototype.handle = function (requestInfo) {
   Promise.resolve(storageService.getChannelInfo({ chid }))
     .then(channelInfo => this.createAndGetInvitations(channelInfo, requestInfo),
       err => this.alertException(err.message, requestInfo))
-    .then(invitationList => this.sendInvitations(invitationList, requestInfo),
-      err => this.alertException(err.message, requestInfo))
+    .then(invitationList => {
+      invitationList.length === 0 ? this.noticeUser(requestInfo) : this.sendInvitations(invitationList, requestInfo)
+    }, err => this.alertException(err.message, requestInfo))
 }
 
 SendInvitationEventHandler.prototype.createAndGetInvitations = async function (channelInfo, requestInfo) {
@@ -43,11 +44,16 @@ SendInvitationEventHandler.prototype.createAndGetInvitations = async function (c
   var newInvitees = packet.invitees
   var content = packet.content
 
-  var inviteesHasBeenInvited = channelInfo.invitees
-  var invitees = _.pullAll(newInvitees, inviteesHasBeenInvited)
+  var membersOrInviteesHasBeenInvited = channelInfo.members.concat(channelInfo.invitees)
+  var invitees = _.pullAll(newInvitees, membersOrInviteesHasBeenInvited)
   var inviData = this.getInvitationCreateionData(channelInfo)
 
-  var invitationList = await storageService.invitationMultiCreated(
+  var invitationList = []
+  if (invitees.length === 0) {
+    return invitationList
+  }
+
+  invitationList = await storageService.invitationMultiCreated(
     inviter,
     invitees,
     inviData.header,
@@ -71,6 +77,23 @@ SendInvitationEventHandler.prototype.getInvitationCreateionData = function (chan
       ciid: channelInfo.ciid
     }
   }
+}
+
+SendInvitationEventHandler.prototype.noticeUser = function (requestInfo) {
+  var businessEvent = this.globalContext['businessEvent']
+  var packet = requestInfo.packet
+
+  var resInfo = new ResponseInfo()
+    .assignProtocol(requestInfo)
+    .setHeader({
+      to: TO.USER,
+      receiver: packet.inviter,
+      responseEvent: RESPONSE_EVENTS.PERSONAL_INFO // inviter self
+    })
+    .setPacket({
+      msgCode: 'The invitees may have been invited or are members'
+    })
+  businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 }
 
 SendInvitationEventHandler.prototype.sendInvitations = function (invitationList, requestInfo) {

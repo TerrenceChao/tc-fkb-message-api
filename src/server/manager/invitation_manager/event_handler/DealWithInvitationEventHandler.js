@@ -36,6 +36,7 @@ DealWithInvitationEventHandler.prototype.handle = function (requestInfo) {
         this.triggerJoinChannelEvent(invitation, requestInfo)
       } else {
         this.broadcastUserHasCanceled(invitation, requestInfo)
+        this.confirmToCancelInvitation(invitation, requestInfo)
       }
     }, err => this.alertException(err.message, requestInfo))
 }
@@ -70,6 +71,28 @@ DealWithInvitationEventHandler.prototype.broadcastUserHasCanceled = function (in
       msgCode: `${packet.nickname} is canceled`
     })
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
+}
+
+DealWithInvitationEventHandler.prototype.confirmToCancelInvitation = function (invitation, requestInfo) {
+  var businessEvent = this.globalContext['businessEvent']
+  var packet = requestInfo.packet
+
+  var resInfo = new ResponseInfo()
+    .assignProtocol(requestInfo)
+    .setHeader({
+      to: TO.USER,
+      receiver: packet.uid,
+      responseEvent: RESPONSE_EVENTS.PERSONAL_INFO
+    })
+    .setPacket({
+      msgCode: `I'am canceled to join channel`,
+      data: {
+        uid: packet.uid,
+        iid: packet.iid
+      }
+    })
+  businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
+  businessEvent.emit(EVENTS.CONFIRM_INVITATION, requestInfo)
 }
 
 DealWithInvitationEventHandler.prototype.isValid = function (requestInfo) {

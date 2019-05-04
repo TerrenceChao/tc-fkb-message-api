@@ -3,8 +3,11 @@ var util = require('util')
 var path = require('path')
 
 const {
-  EVENTS
+  TO,
+  EVENTS,
+  RESPONSE_EVENTS
 } = require(path.join(config.get('src.property'), 'property'))
+var ResponseInfo = require(path.join(config.get('src.manager'), 'ResponseInfo'))
 var EventHandler = require(path.join(config.get('src.manager'), 'EventHandler'))
 
 util.inherits(ConfirmInvitationEventHandler, EventHandler)
@@ -26,7 +29,25 @@ ConfirmInvitationEventHandler.prototype.handle = function (requestInfo) {
   var iid = packet.iid
 
   Promise.resolve(storageService.invitationRemoved(iid))
+    .then(() => this.confirmToRemoveInvitation(requestInfo))
     .catch(err => this.alertException(err.message, requestInfo))
+}
+
+ConfirmInvitationEventHandler.prototype.confirmToRemoveInvitation = function (requestInfo) {
+  var businessEvent = this.globalContext['businessEvent']
+  var packet = requestInfo.packet
+
+  var resInfo = new ResponseInfo()
+    .assignProtocol(requestInfo)
+    .setHeader({
+      to: TO.USER,
+      receiver: packet.uid,
+      responseEvent: RESPONSE_EVENTS.PERSONAL_INFO
+    })
+    .setPacket({
+      msgCode: `Invitation is removed. iid: ${packet.iid}`
+    })
+  businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 }
 
 ConfirmInvitationEventHandler.prototype.isValid = function (requestInfo) {

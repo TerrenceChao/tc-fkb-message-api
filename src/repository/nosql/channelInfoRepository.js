@@ -61,6 +61,42 @@ ChannelInfoRepository.prototype.getListByCiids = async function (ciids, limit, s
   return list.map(doc => getAttributes(doc))
 }
 
+ChannelInfoRepository.prototype.appendInviteeAndReturn = async function (chid, uid) {
+  const returnNewDoc = {
+    new: true
+  }
+
+  var now = Date.now()
+  var refreshedChInfo = await ChannelInfo.findOneAndUpdate({
+    _id: chid
+  }, {
+    '$addToSet': {
+      'invitees': uid
+    },
+    updatedAt: now
+  }, returnNewDoc)
+
+  return getAttributes(refreshedChInfo)
+}
+
+ChannelInfoRepository.prototype.removeInviteeAndReturn = async function (chid, uid) {
+  const returnNewDoc = {
+    new: true
+  }
+
+  var now = Date.now()
+  var refreshedChInfo = await ChannelInfo.findOneAndUpdate({
+    _id: chid
+  }, {
+    '$pull': {
+      'invitees': uid
+    },
+    updatedAt: now
+  }, returnNewDoc)
+
+  return getAttributes(refreshedChInfo)
+}
+
 ChannelInfoRepository.prototype.appendMemberAndReturn = async function (chid, uid) {
   const returnNewDoc = {
     new: true

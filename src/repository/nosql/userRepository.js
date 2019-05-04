@@ -150,7 +150,13 @@ UserRepository.prototype.appendChannelRecord = async function (uid, record) {
   record.joinedAt = (record.joinedAt == null) ? now : record.joinedAt
   record.lastGlimpse = (record.lastGlimpse == null) ? now : record.lastGlimpse
 
-  return User.updateOne({
+  var recordedDoc = await this.getChannelRecord(uid, record)
+  if (recordedDoc !== undefined) {
+    console.log(`channelRecord has been appended: ${JSON.stringify(recordedDoc, null, 2)}`)
+    return recordedDoc
+  }
+
+  var doc = await User.updateOne({
     uid
   }, {
     '$addToSet': {
@@ -158,6 +164,8 @@ UserRepository.prototype.appendChannelRecord = async function (uid, record) {
     },
     updatedAt: now
   })
+
+  return doc
 }
 
 UserRepository.prototype.removeChannelRecord = async function (uid, record) {
@@ -166,7 +174,7 @@ UserRepository.prototype.removeChannelRecord = async function (uid, record) {
   }
 
   var now = Date.now()
-  return User.updateOne({
+  var doc = await User.updateOne({
     uid
   }, {
     '$pull': {
@@ -174,6 +182,8 @@ UserRepository.prototype.removeChannelRecord = async function (uid, record) {
     },
     updatedAt: now
   })
+
+  return doc
 }
 
 UserRepository.prototype.getChannelRecordList = async function (uid) {
