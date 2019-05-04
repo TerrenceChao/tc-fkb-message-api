@@ -15,21 +15,43 @@ function LogoutEventHandler () {
 
 LogoutEventHandler.prototype.eventName = EVENTS.LOGOUT
 
-LogoutEventHandler.prototype.handle = function (requestInfo) {
+LogoutEventHandler.prototype.handle = async function (requestInfo) {
   if (!this.isValid(requestInfo)) {
     console.warn(`${this.eventName}: request info is invalid.`)
     return
   }
 
   var businessEvent = this.globalContext['businessEvent']
-  businessEvent.emit(EVENTS.USER_OFFLINE, requestInfo)
   businessEvent.emit(EVENTS.CHANNEL_OFFLINE, requestInfo)
+  businessEvent.emit(EVENTS.USER_OFFLINE, requestInfo)
+
+  /**
+   * 待優化：
+   * 在 login 期間 user 所瀏覽過 (點開看過) 的 channel(s), 需要將該 channel(s) 最後一次被 user
+   * 瞥見訊息的時間，更新/紀錄在 table "UserInChannel" (從聊天室 A 切換到其他頁面的那個時間點,
+   * 將離開聊天室 A 的 "時間" 紀錄下來，當作聊天室 A 的 last glimpse time) 。
+   * user login 期間將所有房間的 last glimpse time(s) 暫時紀錄於 client 端，logout 時將這些
+   * 各個房間的 lastGlimpse(s) 更新回 database。
+   * 當下次 user login 時，需要透過每個 channel 最後一則 conversation 的 datetime 順序 (desc)
+   * 來載入前幾個 channelInfo(s), 此時和 lastGlimpse 比較，就會知道哪些屬於未讀訊息了
+   */
+  var storageService = this.globalContext['storageService']
+  var packet = requestInfo.packet
+  var uid = packet.uid
+  var config = packet.config
+
+  try {
+    await storageService.updateLastGlimpse(uid, config.glimpses)
+  } catch (err) {
+    console.log(err.message)
+  }
 }
 
 LogoutEventHandler.prototype.isValid = function (requestInfo) {
   var packet = requestInfo.packet
   return packet !== undefined &&
-    typeof packet.uid === 'string'
+    typeof packet.uid === 'string' &&
+    typeof packet.config === 'object'
 }
 
 module.exports = {

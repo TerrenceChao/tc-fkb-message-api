@@ -28,14 +28,19 @@ JoinChannelEventHandler.prototype.handle = function (requestInfo) {
   var packet = requestInfo.packet
   var uid = packet.uid
   var chid = packet.chid
-  var chInfoQuery = {
-    chid
-  }
+
+  /**
+   * 待優化？
+   * 拿到 chid 後，先將自己的 uid 廣播給 channel 內成員，讓他們拿到需要更新的 memebers (多一個 uid)，
+   * 再來執行 channelJoined, then getChannelInfo, 最後 user 才會拿到整個 channelInfo ???
+   *
+   * 結論：
+   * 沒有必要。在未加入 channel 前，除了 chid 以外，其他關於 channelInfo 的 name, ciid, members ... etc
+   * 都拿不到，沒有辦法傳送/接收訊息，僅僅讓其他成員搶先一步知道有新的成員即將加入沒有太大意義。
+   */
 
   // channelJoined: refresh channelInfo FIRST
   Promise.resolve(storageService.channelJoined(uid, chid))
-    .then(confirm => storageService.getChannelInfo(chInfoQuery),
-      err => this.alertException(err.message, requestInfo))
     .then(refreshedChannelInfo => this.executeJoin(refreshedChannelInfo, requestInfo),
       err => this.alertException(err.message, requestInfo))
 }

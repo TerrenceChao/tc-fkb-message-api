@@ -25,12 +25,17 @@ SendConversationEventHandler.prototype.handle = async function (requestInfo) {
   }
 
   var storageService = this.globalContext['storageService']
-
+  var socket = requestInfo.socket
   var packet = requestInfo.packet
   var ciid = packet.ciid
   var uid = packet.uid
   var content = packet.content
   var convType = packet.convType
+
+  if (socket.rooms[ciid] === undefined) {
+    return
+  }
+
   var datetime = Date.now()
   var responseHeader = {
     to: TO.CHANNEL,
@@ -39,7 +44,7 @@ SendConversationEventHandler.prototype.handle = async function (requestInfo) {
   }
 
   this.executeSend(datetime, requestInfo, responseHeader)
-  
+
   try {
     await storageService.conversationCreated(ciid, uid, content, convType, datetime)
   } catch (err) {
@@ -69,7 +74,7 @@ SendConversationEventHandler.prototype.executeSend = function (datetime, request
         datetime
       }
     })
-  
+
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 }
 

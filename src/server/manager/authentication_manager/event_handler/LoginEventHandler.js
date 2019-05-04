@@ -36,6 +36,16 @@ LoginEventHandler.prototype.handle = async function (requestInfo) {
     return
   }
 
+  try {
+    var user = await storageService.getUser(packet.uid)
+    if (user == null) {
+      await storageService.createUser(packet.uid)
+    }
+  } catch (err) {
+    console.error(err.message)
+    return
+  }
+
   // Initial: user makes connections to self & channel
   businessEvent.emit(EVENTS.USER_ONLINE, requestInfo)
   businessEvent.emit(EVENTS.CHANNEL_ONLINE, requestInfo)
@@ -60,7 +70,7 @@ LoginEventHandler.prototype.sendChannelInfoAndConversations = function (userChan
   userChannelInfoList.forEach(async (chInfo) => {
     var ciid = chInfo.ciid
 
-    Promise.resolve(storageService.getConversationList(ciid, convLimit))
+    Promise.resolve(storageService.getConversationList(uid, ciid, convLimit))
       .then(conversationList => {
         chInfo.conversations = conversationList
 

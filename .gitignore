@@ -1,6 +1,4 @@
 node_modules/
-src/repository/
-playground.js
-playground.html
+playground/
 *.informal.js
 *.env

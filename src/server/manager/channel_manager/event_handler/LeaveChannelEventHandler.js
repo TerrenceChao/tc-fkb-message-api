@@ -31,14 +31,20 @@ LeaveChannelEventHandler.prototype.handle = function (requestInfo) {
   var packet = requestInfo.packet
   var uid = packet.uid
   var chid = packet.chid
-  var chInfoQuery = {
-    chid
-  }
+
+  /**
+   * 待優化？
+   * client 可以傳送自己版本的 channelInfo (除了自己 uid 的所有資訊), 藉此先更新其他成員的 channelInfo,
+   * 等待 DB 確實更新 channelInfo 紀錄, 收到 response 後再刪除 client 端的 channelInfo。
+   * [NOTE] 那如果沒接收到 DB 更新成功的訊息？
+   * [NOTE] 是否要跟 join 成對的用同樣的 pattern? 交互的 join/leave 會有更新不即時的情況？
+   *
+   * 結論：
+   * 沒有必要。即將離開的人不再傳送訊息，不會對流量造成壓力，不需要訊息先行，DB 後更新的機制
+   */
 
   // channelLeaved: refresh channelInfo FIRST
   Promise.resolve(storageService.channelLeaved(uid, chid))
-    .then(confirm => storageService.getChannelInfo(chInfoQuery),
-      err => this.alertException(err.message, requestInfo))
     .then(refreshedChannelInfo => this.executeLeave(refreshedChannelInfo, requestInfo),
       err => this.alertException(err.message, requestInfo))
     .then(refreshedChannelInfo => {
@@ -81,7 +87,7 @@ LeaveChannelEventHandler.prototype.broadcastUserHasLeft = function (channelInfo,
         datetime: Date.now()
       }
     })
-  
+
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 }
 

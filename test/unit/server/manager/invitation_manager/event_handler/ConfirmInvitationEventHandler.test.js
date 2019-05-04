@@ -25,19 +25,18 @@ describe('ConfirmInvitationEventHandler test', () => {
   })
 
   beforeEach(() => {
-    requestInfo = new RequestInfo()
-    userPayload = {
-      uid: 'd17aca55-c422-4284-9e1e-7610fe7abbb7',
-      iid: 'b4be066c-106c-4299-b191-42656c69fc1f'
-    }
-
-    requestInfo.packet = userPayload
     stub = sinon.stub(storageService, 'invitationRemoved')
     spyAlertException = sinon.spy(handler, 'alertException')
   })
 
   it('[handle, Pass] test success if invitation removed', (done) => {
     // arrange
+    requestInfo = new RequestInfo()
+    userPayload = {
+      uid: 'd17aca55-c422-4284-9e1e-7610fe7abbb7',
+      iid: 'b4be066c-106c-4299-b191-42656c69fc1f'
+    }
+    requestInfo.packet = userPayload
     stub.callsFake(async (iid) => {
       await delayFunc(DELAY_IN_MS, done)
       return true
@@ -52,6 +51,12 @@ describe('ConfirmInvitationEventHandler test', () => {
 
   it('[handle, Fail] test fail if invitation not removed', (done) => {
     // arrange
+    requestInfo = new RequestInfo()
+    userPayload = {
+      uid: 'd17aca55-c422-4284-9e1e-7610fe7abbb7',
+      iid: 'b4be066c-106c-4299-b191-42656c69fc1f'
+    }
+    requestInfo.packet = userPayload
     stub.callsFake((iid) => {
       return delayFunc(DELAY_IN_MS, done, new Error(`invitation NOT REMOVED`))
     })

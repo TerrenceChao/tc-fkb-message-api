@@ -65,7 +65,7 @@ GetInvitationListEventHandler.prototype.sendInvitationList = function (invitatio
     .setHeader({
       to: TO.USER,
       receiver: packet.uid,
-      responseEvent: RESPONSE_EVENTS.INVITATION_LIST_FROM_CHANNEL // non-realtime invitation list
+      responseEvent: RESPONSE_EVENTS.INVITATION_LIST // non-realtime invitation list
     })
     .setPacket({
       msgCode: `get ${packet.inviType} invitation list`,
