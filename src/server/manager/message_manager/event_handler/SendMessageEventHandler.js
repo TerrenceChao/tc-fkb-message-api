@@ -64,7 +64,7 @@ SendMessageEventHandler.prototype.handle = function (responseInfo) {
             return
           }
 
-          console.log(`"${EVENTS.SEND_MESSAGE}": {"emit to ${header.to}": ${JSON.stringify(receiver)}, "responseEvent": "${responseEvent}"}`, `, "packet": ${JSON.stringify(packet)},`)
+          // console.log(`"${EVENTS.SEND_MESSAGE}": {"emit to ${header.to}": ${JSON.stringify(receiver)}, "responseEvent": "${responseEvent}"}`, `, "packet": ${JSON.stringify(packet)},`)
           break
 
         case TO.SOCKET:
@@ -89,10 +89,10 @@ SendMessageEventHandler.prototype.emitInChannel = function (channel, responseEve
   var socketServer = this.globalContext['socketServer']
   if (Array.isArray(responseEvent)) {
     responseEvent.forEach(resEvent => {
-      socketServer.sockets.in(channel).emit(resEvent, packet)
+      socketServer.in(channel).emit(resEvent, packet)
     })
   } else if (typeof responseEvent === 'string') {
-    socketServer.sockets.in(channel).emit(responseEvent, packet)
+    socketServer.in(channel).emit(responseEvent, packet)
   }
 }
 

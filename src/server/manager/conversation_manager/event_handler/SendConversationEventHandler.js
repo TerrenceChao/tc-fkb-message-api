@@ -19,6 +19,7 @@ function SendConversationEventHandler () {
 SendConversationEventHandler.prototype.eventName = EVENTS.SEND_CONVERSATION
 
 SendConversationEventHandler.prototype.handle = async function (requestInfo) {
+  // console.time('conv')
   if (!this.isValid(requestInfo)) {
     console.warn(`${this.eventName}: request info is invalid.`)
     return
@@ -44,7 +45,8 @@ SendConversationEventHandler.prototype.handle = async function (requestInfo) {
   }
 
   this.executeSend(datetime, requestInfo, responseHeader)
-
+  // console.timeEnd('conv')
+  // console.timeEnd('cycle')
   try {
     await storageService.conversationCreated(ciid, uid, content, convType, datetime)
   } catch (err) {
