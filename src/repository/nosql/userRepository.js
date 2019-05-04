@@ -109,25 +109,21 @@ UserRepository.prototype.deleteInvitation = async function (iid, inviter, invite
 }
 
 UserRepository.prototype.getReceivedInvitationIds = async function (uid, limit, skip = 0) {
-  // $slice:[SKIP_VALUE, LIMIT_VALUE]}
   return User.findOne({
     uid
   })
     .select('receivedInvitations')
-    .where('1 = 1')
-    .slice(skip, limit)
     .then(doc => doc['receivedInvitations'])
+    .then(iidList => iidList.reverse().slice(skip, skip + limit))
 }
 
 UserRepository.prototype.getSentInvitationIds = async function (uid, limit, skip = 0) {
-  // $slice:[SKIP_VALUE, LIMIT_VALUE]}
   return User.findOne({
     uid
   })
     .select('sentInvitations')
-    .where('1 = 1')
-    .slice(skip, limit)
     .then(doc => doc['sentInvitations'])
+    .then(iidList => iidList.reverse().slice(skip, skip + limit))
 }
 
 UserRepository.prototype.getChannelRecord = async function (uid, query) {
