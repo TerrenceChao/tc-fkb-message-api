@@ -1,3 +1,4 @@
+require('dotenv').config()
 const path = require('path')
 const mongoose = require('mongoose')
 
@@ -18,7 +19,7 @@ const POOL_SIZE = process.env.TEST_MONGODB_POOL_SIZE
 const CONNECT = 'req_testing_connect'
 const DISCONNECT = 'req_testing_disconnect'
 
-mongoose.connection.once(CONNECT, (host = null) => {
+mongoose.connection.on(CONNECT, (host = null) => {
   host = (host === null) ? HOST : host
   mongoose.connect(host, {
     useNewUrlParser: true,
@@ -27,7 +28,7 @@ mongoose.connection.once(CONNECT, (host = null) => {
   })
 })
 
-mongoose.connection.once(DISCONNECT, () => {
+mongoose.connection.on(DISCONNECT, () => {
   mongoose.disconnect()
 })
 
