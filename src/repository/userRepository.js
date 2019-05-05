@@ -8,7 +8,7 @@ UserRepository.prototype.create = async function (uid) {
 
 }
 
-UserRepository.prototype.updateLastGlimpse = async function (uid, jsonGlimpses) {
+UserRepository.prototype.updateLastGlimpse = async function (uid, newChRecordList) {
 
 }
 
