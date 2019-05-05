@@ -15,20 +15,28 @@ mongoose.envParams = {
 
 const HOST = process.env.TEST_MONGODB_HOST
 const POOL_SIZE = process.env.TEST_MONGODB_POOL_SIZE
+const CONNECT = 'req_testing_connect'
+const DISCONNECT = 'req_testing_disconnect'
 
-mongoose.connect(HOST, {
-  useNewUrlParser: true,
-  useCreateIndex: true,
-  autoIndex: false
+mongoose.connection.once(CONNECT, (host = null) => {
+  host = (host === null) ? HOST : host
+  mongoose.connect(host, {
+    useNewUrlParser: true,
+    useCreateIndex: true,
+    autoIndex: false
+  })
 })
 
-var nosqlDB = mongoose.connection
-nosqlDB.on('error', console.error.bind(console, '[TEST] connection error:'))
-nosqlDB.once('open', () => {
+mongoose.connection.once(DISCONNECT, () => {
+  mongoose.disconnect()
+})
+
+mongoose.connection.on('error', console.error.bind(console, 'connection error:'))
+mongoose.connection.once('open', () => {
   console.log('[TEST] mongodb is connecting ...')
 })
 
-nosqlDB.once('disconnected', () => {
+mongoose.connection.once('disconnected', () => {
   console.log('[TEST] mongodb is disconnected')
 })
 
@@ -41,13 +49,13 @@ module.exports = function (root) {
     nosql: {
       host: HOST,
       poolSize: POOL_SIZE,
+      connect: CONNECT,
+      disconnect: DISCONNECT,
       factory: path.join(nosql, 'factory'),
       model: path.join(nosql, 'model'),
       Seed: path.join(nosql, 'seed')
     },
     sql: {
-      host: 'host',
-      poolSize: 0,
       factory: path.join(sql, 'factory'),
       model: path.join(sql, 'model'),
       Seed: path.join(sql, 'seed')
