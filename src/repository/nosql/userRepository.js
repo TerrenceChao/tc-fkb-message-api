@@ -29,14 +29,29 @@ UserRepository.prototype.create = async function (uid) {
   return user
 }
 
-UserRepository.prototype.updateLastGlimpse = async function (uid, jsonGlimpses) {
-  // await User.updateOne({
-  //   uid,
-  //   'channelRecords.':
-  // }, {
+UserRepository.prototype.updateLastGlimpse = async function (uid, newChRecordList) {
+  var now = Date.now()
+  var updateChRecordQuery = newChRecordList.map(record => {
+    return {
+      updateOne: {
+        filter: {
+          uid,
+          'channelRecords.chid': record.chid
+        },
+        update: {
+          '$set': {
+            'channelRecords.$.lastGlimpse': record.lastGlimpse
+          },
+          updatedAt: now
+        }
+      }
+    }
+  })
 
-  // })
+  var updatedResult = await User.bulkWrite(updateChRecordQuery)
+  console.log('the result of modify channelReocrds: ', JSON.stringify(updatedResult, null, 2))
 
+  return updatedResult
 }
 
 UserRepository.prototype.recordInvitation = async function (iid, inviter, invitee) {
