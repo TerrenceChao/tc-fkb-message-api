@@ -31,8 +31,7 @@ if (cluster.isWorker) {
   var logger = require('morgan')
   var cookieParser = require('cookie-parser')
   var bodyParser = require('body-parser')
-  const CONNECT_EVENT = config.get('database.nosql.connect')
-  require('mongoose').connection.emit(CONNECT_EVENT)
+  config.get('database.nosql.db').connect()
 
   var routeIndex = require(path.join(config.get('src.router'), 'index'))
   var {
