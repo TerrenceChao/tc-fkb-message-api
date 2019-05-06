@@ -60,14 +60,17 @@ Manager.prototype.listenRequestEvent = function (protocol, handler) {
   // client request
   if (socket !== undefined) {
     socket.on(handler.eventName, (packet) => {
+      // console.time('cycle')
+      // console.time('auth')
       if (handler.eventName !== REQUEST_EVENTS.EXTEND_VALIDITY && authService.isAuthenticated(packet) === false) {
         console.warn(`${handler.eventName}: token validation fail`)
         return
       }
+      // console.timeEnd('auth')
       requestInfo.socket = socket
       requestInfo.packet = packet
       handler.handle(requestInfo)
-      thisManager.receiveAlert(handler.eventName, requestInfo)
+      // thisManager.receiveAlert(handler.eventName, requestInfo)
     })
   // internal service request
   } else if (req !== undefined && res !== undefined) {
