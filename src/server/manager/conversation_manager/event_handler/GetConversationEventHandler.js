@@ -37,6 +37,7 @@ GetConversationEventHandler.prototype.sendConversationList = function (conversat
   var packet = requestInfo.packet
   var {
     uid,
+    ciid,
     convLimit,
     convSkip
   } = packet
@@ -50,7 +51,10 @@ GetConversationEventHandler.prototype.sendConversationList = function (conversat
     })
     .setPacket({
       msgCode: `get conversations from ${convSkip} to ${convSkip + convLimit}`,
-      data: { ciid: conversationList }
+      data: {
+        ciid,
+        list: conversationList
+      }
     })
 
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
