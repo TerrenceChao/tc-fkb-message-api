@@ -28,6 +28,7 @@ NosqlShell.prototype.db = function () {
 NosqlShell.prototype.connect = function (host = null) {
   host = host || process.env.MONGODB_HOST
   mongoose.connect(host, {
+    useFindAndModify: false,
     useNewUrlParser: true,
     useCreateIndex: true,
     autoIndex: false,
