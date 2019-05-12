@@ -57,6 +57,7 @@ SendConversationEventHandler.prototype.handle = async function (requestInfo) {
 SendConversationEventHandler.prototype.executeSend = function (datetime, requestInfo, responseHeader) {
   var businessEvent = this.globalContext['businessEvent']
   var packet = requestInfo.packet
+  var chid = packet.chid
   var ciid = packet.ciid
   var uid = packet.uid
   var content = packet.content
@@ -68,7 +69,8 @@ SendConversationEventHandler.prototype.executeSend = function (datetime, request
     .setPacket({
       msgCode: `conversation type: ${type}`,
       data: {
-        // apply "ciid" to make things easy at frontend
+        // apply "chid/ciid" to make things easy at frontend
+        chid,
         ciid,
         sender: uid,
         content,
@@ -83,6 +85,7 @@ SendConversationEventHandler.prototype.executeSend = function (datetime, request
 SendConversationEventHandler.prototype.isValid = function (requestInfo) {
   var packet = requestInfo.packet
   return packet !== undefined &&
+    packet.chid != null &&
     packet.ciid != null &&
     typeof packet.uid === 'string' &&
     packet.content != null &&
