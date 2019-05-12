@@ -83,7 +83,7 @@ LoginEventHandler.prototype.sendChannelInfoAndConversations = function (userChan
           })
           .setPacket({
             msgCode: `channel: ${chInfo.name} and conversations`,
-            data: chInfo
+            data: [chInfo]
           })
 
         businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
