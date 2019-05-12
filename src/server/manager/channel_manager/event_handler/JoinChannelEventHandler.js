@@ -92,9 +92,7 @@ JoinChannelEventHandler.prototype.sendChannelInfoToUser = function (channelInfo,
     })
     .setPacket({
       msgCode: `get refreshed channelinfo. including name, chid, ciid, creator, members`,
-      data: {
-        chid: channelInfo
-      }
+      data: channelInfo
     })
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 }
