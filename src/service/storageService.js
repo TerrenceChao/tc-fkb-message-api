@@ -110,14 +110,15 @@ StorageService.prototype.invitationRemoved = async function (iid) {
 StorageService.prototype.channelInfoCreated = async function (uid, channelName) {
   // ciid will be saved in local storage (for frontend)
   try {
+    var now = Date.now()
     var channelInfo = await channelInfoRepository.create(uid, channelName)
     // add channel ref(channel record) in User
     await userRepository.appendChannelRecord(
       uid, {
         ciid: channelInfo.ciid,
         chid: channelInfo.chid,
-        joinedAt: Date.now(),
-        lastGlimpse: Date.now()
+        joinedAt: now,
+        lastGlimpse: now
       })
     return channelInfo
   } catch (err) {
@@ -168,6 +169,7 @@ StorageService.prototype.getUserChannelInfoList = async function (uid, limit = 1
 
 StorageService.prototype.channelJoined = async function (uid, chid) {
   try {
+    var now = Date.now()
     // In channelInfo(chid): remove uid from invitees, append uid to members.
     var channelInfo = await channelInfoRepository.appendMemberAndReturn(chid, uid)
     // add channel ref(channel record) in User
@@ -175,8 +177,8 @@ StorageService.prototype.channelJoined = async function (uid, chid) {
       uid, {
         ciid: channelInfo.ciid,
         chid: channelInfo.chid,
-        joinedAt: Date.now(),
-        lastGlimpse: Date.now()
+        joinedAt: now,
+        lastGlimpse: now
       })
     return channelInfo
   } catch (err) {
