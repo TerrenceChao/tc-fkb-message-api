@@ -23,7 +23,7 @@ var storageService = globalContext.storageService
 var businessEvent = globalContext.businessEvent
 
 routeIndex.get(`/index`, (req, res, next) => {
-  var url = `${req.protocol}://${req.get('host')}/${req.originalUrl}`
+  var url = `${req.protocol}://${req.get('host')}${req.originalUrl}`
   console.log(`url: ${url}`)
   res.send({
     a: 1,
