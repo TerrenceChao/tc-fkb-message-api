@@ -10,14 +10,20 @@ mongoose.envParams = {
   }
 }
 
-function NosqlShell () {
+function NosqlShell() {
+  this.attempts = 1
+
   mongoose.connection.on('error', console.error.bind(console, 'connection error:'))
-  mongoose.connection.once('open', () => {
+  mongoose.connection.on('open', () => {
     console.log('mongodb is connecting ...')
   })
 
-  mongoose.connection.once('disconnected', () => {
-    console.log('mongodb is disconnected')
+  mongoose.connection.on('disconnected', () => {
+    console.log('\nmongodb is disconnected\n')
+    console.log(`re-connectting... attempts: ${this.attempts++}\n`)
+    setTimeout(() => {
+      this.connect(process.env.MONGODB_HOST)
+    }, parseInt(process.env.MONGODB_RECONNECT_INTERVAL))
   })
 }
 
