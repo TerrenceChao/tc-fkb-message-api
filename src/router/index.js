@@ -23,7 +23,7 @@ var storageService = globalContext.storageService
 var businessEvent = globalContext.businessEvent
 
 routeIndex.get(`/index`, (req, res, next) => {
-  var url = `${req.protocol}://${req.get('host')}/${req.originalUrl}`
+  var url = `${req.protocol}://${req.get('host')}${req.originalUrl}`
   console.log(`url: ${url}`)
   res.send({
     a: 1,
@@ -32,12 +32,12 @@ routeIndex.get(`/index`, (req, res, next) => {
   })
 })
 
-routeIndex.get(`/${BUSINESS_EVENTS.AUTHENTICATE}`, async (req, res, next) => {
+routeIndex.get(`/${BUSINESS_EVENTS.AUTHENTICATE}`, (req, res, next) => {
   try {
     var token = authService.obtainAuthorization(req.headers)
     // var secret = uuidv4()
     // var refreshToken = authService.obtainValidCert(req.headers, secret)
-    // await storageService.saveUserValidateInfo(req.headers.uid, secret)
+    // storageService.saveUserValidateInfo(req.headers.uid, secret)
 
     res.send({
       // [REFRESH_TOKEN]: refreshToken,

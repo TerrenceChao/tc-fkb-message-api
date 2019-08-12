@@ -26,6 +26,7 @@ const EVENTS = {
   CHANNEL_ONLINE: 'req_channel_channel_online',
   CHANNEL_OFFLINE: 'req_channel_channel_offline',
   GET_CHANNEL_LIST: 'req_channel_get_channel_list',
+  GET_ONE_CHANNEL: 'req_channel_get_one_channel',
   CREATE_CHANNEL: 'req_channel_create_channel',
   JOIN_CHANNEL: 'req_channel_join_channel',
   LEAVE_CHANNEL: 'req_channel_leave_channel',
@@ -42,7 +43,7 @@ const EVENTS = {
   GET_INVITATION_LIST: 'req_invitation_get_invitation_list',
   SEND_INVITATION: 'req_invitation_send_invitation',
   DEAL_WITH_INVITATION: 'req_invitation_deal_with_invitation',
-  CONFIRM_INVITATION: 'req_invitation_confirm_invitation',
+  REMOVE_INVITATION: 'req_invitation_remove_invitation',
 
   // UserManager
   USER_ONLINE: 'req_user_user_online',
@@ -65,6 +66,7 @@ const REQUEST_EVENTS = {
 
   // ChannelManager
   GET_CHANNEL_LIST: EVENTS.GET_CHANNEL_LIST,
+  GET_ONE_CHANNEL: EVENTS.GET_ONE_CHANNEL,
   CREATE_CHANNEL: EVENTS.CREATE_CHANNEL,
 
   // [NOTE]: Will be keeped if there's invitation implementation. Otherwise will be removed
@@ -81,7 +83,7 @@ const REQUEST_EVENTS = {
   GET_INVITATION_LIST: EVENTS.GET_INVITATION_LIST,
   SEND_INVITATION: EVENTS.SEND_INVITATION,
   DEAL_WITH_INVITATION: EVENTS.DEAL_WITH_INVITATION,
-  CONFIRM_INVITATION: EVENTS.CONFIRM_INVITATION,
+  REMOVE_INVITATION: EVENTS.REMOVE_INVITATION,
 
   // UserManager
 
@@ -112,7 +114,7 @@ const BUSINESS_EVENTS = {
 
   // InvitationManager
   GET_INVITATION_LIST: EVENTS.GET_INVITATION_LIST,
-  CONFIRM_INVITATION: EVENTS.CONFIRM_INVITATION,
+  REMOVE_INVITATION: EVENTS.REMOVE_INVITATION,
 
   // UserManager
   USER_ONLINE: EVENTS.USER_ONLINE,
@@ -135,6 +137,7 @@ const RESPONSE_EVENTS = {
   INVITATION_LIST: 'invitation_list',
 
   // Channel (realtime) (to.USER)
+  SPECIFIED_CHANNEL: 'specified_channel',
   CHANNEL_CREATED: 'channel_created',
   CHANNEL_REMOVED: 'channel_removed',
   // Channel (realtime) (to.CHANNEL / USER)

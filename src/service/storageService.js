@@ -147,6 +147,16 @@ StorageService.prototype.getChannelInfo = async function (query) {
   }
 }
 
+StorageService.prototype.getUserChannelInfo = async function (query) {
+  // ciid will be saved in local storage (for frontend)
+  try {
+    return await channelInfoRepository.findOneByUser(query)
+  } catch (err) {
+    logger(err)
+    throw new Error(`couldn't get user's channel info with: ${JSON.stringify(query, null, 2)}`)
+  }
+}
+
 StorageService.prototype.getUserChannelInfoList = async function (uid, limit = 10, skip = 0) {
   // order by conversation's 'createdAt' DESC
   return Promise.resolve(userRepository.getChannelRecordList(uid))

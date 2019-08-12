@@ -49,11 +49,11 @@ JoinChannelEventHandler.prototype.executeJoin = function (channelInfo, requestIn
   var socketServer = this.globalContext['socketServer']
   socketServer.of('/').adapter.remoteJoin(requestInfo.socket.id, channelInfo.ciid)
 
-  this.broadcastUserHasJoined(channelInfo, requestInfo)
+  this.broadcastInviteeJoined(channelInfo, requestInfo)
   this.sendChannelInfoToUser(channelInfo, requestInfo)
 }
 
-JoinChannelEventHandler.prototype.broadcastUserHasJoined = function (channelInfo, requestInfo) {
+JoinChannelEventHandler.prototype.broadcastInviteeJoined = function (channelInfo, requestInfo) {
   var businessEvent = this.globalContext['businessEvent']
   var packet = requestInfo.packet
   var uid = packet.uid

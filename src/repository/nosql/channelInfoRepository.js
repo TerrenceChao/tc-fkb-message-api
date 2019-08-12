@@ -45,6 +45,22 @@ ChannelInfoRepository.prototype.findOne = async function (query) {
   return getAttributes(channelInfo)
 }
 
+ChannelInfoRepository.prototype.findOneByUser = async function (query) {
+  if (typeof query.uid !== 'string' && typeof query.chid !== 'string' && typeof query.ciid !== 'string') {
+    throw TypeError('ChannelInfoRepository.findOneByUser: param(s) of query is(are) wrong')
+  }
+
+  var uid = query.uid
+  delete query.uid
+  query._id = query.chid
+  delete query.chid
+
+  var chInfo = await ChannelInfo.findOne(query)
+
+  var targetUserId = chInfo.members.find((member) => uid === member)
+  return targetUserId === undefined ? [] : getAttributes(chInfo)
+}
+
 ChannelInfoRepository.prototype.getListByCiids = async function (ciids, limit, skip = 0, sort = 'DESC') {
   var list = await ChannelInfo.find({
     ciid: {
