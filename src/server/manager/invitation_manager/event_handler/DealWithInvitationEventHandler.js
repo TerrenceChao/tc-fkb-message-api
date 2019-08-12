@@ -33,15 +33,19 @@ DealWithInvitationEventHandler.prototype.handle = function (requestInfo) {
   Promise.resolve(storageService.getInvitation(iid))
     .then(invitation => {
       if (dealWith === 'y') {
-        this.triggerJoinChannelEvent(invitation, requestInfo)
+        this.joinChannel(invitation, requestInfo)
       } else {
-        this.broadcastUserHasCanceled(invitation, requestInfo)
-        this.confirmToCancelInvitation(invitation, requestInfo)
+        this.broadcastInviteeCanceled(invitation, requestInfo)
       }
-    }, err => this.alertException(err.message, requestInfo))
+      return invitation
+    })
+    // [BUG] 當 dealWith === 'y', 執行 joinChannel, 無法刪除 invitation.
+    // dealWith !== 'y' 卻可以成功刪除！
+    .then(invitation => this.removeInvitation(invitation, requestInfo),
+      err => this.alertException(err.message, requestInfo))
 }
 
-DealWithInvitationEventHandler.prototype.triggerJoinChannelEvent = function (invitation, requestInfo) {
+DealWithInvitationEventHandler.prototype.joinChannel = function (invitation, requestInfo) {
   var businessEvent = this.globalContext['businessEvent']
   var packet = requestInfo.packet
   var uid = packet.uid
@@ -56,7 +60,7 @@ DealWithInvitationEventHandler.prototype.triggerJoinChannelEvent = function (inv
     }))
 }
 
-DealWithInvitationEventHandler.prototype.broadcastUserHasCanceled = function (invitation, requestInfo) {
+DealWithInvitationEventHandler.prototype.broadcastInviteeCanceled = function (invitation, requestInfo) {
   var businessEvent = this.globalContext['businessEvent']
   var packet = requestInfo.packet
 
@@ -73,7 +77,7 @@ DealWithInvitationEventHandler.prototype.broadcastUserHasCanceled = function (in
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 }
 
-DealWithInvitationEventHandler.prototype.confirmToCancelInvitation = function (invitation, requestInfo) {
+DealWithInvitationEventHandler.prototype.removeInvitation = function (invitation, requestInfo) {
   var businessEvent = this.globalContext['businessEvent']
   var packet = requestInfo.packet
 
@@ -85,14 +89,14 @@ DealWithInvitationEventHandler.prototype.confirmToCancelInvitation = function (i
       responseEvent: RESPONSE_EVENTS.PERSONAL_INFO
     })
     .setPacket({
-      msgCode: `I'am canceled to join channel`,
+      msgCode: `removing invitation`,
       data: {
         uid: packet.uid,
         iid: packet.iid
       }
     })
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
-  businessEvent.emit(EVENTS.CONFIRM_INVITATION, requestInfo)
+  businessEvent.emit(EVENTS.REMOVE_INVITATION, requestInfo)
 }
 
 DealWithInvitationEventHandler.prototype.isValid = function (requestInfo) {
