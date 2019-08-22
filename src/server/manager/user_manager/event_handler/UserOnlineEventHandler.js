@@ -40,7 +40,8 @@ UserOnlineEventHandler.prototype.handle = function (requestInfo) {
       responseEvent: RESPONSE_EVENTS.PERSONAL_INFO
     })
     .setPacket({
-      msgCode: `user is online`
+      msgCode: `user is online`,
+      uid
     })
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 }

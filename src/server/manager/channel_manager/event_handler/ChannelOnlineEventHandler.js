@@ -55,7 +55,8 @@ ChannelOnlineEventHandler.prototype.broadcast = function (channelIds, requestInf
       responseEvent: RESPONSE_EVENTS.CONVERSATION_FROM_CHANNEL
     })
     .setPacket({
-      msgCode: `user: ${uid} is online`
+      msgCode: `user: ${uid} is online`,
+      uid
     })
 
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
