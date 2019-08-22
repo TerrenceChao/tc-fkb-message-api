@@ -42,10 +42,14 @@ RemoveInvitationEventHandler.prototype.notify = function (requestInfo) {
     .setHeader({
       to: TO.USER,
       receiver: packet.uid,
-      responseEvent: RESPONSE_EVENTS.PERSONAL_INFO
+      responseEvent: RESPONSE_EVENTS.INVITATION_REMOVED
     })
     .setPacket({
-      msgCode: `Invitation is removed. iid: ${packet.iid}`
+      msgCode: `Invitation is removed. iid: ${packet.iid}`,
+      data: {
+        uid: packet.uid,
+        iid: packet.iid
+      }
     })
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 }

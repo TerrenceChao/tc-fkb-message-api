@@ -38,7 +38,10 @@ UserOfflineEventHandler.prototype.handle = function (requestInfo) {
       responseEvent: RESPONSE_EVENTS.PERSONAL_INFO
     })
     .setPacket({
-      msgCode: `user is offline`
+      msgCode: `user is offline`,
+      data: {
+        uid
+      }
     })
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 

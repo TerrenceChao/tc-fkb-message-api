@@ -26,6 +26,7 @@ DealWithInvitationEventHandler.prototype.handle = function (requestInfo) {
   }
 
   var storageService = this.globalContext['storageService']
+  var businessEvent = this.globalContext['businessEvent']
   var packet = requestInfo.packet
   var iid = packet.iid
   var dealWith = packet.dealWith.toLowerCase()
@@ -37,11 +38,11 @@ DealWithInvitationEventHandler.prototype.handle = function (requestInfo) {
       } else {
         this.broadcastInviteeCanceled(invitation, requestInfo)
       }
-      return invitation
+      return true
     })
     // [BUG] 當 dealWith === 'y', 執行 joinChannel, 無法刪除 invitation.
     // dealWith !== 'y' 卻可以成功刪除！
-    .then(invitation => this.removeInvitation(invitation, requestInfo),
+    .then(() => businessEvent.emit(EVENTS.REMOVE_INVITATION, requestInfo),
       err => this.alertException(err.message, requestInfo))
 }
 
@@ -75,28 +76,6 @@ DealWithInvitationEventHandler.prototype.broadcastInviteeCanceled = function (in
       msgCode: `${packet.nickname} is canceled`
     })
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
-}
-
-DealWithInvitationEventHandler.prototype.removeInvitation = function (invitation, requestInfo) {
-  var businessEvent = this.globalContext['businessEvent']
-  var packet = requestInfo.packet
-
-  var resInfo = new ResponseInfo()
-    .assignProtocol(requestInfo)
-    .setHeader({
-      to: TO.USER,
-      receiver: packet.uid,
-      responseEvent: RESPONSE_EVENTS.PERSONAL_INFO
-    })
-    .setPacket({
-      msgCode: `removing invitation`,
-      data: {
-        uid: packet.uid,
-        iid: packet.iid
-      }
-    })
-  businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
-  businessEvent.emit(EVENTS.REMOVE_INVITATION, requestInfo)
 }
 
 DealWithInvitationEventHandler.prototype.isValid = function (requestInfo) {

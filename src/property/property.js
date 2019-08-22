@@ -128,11 +128,14 @@ const BUSINESS_EVENTS = {
 // Client side (respose to client's event)
 const RESPONSE_EVENTS = {
   // Personal info (to.USER)
+  LOGIN_INFO: 'login_info',
   PERSONAL_INFO: 'personal_info',
+  REFRESHED_TOKEN: 'refreshed_token',
   EXCEPTION_ALERT: 'exception_alert',
 
   // Invitation (realtime) (to.USER)
-  INVITATION_TO_ME: 'invitation_to_me',
+  INVITATION_CREATED: 'invitation_created',
+  INVITATION_REMOVED: 'invitation_removed',
   // Invitation (non-realtime) (to.USER)
   INVITATION_LIST: 'invitation_list',
 

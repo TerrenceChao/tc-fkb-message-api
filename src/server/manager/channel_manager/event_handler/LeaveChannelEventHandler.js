@@ -57,7 +57,7 @@ LeaveChannelEventHandler.prototype.handle = function (requestInfo) {
 
 LeaveChannelEventHandler.prototype.executeLeave = function (channelInfo, requestInfo) {
   this.broadcastUserHasLeft(channelInfo, requestInfo)
-  this.notifyUserToDelete(channelInfo, requestInfo)
+  // this.notifyUserToDelete(channelInfo, requestInfo)
 
   var socketServer = this.globalContext['socketServer']
   socketServer.of('/').adapter.remoteLeave(requestInfo.socket.id, channelInfo.ciid)
@@ -75,7 +75,7 @@ LeaveChannelEventHandler.prototype.broadcastUserHasLeft = function (channelInfo,
     .setHeader({
       to: TO.CHANNEL,
       receiver: channelInfo.ciid,
-      responseEvent: RESPONSE_EVENTS.CONVERSATION_FROM_CHANNEL
+      responseEvent: RESPONSE_EVENTS.CHANNEL_LEFT // RESPONSE_EVENTS.CONVERSATION_FROM_CHANNEL
     })
     .setPacket({
       msgCode: `${nickname} has left`,

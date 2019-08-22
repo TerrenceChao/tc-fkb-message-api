@@ -91,7 +91,10 @@ SendInvitationEventHandler.prototype.noticeUser = function (requestInfo) {
       responseEvent: RESPONSE_EVENTS.PERSONAL_INFO // inviter self
     })
     .setPacket({
-      msgCode: 'The invitees may have been invited or are members'
+      msgCode: 'The invitees may have been invited or are members',
+      data: {
+        uid: packet.inviter
+      }
     })
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 }
@@ -107,7 +110,7 @@ SendInvitationEventHandler.prototype.sendInvitations = function (invitationList,
       .setHeader({
         to: TO.USER,
         receiver: invitation.invitee,
-        responseEvent: RESPONSE_EVENTS.INVITATION_TO_ME // to individual invitees (realtime)
+        responseEvent: RESPONSE_EVENTS.INVITATION_CREATED // to individual invitees (realtime)
       })
       .setPacket({
         msgCode: 'you got an invitation',

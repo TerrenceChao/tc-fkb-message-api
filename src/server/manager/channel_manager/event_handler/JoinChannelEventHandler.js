@@ -50,7 +50,7 @@ JoinChannelEventHandler.prototype.executeJoin = function (channelInfo, requestIn
   socketServer.of('/').adapter.remoteJoin(requestInfo.socket.id, channelInfo.ciid)
 
   this.broadcastInviteeJoined(channelInfo, requestInfo)
-  this.sendChannelInfoToUser(channelInfo, requestInfo)
+  // this.sendChannelInfoToUser(channelInfo, requestInfo)
 }
 
 JoinChannelEventHandler.prototype.broadcastInviteeJoined = function (channelInfo, requestInfo) {
@@ -64,7 +64,7 @@ JoinChannelEventHandler.prototype.broadcastInviteeJoined = function (channelInfo
     .setHeader({
       to: TO.CHANNEL,
       receiver: channelInfo.ciid,
-      responseEvent: RESPONSE_EVENTS.CONVERSATION_FROM_CHANNEL // notify in channel
+      responseEvent: RESPONSE_EVENTS.CHANNEL_JOINED // RESPONSE_EVENTS.CONVERSATION_FROM_CHANNEL // notify in channel
     })
     .setPacket({
       msgCode: `${nickname} has joined`,
