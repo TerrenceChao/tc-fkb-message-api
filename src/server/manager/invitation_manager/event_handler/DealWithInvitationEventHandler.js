@@ -73,7 +73,10 @@ DealWithInvitationEventHandler.prototype.broadcastInviteeCanceled = function (in
       responseEvent: RESPONSE_EVENTS.CONVERSATION_FROM_CHANNEL // notify in channel
     })
     .setPacket({
-      msgCode: `${packet.nickname} is canceled`
+      msgCode: `${packet.nickname} is canceled`,
+      data: {
+        uid: packet.uid
+      }
     })
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 }

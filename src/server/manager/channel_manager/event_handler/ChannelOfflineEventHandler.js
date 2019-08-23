@@ -44,6 +44,8 @@ ChannelOfflineEventHandler.prototype.leaveChannels = function (channelIds, reque
 
 ChannelOfflineEventHandler.prototype.broadcast = function (channelIds, requestInfo) {
   var businessEvent = this.globalContext['businessEvent']
+  var uid = requestInfo.packet.uid
+
   var resInfo = new ResponseInfo()
     .assignProtocol(requestInfo)
     .setHeader({
@@ -52,7 +54,10 @@ ChannelOfflineEventHandler.prototype.broadcast = function (channelIds, requestIn
       responseEvent: RESPONSE_EVENTS.CONVERSATION_FROM_CHANNEL
     })
     .setPacket({
-      msgCode: `user: ${requestInfo.packet.uid} is offline`
+      msgCode: `user: ${uid} is offline`,
+      data: {
+        uid
+      }
     })
 
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
