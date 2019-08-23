@@ -50,7 +50,6 @@ JoinChannelEventHandler.prototype.executeJoin = function (channelInfo, requestIn
   socketServer.of('/').adapter.remoteJoin(requestInfo.socket.id, channelInfo.ciid)
 
   this.broadcastInviteeJoined(channelInfo, requestInfo)
-  // this.sendChannelInfoToUser(channelInfo, requestInfo)
 }
 
 JoinChannelEventHandler.prototype.broadcastInviteeJoined = function (channelInfo, requestInfo) {
@@ -64,7 +63,7 @@ JoinChannelEventHandler.prototype.broadcastInviteeJoined = function (channelInfo
     .setHeader({
       to: TO.CHANNEL,
       receiver: channelInfo.ciid,
-      responseEvent: RESPONSE_EVENTS.CHANNEL_JOINED // RESPONSE_EVENTS.CONVERSATION_FROM_CHANNEL // notify in channel
+      responseEvent: RESPONSE_EVENTS.CHANNEL_JOINED // notify in channel
     })
     .setPacket({
       msgCode: `${nickname} has joined`,
@@ -75,24 +74,6 @@ JoinChannelEventHandler.prototype.broadcastInviteeJoined = function (channelInfo
         channelInfo,
         datetime: Date.now()
       }
-    })
-  businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
-}
-
-JoinChannelEventHandler.prototype.sendChannelInfoToUser = function (channelInfo, requestInfo) {
-  var businessEvent = this.globalContext['businessEvent']
-  var uid = requestInfo.packet.uid
-
-  var resInfo = new ResponseInfo()
-    .assignProtocol(requestInfo)
-    .setHeader({
-      to: TO.USER,
-      receiver: uid,
-      responseEvent: RESPONSE_EVENTS.CHANNEL_JOINED // to user self
-    })
-    .setPacket({
-      msgCode: `get refreshed channelinfo. including name, chid, ciid, creator, members`,
-      data: channelInfo
     })
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 }

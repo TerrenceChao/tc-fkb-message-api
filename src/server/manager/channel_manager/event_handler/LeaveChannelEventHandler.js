@@ -57,7 +57,6 @@ LeaveChannelEventHandler.prototype.handle = function (requestInfo) {
 
 LeaveChannelEventHandler.prototype.executeLeave = function (channelInfo, requestInfo) {
   this.broadcastUserHasLeft(channelInfo, requestInfo)
-  // this.notifyUserToDelete(channelInfo, requestInfo)
 
   var socketServer = this.globalContext['socketServer']
   socketServer.of('/').adapter.remoteLeave(requestInfo.socket.id, channelInfo.ciid)
@@ -88,26 +87,6 @@ LeaveChannelEventHandler.prototype.broadcastUserHasLeft = function (channelInfo,
       }
     })
 
-  businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
-}
-
-LeaveChannelEventHandler.prototype.notifyUserToDelete = function (channelInfo, requestInfo) {
-  var businessEvent = this.globalContext['businessEvent']
-  var uid = requestInfo.packet.uid
-
-  var resInfo = new ResponseInfo()
-    .assignProtocol(requestInfo)
-    .setHeader({
-      to: TO.USER,
-      receiver: uid,
-      responseEvent: RESPONSE_EVENTS.CHANNEL_LEFT // to user self
-    })
-    .setPacket({
-      msgCode: `delete channelinfo (${channelInfo.chid})`,
-      data: {
-        chid: channelInfo.chid
-      }
-    })
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 }
 
