@@ -128,7 +128,6 @@ const BUSINESS_EVENTS = {
 // Client side (respose to client's event)
 const RESPONSE_EVENTS = {
   // Personal info (to.USER)
-  LOGIN_INFO: 'login_info',
   PERSONAL_INFO: 'personal_info',
   REFRESHED_TOKEN: 'refreshed_token',
   EXCEPTION_ALERT: 'exception_alert',

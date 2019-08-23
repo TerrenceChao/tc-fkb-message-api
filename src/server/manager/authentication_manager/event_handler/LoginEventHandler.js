@@ -13,6 +13,8 @@ var EventHandler = require(path.join(config.get('src.manager'), 'EventHandler'))
 
 util.inherits(LoginEventHandler, EventHandler)
 
+const CONV_LIMIT = 1
+
 function LoginEventHandler () {
   this.name = arguments.callee.name
 }
@@ -65,31 +67,29 @@ LoginEventHandler.prototype.sendChannelInfoAndConversations = function (userChan
 
   var packet = requestInfo.packet
   var uid = packet.uid
-  var convLimit = packet.convLimit
+  var convLimit = packet.convLimit || CONV_LIMIT
 
-  userChannelInfoList.forEach(async (chInfo) => {
-    var ciid = chInfo.ciid
+  Promise.all(userChannelInfoList.map(async chInfo => {
+      var conversationList = await storageService.getConversationList(uid, chInfo.ciid, convLimit)
+      chInfo.conversations = conversationList
+      return chInfo
+    }))
+    .then(chInfoList => {
+      var resInfo = new ResponseInfo()
+        .assignProtocol(requestInfo)
+        .setHeader({
+          to: TO.USER,
+          receiver: uid,
+          responseEvent: RESPONSE_EVENTS.CHANNEL_LIST
+        })
+        .setPacket({
+          msgCode: `channel list with conversations`,
+          data: chInfoList
+        })
 
-    Promise.resolve(storageService.getConversationList(uid, ciid, convLimit))
-      .then(conversationList => {
-        chInfo.conversations = conversationList
-
-        var resInfo = new ResponseInfo()
-          .assignProtocol(requestInfo)
-          .setHeader({
-            to: TO.USER,
-            receiver: uid,
-            responseEvent: RESPONSE_EVENTS.CHANNEL_LIST
-          })
-          .setPacket({
-            msgCode: `channel: ${chInfo.name} and conversations`,
-            data: [chInfo]
-          })
-
-        businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
-      })
-      .catch(err => this.alertException(err.message, requestInfo))
-  })
+      businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
+    })
+    .catch(err => this.alertException(err.message, requestInfo))
 }
 
 LoginEventHandler.prototype.isValid = function (requestInfo) {
@@ -99,8 +99,7 @@ LoginEventHandler.prototype.isValid = function (requestInfo) {
     typeof packet[TOKEN] === 'string' &&
     typeof packet.uid === 'string' &&
     packet.inviLimit != null &&
-    packet.chanLimit != null &&
-    packet.convLimit != null
+    packet.chanLimit != null
 }
 
 module.exports = {
