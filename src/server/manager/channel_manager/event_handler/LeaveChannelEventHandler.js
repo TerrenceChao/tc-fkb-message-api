@@ -58,8 +58,12 @@ LeaveChannelEventHandler.prototype.handle = function (requestInfo) {
 LeaveChannelEventHandler.prototype.executeLeave = function (channelInfo, requestInfo) {
   this.broadcastUserHasLeft(channelInfo, requestInfo)
 
-  var socketServer = this.globalContext['socketServer']
-  socketServer.of('/').adapter.remoteLeave(requestInfo.socket.id, channelInfo.ciid)
+  var socketService = this.globalContext['socketService']
+  // socketServer.of('/').adapter.remoteLeave(requestInfo.socket.id, channelInfo.ciid)
+
+  // leave 應該是該 userId 下的所有 socketId List 一起離開，不是只有 browser 的其中一個分頁離開
+  // socketService.leave(requestInfo.socket.id, channelInfo.ciid)
+  socketService.leaveChannel(requestInfo.packet.targetUid, channelInfo.ciid)
 
   return channelInfo
 }

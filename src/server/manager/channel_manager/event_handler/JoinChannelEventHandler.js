@@ -46,10 +46,16 @@ JoinChannelEventHandler.prototype.handle = function (requestInfo) {
 }
 
 JoinChannelEventHandler.prototype.executeJoin = function (channelInfo, requestInfo) {
-  var socketServer = this.globalContext['socketServer']
-  socketServer.of('/').adapter.remoteJoin(requestInfo.socket.id, channelInfo.ciid)
+  var socketService = this.globalContext['socketService']
+  // socketServer.of('/').adapter.remoteJoin(requestInfo.socket.id, channelInfo.ciid)
 
-  this.broadcastInviteeJoined(channelInfo, requestInfo)
+  // join 應該是該 userId 下的所有 socketId List 一起加入，不是只有 browser 的其中一個分頁加入
+  // socketService.join(requestInfo.socket.id, channelInfo.ciid)
+  socketService.joinChannelSync(
+    () => this.broadcastInviteeJoined(channelInfo, requestInfo),
+    requestInfo.packet.targetUid,
+    channelInfo.ciid
+  )
 }
 
 JoinChannelEventHandler.prototype.broadcastInviteeJoined = function (channelInfo, requestInfo) {
