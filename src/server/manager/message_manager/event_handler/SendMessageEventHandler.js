@@ -36,7 +36,7 @@ SendMessageEventHandler.prototype.handle = function (responseInfo) {
 
     case PROTOCOL.SOCKET:
     default:
-      var socketServer = this.globalContext['socketServer']
+      var socketService = this.globalContext['socketService']
       var responseEvent = responseInfo.header.responseEvent
       if (responseEvent == null) {
         console.error(`${EVENTS.SEND_MESSAGE}:`, `responseEvent for socket's listener is undefined.`)
@@ -45,7 +45,8 @@ SendMessageEventHandler.prototype.handle = function (responseInfo) {
 
       switch (header.to) {
         case TO.BROADCAST:
-          socketServer.sockets.emit(responseEvent, packet)
+          // socketServer.sockets.emit(responseEvent, packet)
+          socketService.broadcast(responseEvent, packet)
           console.log(`${EVENTS.SEND_MESSAGE}:`, `broadcast to all.`, `responseEvent: "${responseEvent}"`, JSON.stringify(packet))
           break
 
@@ -55,10 +56,10 @@ SendMessageEventHandler.prototype.handle = function (responseInfo) {
 
           if (Array.isArray(receiver)) {
             receiver.forEach((r) => {
-              this.emitInChannel(r, responseEvent, packet)
+              socketService.emitInChannel(r, responseEvent, packet)
             })
           } else if (typeof receiver === 'string') {
-            this.emitInChannel(receiver, responseEvent, packet)
+            socketService.emitInChannel(receiver, responseEvent, packet)
           } else {
             console.error(`${EVENTS.SEND_MESSAGE}:`, `type of receiver is unkonw or invalid`)
             return
@@ -85,16 +86,16 @@ SendMessageEventHandler.prototype.handle = function (responseInfo) {
   }
 }
 
-SendMessageEventHandler.prototype.emitInChannel = function (channel, responseEvent, packet) {
-  var socketServer = this.globalContext['socketServer']
-  if (Array.isArray(responseEvent)) {
-    responseEvent.forEach(resEvent => {
-      socketServer.sockets.in(channel).emit(resEvent, packet)
-    })
-  } else if (typeof responseEvent === 'string') {
-    socketServer.sockets.in(channel).emit(responseEvent, packet)
-  }
-}
+// SendMessageEventHandler.prototype.emitInChannel = function (channel, responseEvent, packet) {
+//   var socketServer = this.globalContext['socketServer']
+//   if (Array.isArray(responseEvent)) {
+//     responseEvent.forEach(resEvent => {
+//       socketServer.sockets.in(channel).emit(resEvent, packet)
+//     })
+//   } else if (typeof responseEvent === 'string') {
+//     socketServer.sockets.in(channel).emit(responseEvent, packet)
+//   }
+// }
 
 SendMessageEventHandler.prototype.isValid = function (responseInfo) {
   return responseInfo instanceof ResponseInfo &&

@@ -35,11 +35,14 @@ ChannelOfflineEventHandler.prototype.handle = function (requestInfo) {
 ChannelOfflineEventHandler.prototype.leaveChannels = function (channelIds, requestInfo) {
   this.broadcast(channelIds, requestInfo)
 
-  var socketServer = this.globalContext['socketServer']
-  var socket = requestInfo.socket
-  channelIds.forEach(ciid => {
-    socketServer.of('/').adapter.remoteLeave(socket.id, ciid)
-  })
+  var socketService = this.globalContext['socketService']
+  // // var socket = requestInfo.socket
+  // // channelIds.forEach(ciid => {
+  // //   socketServer.of('/').adapter.remoteLeave(socket.id, ciid)
+  // // })
+  // socketService.collectiveLeave(socket.id, channelIds)
+  var uid = requestInfo.packet.uid
+  socketService.offlineChannelList(uid, channelIds)
 }
 
 ChannelOfflineEventHandler.prototype.broadcast = function (channelIds, requestInfo) {

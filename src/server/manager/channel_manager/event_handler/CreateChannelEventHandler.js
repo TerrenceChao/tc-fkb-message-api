@@ -44,10 +44,13 @@ CreateChannelEventHandler.prototype.handle = function (requestInfo) {
 }
 
 CreateChannelEventHandler.prototype.enterChannel = function (channelInfo, requestInfo) {
-  var socketServer = this.globalContext['socketServer']
-  var socket = requestInfo.socket
+  var socketService = this.globalContext['socketService']
+  // var socket = requestInfo.socket
+  // socketServer.of('/').adapter.remoteJoin(socket.id, channelInfo.ciid)
+  // socketService.join(socket.id, channelInfo.ciid)
 
-  socketServer.of('/').adapter.remoteJoin(socket.id, channelInfo.ciid)
+  socketService.joinChannel(requestInfo.packet.uid, channelInfo.ciid)
+
   this.sendChannelInfoToUser(channelInfo, requestInfo)
 }
 
