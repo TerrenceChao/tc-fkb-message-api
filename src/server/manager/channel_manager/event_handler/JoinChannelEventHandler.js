@@ -26,12 +26,12 @@ JoinChannelEventHandler.prototype.handle = function (requestInfo) {
 
   var storageService = this.globalContext['storageService']
   var packet = requestInfo.packet
-  var uid = packet.uid
+  var targetUid = packet.targetUid
   var chid = packet.chid
 
   /**
    * 待優化？
-   * 拿到 chid 後，先將自己的 uid 廣播給 channel 內成員，讓他們拿到需要更新的 memebers (多一個 uid)，
+   * 拿到 chid 後，先將自己的 targetUid 廣播給 channel 內成員，讓他們拿到需要更新的 memebers (多一個 targetUid)，
    * 再來執行 channelJoined, then getChannelInfo, 最後 user 才會拿到整個 channelInfo ???
    *
    * 結論：
@@ -40,7 +40,7 @@ JoinChannelEventHandler.prototype.handle = function (requestInfo) {
    */
 
   // channelJoined: refresh channelInfo FIRST
-  Promise.resolve(storageService.channelJoined(uid, chid))
+  Promise.resolve(storageService.channelJoined(targetUid, chid))
     .then(refreshedChannelInfo => this.executeJoin(refreshedChannelInfo, requestInfo),
       err => this.alertException(err.message, requestInfo))
 }
@@ -55,7 +55,7 @@ JoinChannelEventHandler.prototype.executeJoin = function (channelInfo, requestIn
 JoinChannelEventHandler.prototype.broadcastInviteeJoined = function (channelInfo, requestInfo) {
   var businessEvent = this.globalContext['businessEvent']
   var packet = requestInfo.packet
-  var uid = packet.uid
+  var targetUid = packet.targetUid
   var nickname = packet.nickname
 
   var resInfo = new ResponseInfo()
@@ -68,8 +68,8 @@ JoinChannelEventHandler.prototype.broadcastInviteeJoined = function (channelInfo
     .setPacket({
       msgCode: `${nickname} has joined`,
       data: {
-        uid,
-        // 1. refresh members: add uid to channel.members(array), remove uid from channel.invitees(array) for "each member" in localStorage (frontend)
+        uid: targetUid,
+        // 1. refresh members: add targetUid to channel.members(array), remove targetUid from channel.invitees(array) for "each member" in localStorage (frontend)
         // 2. 其他使用者登入時，只載入了少數的 channelInfo, 有可能沒載入此 channelInfo 的資訊。當新的成員加入時可提供更新後的 channelInfo 給前端
         channelInfo,
         datetime: Date.now()
@@ -81,7 +81,7 @@ JoinChannelEventHandler.prototype.broadcastInviteeJoined = function (channelInfo
 JoinChannelEventHandler.prototype.isValid = function (requestInfo) {
   var packet = requestInfo.packet
   return packet !== undefined &&
-    typeof packet.uid === 'string' &&
+    typeof packet.targetUid === 'string' &&
     typeof packet.nickname === 'string' &&
     typeof packet.chid === 'string'
 }

@@ -49,13 +49,13 @@ DealWithInvitationEventHandler.prototype.handle = function (requestInfo) {
 DealWithInvitationEventHandler.prototype.joinChannel = function (invitation, requestInfo) {
   var businessEvent = this.globalContext['businessEvent']
   var packet = requestInfo.packet
-  var uid = packet.uid
+  var targetUid = packet.targetUid
   var nickname = packet.nickname
 
   businessEvent.emit(
     BUSINESS_EVENTS.JOIN_CHANNEL,
     requestInfo.setPacket({
-      uid,
+      targetUid,
       nickname,
       chid: invitation.sensitive.chid
     }))
@@ -75,7 +75,7 @@ DealWithInvitationEventHandler.prototype.broadcastInviteeCanceled = function (in
     .setPacket({
       msgCode: `${packet.nickname} is canceled`,
       data: {
-        uid: packet.uid
+        uid: packet.targetUid
       }
     })
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
@@ -84,7 +84,7 @@ DealWithInvitationEventHandler.prototype.broadcastInviteeCanceled = function (in
 DealWithInvitationEventHandler.prototype.isValid = function (requestInfo) {
   var packet = requestInfo.packet
   return packet !== undefined &&
-    typeof packet.uid === 'string' &&
+    typeof packet.targetUid === 'string' &&
     typeof packet.nickname === 'string' &&
     typeof packet.iid === 'string' &&
     typeof packet.dealWith === 'string'

@@ -29,12 +29,12 @@ LeaveChannelEventHandler.prototype.handle = function (requestInfo) {
   var storageService = this.globalContext['storageService']
 
   var packet = requestInfo.packet
-  var uid = packet.uid
+  var targetUid = packet.targetUid
   var chid = packet.chid
 
   /**
    * 待優化？
-   * client 可以傳送自己版本的 channelInfo (除了自己 uid 的所有資訊), 藉此先更新其他成員的 channelInfo,
+   * client 可以傳送自己版本的 channelInfo (除了自己 targetUid 的所有資訊), 藉此先更新其他成員的 channelInfo,
    * 等待 DB 確實更新 channelInfo 紀錄, 收到 response 後再刪除 client 端的 channelInfo。
    * [NOTE] 那如果沒接收到 DB 更新成功的訊息？
    * [NOTE] 是否要跟 join 成對的用同樣的 pattern? 交互的 join/leave 會有更新不即時的情況？
@@ -44,7 +44,7 @@ LeaveChannelEventHandler.prototype.handle = function (requestInfo) {
    */
 
   // channelLeaved: refresh channelInfo FIRST
-  Promise.resolve(storageService.channelLeaved(uid, chid))
+  Promise.resolve(storageService.channelLeaved(targetUid, chid))
     .then(refreshedChannelInfo => this.executeLeave(refreshedChannelInfo, requestInfo),
       err => this.alertException(err.message, requestInfo))
     .then(refreshedChannelInfo => {
@@ -66,7 +66,7 @@ LeaveChannelEventHandler.prototype.executeLeave = function (channelInfo, request
 
 LeaveChannelEventHandler.prototype.broadcastUserHasLeft = function (channelInfo, requestInfo) {
   var businessEvent = this.globalContext['businessEvent']
-  var uid = requestInfo.packet.uid
+  var targetUid = requestInfo.packet.targetUid
   var nickname = requestInfo.packet.nickname
 
   var resInfo = new ResponseInfo()
@@ -79,8 +79,8 @@ LeaveChannelEventHandler.prototype.broadcastUserHasLeft = function (channelInfo,
     .setPacket({
       msgCode: `${nickname} has left`,
       data: {
-        uid,
-        // 1. delete uid from channel.members(array) for "each member" in localStorage (frontend)
+        uid: targetUid,
+        // 1. delete targetUid from channel.members(array) for "each member" in localStorage (frontend)
         // 2. 其他使用者登入時，只載入了少數的 channelInfo, 有可能沒載入此 channelInfo 的資訊。當有成員離開時可提供更新後的 channelInfo 給前端
         channelInfo,
         datetime: Date.now()
@@ -93,7 +93,7 @@ LeaveChannelEventHandler.prototype.broadcastUserHasLeft = function (channelInfo,
 LeaveChannelEventHandler.prototype.isValid = function (requestInfo) {
   var packet = requestInfo.packet
   return packet !== undefined &&
-    typeof packet.uid === 'string' &&
+    typeof packet.targetUid === 'string' &&
     typeof packet.nickname === 'string' &&
     typeof packet.chid === 'string'
 }
