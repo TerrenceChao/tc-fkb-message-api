@@ -62,7 +62,7 @@ function secretGenerator (payload) {
   // the time cost is 10 ~ 15 times
   return crypto
     .createHash(algorithm)
-    .update(JSON.stringify(data))
+    .update(JSON.stringify(data), 'utf-8')
     .digest()
 }
 
