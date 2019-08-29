@@ -10,7 +10,7 @@ function getAttributes (doc) {
     ciid: doc.ciid,
     name: doc.name,
     creator: doc.creator,
-    invitees: doc.invitees,
+    recipients: doc.recipients,
     members: doc.members,
     latestSpoke: doc.latestSpoke
   }
@@ -70,14 +70,14 @@ ChannelInfoRepository.prototype.getListByCiids = async function (ciids, limit, s
     .sort({
       latestSpoke: sort.toLowerCase()
     })
-    .select(['chid', 'ciid', 'name', 'creator', 'invitees', 'members', 'latestSpoke'])
+    .select(['chid', 'ciid', 'name', 'creator', 'recipients', 'members', 'latestSpoke'])
     .limit(limit)
     .skip(skip)
 
   return list.map(doc => getAttributes(doc))
 }
 
-ChannelInfoRepository.prototype.appendInviteeAndReturn = async function (chid, uid) {
+ChannelInfoRepository.prototype.appendRecipientAndReturn = async function (chid, uid) {
   const returnNewDoc = {
     new: true
   }
@@ -87,7 +87,7 @@ ChannelInfoRepository.prototype.appendInviteeAndReturn = async function (chid, u
     _id: chid
   }, {
     '$addToSet': {
-      'invitees': uid
+      'recipients': uid
     },
     updatedAt: now
   }, returnNewDoc)
@@ -95,7 +95,7 @@ ChannelInfoRepository.prototype.appendInviteeAndReturn = async function (chid, u
   return getAttributes(refreshedChInfo)
 }
 
-ChannelInfoRepository.prototype.removeInviteeAndReturn = async function (chid, uid) {
+ChannelInfoRepository.prototype.removeRecipientAndReturn = async function (chid, uid) {
   const returnNewDoc = {
     new: true
   }
@@ -105,7 +105,7 @@ ChannelInfoRepository.prototype.removeInviteeAndReturn = async function (chid, u
     _id: chid
   }, {
     '$pull': {
-      'invitees': uid
+      'recipients': uid
     },
     updatedAt: now
   }, returnNewDoc)
@@ -123,7 +123,7 @@ ChannelInfoRepository.prototype.appendMemberAndReturn = async function (chid, ui
     _id: chid
   }, {
     '$pull': {
-      'invitees': uid
+      'recipients': uid
     },
     '$addToSet': {
       'members': uid

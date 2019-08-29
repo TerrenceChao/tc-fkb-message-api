@@ -52,13 +52,13 @@ JoinChannelEventHandler.prototype.executeJoin = function (channelInfo, requestIn
   // join 應該是該 userId 下的所有 socketId List 一起加入，不是只有 browser 的其中一個分頁加入
   // socketService.join(requestInfo.socket.id, channelInfo.ciid)
   socketService.joinChannelSync(
-    () => this.broadcastInviteeJoined(channelInfo, requestInfo),
+    () => this.broadcastRecipientJoined(channelInfo, requestInfo),
     requestInfo.packet.targetUid,
     channelInfo.ciid
   )
 }
 
-JoinChannelEventHandler.prototype.broadcastInviteeJoined = function (channelInfo, requestInfo) {
+JoinChannelEventHandler.prototype.broadcastRecipientJoined = function (channelInfo, requestInfo) {
   var businessEvent = this.globalContext['businessEvent']
   var packet = requestInfo.packet
   var targetUid = packet.targetUid
@@ -75,7 +75,7 @@ JoinChannelEventHandler.prototype.broadcastInviteeJoined = function (channelInfo
       msgCode: `${nickname} has joined`,
       data: {
         uid: targetUid,
-        // 1. refresh members: add targetUid to channel.members(array), remove targetUid from channel.invitees(array) for "each member" in localStorage (frontend)
+        // 1. refresh members: add targetUid to channel.members(array), remove targetUid from channel.recipients(array) for "each member" in localStorage (frontend)
         // 2. 其他使用者登入時，只載入了少數的 channelInfo, 有可能沒載入此 channelInfo 的資訊。當新的成員加入時可提供更新後的 channelInfo 給前端
         channelInfo,
         datetime: Date.now()

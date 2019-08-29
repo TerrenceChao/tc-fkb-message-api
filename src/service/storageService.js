@@ -38,19 +38,19 @@ StorageService.prototype.updateLastGlimpse = async function (uid, jsonGlimpses) 
 
 StorageService.prototype.invitationMultiCreated = async function (
   inviter,
-  invitees,
+  recipients,
   header,
   content,
   sensitive
 ) {
-  if (!Array.isArray(invitees)) {
-    throw new TypeError(`param 'invitees' is not an array`)
+  if (!Array.isArray(recipients)) {
+    throw new TypeError(`param 'recipients' is not an array`)
   }
 
-  return Promise.all(invitees.map(async (invitee) => {
-    var invitation = await invitationRepository.create(inviter, invitee, header, content, sensitive)
-    await userRepository.recordInvitation(invitation.iid, inviter, invitee) // return true
-    await channelInfoRepository.appendInviteeAndReturn(sensitive.chid, invitee) // recorded in chInfo.invitees
+  return Promise.all(recipients.map(async (recipient) => {
+    var invitation = await invitationRepository.create(inviter, recipient, header, content, sensitive)
+    await userRepository.recordInvitation(invitation.iid, inviter, recipient) // return true
+    await channelInfoRepository.appendRecipientAndReturn(sensitive.chid, recipient) // recorded in chInfo.recipients
 
     return invitation
   }))
@@ -96,9 +96,9 @@ StorageService.prototype.invitationRemoved = async function (iid) {
     await userRepository.deleteInvitation(
       invitation.iid,
       invitation.inviter,
-      invitation.invitee
+      invitation.recipient
     ) // return true
-    await channelInfoRepository.removeInviteeAndReturn(invitation.sensitive.chid, invitation.invitee)
+    await channelInfoRepository.removeRecipientAndReturn(invitation.sensitive.chid, invitation.recipient)
 
     return await invitationRepository.removeById(iid) // return true
   } catch (err) {
@@ -180,7 +180,7 @@ StorageService.prototype.getUserChannelInfoList = async function (uid, limit = 1
 StorageService.prototype.channelJoined = async function (uid, chid) {
   try {
     var now = Date.now()
-    // In channelInfo(chid): remove uid from invitees, append uid to members.
+    // In channelInfo(chid): remove uid from recipients, append uid to members.
     var channelInfo = await channelInfoRepository.appendMemberAndReturn(chid, uid)
     // add channel ref(channel record) in User
     await userRepository.appendChannelRecord(

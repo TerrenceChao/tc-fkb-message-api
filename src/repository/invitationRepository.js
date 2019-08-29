@@ -1,7 +1,7 @@
 
 function InvitationRepository () {}
 
-InvitationRepository.prototype.create = async function (inviter, invitee, header, content, sensitive) {
+InvitationRepository.prototype.create = async function (inviter, recipient, header, content, sensitive) {
 
 }
 

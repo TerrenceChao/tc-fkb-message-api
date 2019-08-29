@@ -12,11 +12,11 @@ UserRepository.prototype.updateLastGlimpse = async function (uid, newChRecordLis
 
 }
 
-UserRepository.prototype.recordInvitation = async function (iid, inviter, invitee) {
+UserRepository.prototype.recordInvitation = async function (iid, inviter, recipient) {
 
 }
 
-UserRepository.prototype.deleteInvitation = async function (iid, inviter, invitee) {
+UserRepository.prototype.deleteInvitation = async function (iid, inviter, recipient) {
 
 }
 

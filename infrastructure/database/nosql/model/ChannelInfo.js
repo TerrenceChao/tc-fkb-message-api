@@ -16,7 +16,7 @@ const ChannelInfoSchema = new mongoose.Schema({
     ref: 'User',
     required: true
   },
-  invitees: [{
+  recipients: [{
     type: String,
     ref: 'User',
     required: true

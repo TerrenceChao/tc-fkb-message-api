@@ -9,12 +9,12 @@ var path = require('path')
 function StorageServiceTemplate () {}
 
 //   var invitations = []
-//   invitations = invitees.map(invi => {
+//   invitations = recipients.map(invi => {
 //     return {
 //       // Avoid creating repeat items
 //       iid: `${invi}.encrypt(${chid}, ${invi}, secret?)`,
 //       inviter,
-//       invitee: invi,
+//       recipient: invi,
 //       header,
 //       content,
 //       sensitive,
@@ -27,9 +27,9 @@ function StorageServiceTemplate () {}
 //    *      e.g. bcrypt
 //    * 1. craete InvitationOfChannel(schema):
 //    *      Model.insertMany(invitations)
-//    * 2. for 'channelInfo': insert invitee = 'uid' (type string or Array) into channelInfo(schema)
+//    * 2. for 'channelInfo': insert recipient = 'uid' (type string or Array) into channelInfo(schema)
 //    *      Model.update(...)
-//    * 3. for 'invitee': insert 'iid' into UserInChannel.receivedInvitations(schema)
+//    * 3. for 'recipient': insert 'iid' into UserInChannel.receivedInvitations(schema)
 //    *      Model.update(...)
 //    * 4. for 'inviter': insert 'iid' into UserInChannel.sentInvitations(schema):
 //    *      Model.update(...)
@@ -72,7 +72,7 @@ StorageServiceTemplate.prototype.updateLastGlimpse = async function (uid, jsonGl
 
 StorageServiceTemplate.prototype.invitationMultiCreated = async function (
   inviter,
-  invitees,
+  recipients,
   header,
   content,
   sensitive
@@ -80,7 +80,7 @@ StorageServiceTemplate.prototype.invitationMultiCreated = async function (
   return [{
     iid: 'mbnht594EokdMvfht54elwTsd98',
     inviter,
-    invitee: TESTED_UID || invitees[0] || 'invitee?',
+    recipient: TESTED_UID || recipients[0] || 'recipient?',
     header,
     content,
     sensitive,
@@ -88,7 +88,7 @@ StorageServiceTemplate.prototype.invitationMultiCreated = async function (
   }, {
     iid: 'vfgty78iolkmnhgtrfdcvbhjkjmn',
     inviter,
-    invitee: invitees[1] || 'invitee?',
+    recipient: recipients[1] || 'recipient?',
     header,
     content,
     sensitive,
@@ -101,7 +101,7 @@ StorageServiceTemplate.prototype.getInvitation = async function (iid) {
   return {
     iid: 'mbnht594EokdMvfht54elwTsd98',
     inviter: 'inviter?',
-    invitee: TESTED_UID,
+    recipient: TESTED_UID,
     header: {},
     content: 'HTML string',
     sensitive: {
@@ -114,11 +114,11 @@ StorageServiceTemplate.prototype.getInvitation = async function (iid) {
 }
 
 StorageServiceTemplate.prototype.getReceivedInvitationList = async function (uid, limit = 10, skip = 0) {
-  // get invitations where "invitee" is uid
+  // get invitations where "recipient" is uid
   return [{
     iid: 'mbnht594EokdMvfht54elwTsd98',
     inviter: 'ruby',
-    invitee: TESTED_UID,
+    recipient: TESTED_UID,
     header: {
       requestEvent: 'req_invitation_deal_with_invitation',
       data: {
@@ -134,7 +134,7 @@ StorageServiceTemplate.prototype.getReceivedInvitationList = async function (uid
   }, {
     iid: '9kjnbvcdrtyuiljhgtloytfghjk',
     inviter: 'summer',
-    invitee: TESTED_UID,
+    recipient: TESTED_UID,
     header: {
       requestEvent: 'req_invitation_deal_with_invitation',
       data: {
@@ -156,7 +156,7 @@ StorageServiceTemplate.prototype.getSentInvitationList = async function (uid, li
   return [{
     iid: 'fyjael5845givsydgvldygrfila',
     inviter: TESTED_UID,
-    invitee: 'william',
+    recipient: 'william',
     header: {
       requestEvent: 'req_invitation_deal_with_invitation',
       data: {
@@ -172,7 +172,7 @@ StorageServiceTemplate.prototype.getSentInvitationList = async function (uid, li
   }, {
     iid: 'l8hnadfvbwritgbsi5rgtbirwas',
     inviter: TESTED_UID,
-    invitee: 'cathy',
+    recipient: 'cathy',
     header: {
       requestEvent: 'req_invitation_deal_with_invitation',
       data: {
@@ -194,15 +194,15 @@ StorageServiceTemplate.prototype.getSentInvitationList = async function (uid, li
 //    * Database:
 //    * 1. query and get (copied obj)
 //    * 2. for 'inviter': pull element(iid) from UserInChannel.sentInvitations(schema)
-//    * 3. for 'invitee': pull element(iid) from UserInChannel.receivedInvitations(schema)
-//    * 4. for 'channelInfo': pull element(uid) from ChannelInfo.invitee(schema)
+//    * 3. for 'recipient': pull element(iid) from UserInChannel.receivedInvitations(schema)
+//    * 4. for 'channelInfo': pull element(uid) from ChannelInfo.recipient(schema)
 //    * 5. remove InvitationOfChannel(schema)
 //    * 6. return (copied obj)
 //    */
 //   return {
 //     iid: 'mbnht594EokdMvfht54elwTsd98',
 //     inviter: 'inviter?',
-//     invitee: 'invitee?',
+//     recipient: 'recipient?',
 //     header: {},
 //     content: 'HTML string',
 //     sensitive: {
@@ -218,8 +218,8 @@ StorageServiceTemplate.prototype.invitationRemoved = async function (iid) {
    * Database:
    * 1. query and get (copied obj)
    * 2. for 'inviter': pull element(iid) from UserInChannel.sentInvitations(schema)
-   * 3. for 'invitee': pull element(iid) from UserInChannel.receivedInvitations(schema)
-   * 4. for 'channelInfo': pull element(uid) from ChannelInfo.invitee(schema)
+   * 3. for 'recipient': pull element(iid) from UserInChannel.receivedInvitations(schema)
+   * 4. for 'channelInfo': pull element(uid) from ChannelInfo.recipient(schema)
    * 5. remove InvitationOfChannel(schema)
    */
   return true
@@ -235,7 +235,7 @@ StorageServiceTemplate.prototype.channelInfoCreated = async function (uid, chann
     creator: TESTED_UID,
     chid: 'chid:l4ehfuvljifgbudvzsugkurliLO4U*T&IYEOW*UGY',
     name: 'Room 18',
-    invitees: [],
+    recipients: [],
     members: [TESTED_UID]
   } || null
   // throw new Error(`channel: ${channelName} is failed to create or has been created`)
@@ -254,7 +254,7 @@ StorageServiceTemplate.prototype.getChannelInfo = async function (queryCondition
     creator: TESTED_UID,
     chid: 'chid:l4ehfuvljifgbudvzsugkurliLO4U*T&IYEOW*UGY',
     name: 'Room 18',
-    invitees: [],
+    recipients: [],
     members: [TESTED_UID, 'uidA', 'uidB', 'uidC']
   }
   // throw new Error(`couldn't get channel info with: ${JSON.stringify(queryCondition, null, 2)}`)
@@ -267,27 +267,27 @@ StorageServiceTemplate.prototype.getUserChannelInfoList = async function (uid, l
     creator: 'someone',
     chid: 'chid:l4ehfuvljifgbudvzsugkurliLO4U*T&IYEOW*UGY',
     name: 'Room 18',
-    invitees: [],
+    recipients: [],
     members: [TESTED_UID, 'uidA', 'uidB', 'uidC']
   }, {
     ciid: 'ciid A',
     creator: 'WHO?',
     chid: 'chid:ijmlYIOUYGVUYBK>DFRUTYIHUJNJKTSARFDCVSBUN',
     name: 'Night Bar',
-    invitees: [],
+    recipients: [],
     members: [TESTED_UID, 'uidE', 'uidF']
   }] || []
   // throw new Error(`get user's channel list FAIL. user:${uid}`)
 }
 
 StorageServiceTemplate.prototype.channelJoined = async function (uid, chid) {
-  // In channelInfo(chid): remove uid from invitees, append uid to members.
+  // In channelInfo(chid): remove uid from recipients, append uid to members.
   return {
     ciid: 'ciid B',
     creator: 'WHO?',
     chid: 'chid:ijmlYIOUYGVUYBK>DFRUTYIHUJNJKTSARFDCVSBUN',
     name: 'Night Bar',
-    invitees: [],
+    recipients: [],
     members: [TESTED_UID, 'uidE', 'uidF']
   }
   // throw new Error(`join channel: ${chid} fail. uid: ${uid}`)
@@ -300,7 +300,7 @@ StorageServiceTemplate.prototype.channelLeaved = async function (uid, chid) {
     creator: 'WHO?',
     chid: 'chid:ijmlYIOUYGVUYBK>DFRUTYIHUJNJKTSARFDCVSBUN',
     name: 'Night Bar',
-    invitees: [],
+    recipients: [],
     members: [TESTED_UID, 'uidE', 'uidF']
   }
   // throw new Error(`leave channel: ${chid} fail. uid: ${uid}`)

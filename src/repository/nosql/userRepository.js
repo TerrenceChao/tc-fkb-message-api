@@ -54,10 +54,10 @@ UserRepository.prototype.updateLastGlimpse = async function (uid, newChRecordLis
   return updatedResult
 }
 
-UserRepository.prototype.recordInvitation = async function (iid, inviter, invitee) {
+UserRepository.prototype.recordInvitation = async function (iid, inviter, recipient) {
   // return Promise.all([
   //   User.updateOne({ uid: inviter }, { '$addToSet': { 'sentInvitations': mongoose.Types.ObjectId(iid) } }),
-  //   User.updateOne({ uid: invitee }, { '$addToSet': { 'receivedInvitations': mongoose.Types.ObjectId(iid) } })
+  //   User.updateOne({ uid: recipient }, { '$addToSet': { 'receivedInvitations': mongoose.Types.ObjectId(iid) } })
   // ])
   //   .catch(err => Promise.reject(err))
   var now = Date.now()
@@ -77,7 +77,7 @@ UserRepository.prototype.recordInvitation = async function (iid, inviter, invite
   {
     updateOne: {
       filter: {
-        uid: invitee
+        uid: recipient
       },
       update: {
         '$addToSet': {
@@ -91,7 +91,7 @@ UserRepository.prototype.recordInvitation = async function (iid, inviter, invite
     .then(res => res.modifiedCount)
 }
 
-UserRepository.prototype.deleteInvitation = async function (iid, inviter, invitee) {
+UserRepository.prototype.deleteInvitation = async function (iid, inviter, recipient) {
   var now = Date.now()
   return User.bulkWrite([{
     updateOne: {
@@ -109,7 +109,7 @@ UserRepository.prototype.deleteInvitation = async function (iid, inviter, invite
   {
     updateOne: {
       filter: {
-        uid: invitee
+        uid: recipient
       },
       update: {
         '$pull': {

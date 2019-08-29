@@ -12,10 +12,10 @@ ChannelInfoRepository.prototype.getListByCiids = async function (ciids, limit, s
 
 }
 
-ChannelInfoRepository.prototype.appendInviteeAndReturn = async function (chid, uid) {
+ChannelInfoRepository.prototype.appendRecipientAndReturn = async function (chid, uid) {
 }
 
-ChannelInfoRepository.prototype.removeInviteeAndReturn = async function (chid, uid) {
+ChannelInfoRepository.prototype.removeRecipientAndReturn = async function (chid, uid) {
 }
 
 ChannelInfoRepository.prototype.appendMemberAndReturn = async function (chid, uid) {

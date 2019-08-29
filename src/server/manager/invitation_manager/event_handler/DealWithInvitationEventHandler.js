@@ -36,7 +36,7 @@ DealWithInvitationEventHandler.prototype.handle = function (requestInfo) {
       if (dealWith === 'y') {
         this.joinChannel(invitation, requestInfo)
       } else {
-        this.broadcastInviteeCanceled(invitation, requestInfo)
+        this.broadcastRecipientCanceled(invitation, requestInfo)
       }
       return true
     })
@@ -61,7 +61,7 @@ DealWithInvitationEventHandler.prototype.joinChannel = function (invitation, req
     }))
 }
 
-DealWithInvitationEventHandler.prototype.broadcastInviteeCanceled = function (invitation, requestInfo) {
+DealWithInvitationEventHandler.prototype.broadcastRecipientCanceled = function (invitation, requestInfo) {
   var businessEvent = this.globalContext['businessEvent']
   var packet = requestInfo.packet
 
