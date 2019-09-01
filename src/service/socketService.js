@@ -1,3 +1,4 @@
+var socketIo = require('socket.io')
 var {
   adaptor
 } = require('../server/Adapter')
@@ -6,8 +7,8 @@ function SocketService() {
   this.socketServer = {}
 }
 
-SocketService.prototype.init = function (socketServer) {
-  this.socketServer = socketServer
+SocketService.prototype.init = function (httpServer) {
+  this.socketServer = socketIo.listen(httpServer)
   adaptor(this.socketServer)
   
   return this

@@ -1,6 +1,5 @@
 var path = require('path')
 var config = require('config')
-var socketIo = require('socket.io')
 
 let globalContext = require(path.join(config.get('src.manager'), 'globalContext'))
 var ConnectionManager = require(path.join(config.get('src.connectionManager'), 'ConnectionManager'))
@@ -20,8 +19,7 @@ function startUp (httpServer) {
   let userManager = new UserManager().init(globalContext)
   let messageManager = new MessageManager().init(globalContext)
 
-  globalContext.socketService
-    .init(socketIo.listen(httpServer))
+  globalContext.socketService.init(httpServer)
     .listen(function (socket) {
       var protocol = {
         socket
