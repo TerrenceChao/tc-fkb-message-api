@@ -27,26 +27,26 @@ SendConversationEventHandler.prototype.handle = async function (requestInfo) {
   var storageService = this.globalContext['storageService']
   var socket = requestInfo.socket
   var packet = requestInfo.packet
-  var ciid = packet.ciid
+  var chid = packet.chid
   var uid = packet.uid
   var content = packet.content
   var convType = packet.convType
 
-  if (socket.rooms[ciid] === undefined) {
+  if (socket.rooms[chid] === undefined) {
     return
   }
 
   var datetime = Date.now()
   var responseHeader = {
     to: TO.CHANNEL,
-    receiver: ciid,
+    receiver: chid,
     responseEvent: RESPONSE_EVENTS.CONVERSATION_FROM_CHANNEL
   }
 
   this.executeSend(datetime, requestInfo, responseHeader)
 
   try {
-    await storageService.conversationCreated(ciid, uid, content, convType, datetime)
+    await storageService.conversationCreated(chid, uid, content, convType, datetime)
   } catch (err) {
     this.alertException(err.message, requestInfo, responseHeader)
   }
@@ -56,7 +56,6 @@ SendConversationEventHandler.prototype.executeSend = function (datetime, request
   var businessEvent = this.globalContext['businessEvent']
   var packet = requestInfo.packet
   var chid = packet.chid
-  var ciid = packet.ciid
   var uid = packet.uid
   var content = packet.content
   var type = packet.convType
@@ -67,9 +66,8 @@ SendConversationEventHandler.prototype.executeSend = function (datetime, request
     .setPacket({
       msgCode: `conversation type: ${type}`,
       data: {
-        // apply "chid/ciid" to make things easy at frontend
+        // apply "chid" to make things easy at frontend
         chid,
-        ciid,
         sender: uid,
         content,
         type,
@@ -84,7 +82,6 @@ SendConversationEventHandler.prototype.isValid = function (requestInfo) {
   var packet = requestInfo.packet
   return packet !== undefined &&
     packet.chid != null &&
-    packet.ciid != null &&
     typeof packet.uid === 'string' &&
     packet.content != null &&
     packet.convType != null

@@ -62,9 +62,9 @@ StorageServiceTemplate.prototype.createUser = async function (uid) {
 StorageServiceTemplate.prototype.updateLastGlimpse = async function (uid, jsonGlimpses) {
   // assume "jsonObjCopy" is "jsonGlimpses"
   var jsonObjCopy = {
-    ciidA: Date.now(),
-    ciidB: Date.now(),
-    ciidC: Date.now()
+    chidA: Date.now(),
+    chidB: Date.now(),
+    chidC: Date.now()
   }
 
   return true
@@ -106,7 +106,6 @@ StorageServiceTemplate.prototype.getInvitation = async function (iid) {
     content: 'HTML string',
     sensitive: {
       chid: 'chid: aert5hewinaslgsi584waesr',
-      ciid: 'ciid B'
     },
     create_at: Date.now()
   }
@@ -128,7 +127,6 @@ StorageServiceTemplate.prototype.getReceivedInvitationList = async function (uid
     content: 'HTML string',
     sensitive: {
       chid: 'chid: sdfghjklcbvghikliuyuii7g',
-      ciid: 'ciid A'
     },
     create_at: Date.now()
   }, {
@@ -144,7 +142,6 @@ StorageServiceTemplate.prototype.getReceivedInvitationList = async function (uid
     content: 'another HTML string',
     sensitive: {
       chid: 'chid: aert5hewinaslgsi584waesr',
-      ciid: 'ciid B'
     },
     create_at: Date.now()
   }] || []
@@ -166,7 +163,6 @@ StorageServiceTemplate.prototype.getSentInvitationList = async function (uid, li
     content: 'HTML string',
     sensitive: {
       chid: 'chid: cgh78oluiuefhwrbjsdhfvbas',
-      ciid: 'ciid C'
     },
     create_at: Date.now()
   }, {
@@ -182,7 +178,6 @@ StorageServiceTemplate.prototype.getSentInvitationList = async function (uid, li
     content: 'another HTML string',
     sensitive: {
       chid: 'chid: fguiodbfmjuytfghjkemngfgh',
-      ciid: 'ciid D'
     },
     create_at: Date.now()
   }] || []
@@ -207,7 +202,6 @@ StorageServiceTemplate.prototype.getSentInvitationList = async function (uid, li
 //     content: 'HTML string',
 //     sensitive: {
 //       chid: 'chid: aert5hewinaslgsi584waesr',
-//       ciid: 'ciid B'
 //     },
 //     create_at: Date.now()
 //   } || false
@@ -229,9 +223,8 @@ StorageServiceTemplate.prototype.invitationRemoved = async function (iid) {
 // for channel
 // 'return null' if channelInfo had has been created.
 StorageServiceTemplate.prototype.channelInfoCreated = async function (uid, channelName) {
-  // ciid saved in local storage (for frontend)
+  // chid saved in local storage (for frontend)
   return {
-    ciid: 'ciid B',
     creator: TESTED_UID,
     chid: 'chid:l4ehfuvljifgbudvzsugkurliLO4U*T&IYEOW*UGY',
     name: 'Room 18',
@@ -242,15 +235,14 @@ StorageServiceTemplate.prototype.channelInfoCreated = async function (uid, chann
 }
 
 StorageServiceTemplate.prototype.getAllChannelIds = async function (uid) {
-  // return ciid !!! (for internal)
-  return ['ciid chPub', 'ciid chGasStation', 'ciid chHospital', 'ciid B'] || []
-  // throw new Error(`fail to get user's all channel ciid(s). user: ${uid}`)
+  // return chid !!! (for internal)
+  return ['chid chPub', 'chid chGasStation', 'chid chHospital', 'chid B'] || []
+  // throw new Error(`fail to get user's all channel chid(s). user: ${uid}`)
 }
 
 StorageServiceTemplate.prototype.getChannelInfo = async function (queryCondition) {
-  // ciid?? saved in local storage (for frontend)
+  // chid?? saved in local storage (for frontend)
   return {
-    ciid: 'ciid B',
     creator: TESTED_UID,
     chid: 'chid:l4ehfuvljifgbudvzsugkurliLO4U*T&IYEOW*UGY',
     name: 'Room 18',
@@ -263,14 +255,12 @@ StorageServiceTemplate.prototype.getChannelInfo = async function (queryCondition
 StorageServiceTemplate.prototype.getUserChannelInfoList = async function (uid, limit = 10, skip = 0) {
   // order by conversation's 'createdAt' DESC
   return [{
-    ciid: 'ciid B',
     creator: 'someone',
     chid: 'chid:l4ehfuvljifgbudvzsugkurliLO4U*T&IYEOW*UGY',
     name: 'Room 18',
     recipients: [],
     members: [TESTED_UID, 'uidA', 'uidB', 'uidC']
   }, {
-    ciid: 'ciid A',
     creator: 'WHO?',
     chid: 'chid:ijmlYIOUYGVUYBK>DFRUTYIHUJNJKTSARFDCVSBUN',
     name: 'Night Bar',
@@ -283,7 +273,6 @@ StorageServiceTemplate.prototype.getUserChannelInfoList = async function (uid, l
 StorageServiceTemplate.prototype.channelJoined = async function (uid, chid) {
   // In channelInfo(chid): remove uid from recipients, append uid to members.
   return {
-    ciid: 'ciid B',
     creator: 'WHO?',
     chid: 'chid:ijmlYIOUYGVUYBK>DFRUTYIHUJNJKTSARFDCVSBUN',
     name: 'Night Bar',
@@ -296,7 +285,6 @@ StorageServiceTemplate.prototype.channelJoined = async function (uid, chid) {
 StorageServiceTemplate.prototype.channelLeaved = async function (uid, chid) {
   // In channelInfo(chid): remove uid from members
   return {
-    ciid: 'ciid B',
     creator: 'WHO?',
     chid: 'chid:ijmlYIOUYGVUYBK>DFRUTYIHUJNJKTSARFDCVSBUN',
     name: 'Night Bar',
@@ -312,15 +300,15 @@ StorageServiceTemplate.prototype.channelInfoRemoved = async function (queryCondi
 }
 
 // for channel => conversations
-StorageServiceTemplate.prototype.conversationCreated = function (ciid, uid, content, type, datetime) {
+StorageServiceTemplate.prototype.conversationCreated = function (chid, uid, content, type, datetime) {
   return true || false
-  // throw new Error(`conversation in channelInfo(ciid): ${ciid} is failed to created`)
+  // throw new Error(`conversation in channelInfo(chid): ${chid} is failed to created`)
 }
 
-StorageServiceTemplate.prototype.getConversationList = async function (uid, ciid, limit = 10, skip = 0) {
+StorageServiceTemplate.prototype.getConversationList = async function (uid, chid, limit = 10, skip = 0) {
   // get user's (uid) channelRecord & check the time of joinedAt, lastGlimpse
   return [{
-    ciid,
+    chid,
     sender: 'Eason',
     content: 'this is a messaging service',
     type: 'text',
@@ -328,7 +316,7 @@ StorageServiceTemplate.prototype.getConversationList = async function (uid, ciid
     // createdAt: '發送時間和 DB 建立 record 時間會有落差'
   },
   {
-    ciid,
+    chid,
     sender: 'Billy',
     content: 'Today is a sunny day',
     type: 'text',
@@ -336,7 +324,7 @@ StorageServiceTemplate.prototype.getConversationList = async function (uid, ciid
     // createdAt: '發送時間和 DB 建立 record 時間會有落差'
   },
   {
-    ciid,
+    chid,
     sender: 'Jessica',
     content: 'Hello world',
     type: 'text',
@@ -344,7 +332,7 @@ StorageServiceTemplate.prototype.getConversationList = async function (uid, ciid
     // createdAt: '發送時間和 DB 建立 record 時間會有落差'
   }
   ] || []
-  // throw new Error(`get conversations in channel(ciid): ${ciid} FAIL`)
+  // throw new Error(`get conversations in channel(chid): ${chid} FAIL`)
 }
 
 /**

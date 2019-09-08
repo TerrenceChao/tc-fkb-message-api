@@ -74,7 +74,6 @@ SendInvitationEventHandler.prototype.getInvitationCreateionData = function (chan
     },
     sensitive: {
       chid: channelInfo.chid,
-      ciid: channelInfo.ciid
     }
   }
 }

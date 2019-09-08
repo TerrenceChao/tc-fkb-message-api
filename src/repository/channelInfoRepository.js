@@ -8,7 +8,7 @@ ChannelInfoRepository.prototype.findOne = async function (query) {
 
 }
 
-ChannelInfoRepository.prototype.getListByCiids = async function (ciids, limit, skip = 0, sort = 'DESC') {
+ChannelInfoRepository.prototype.getListByChids = async function (chids, limit, skip = 0, sort = 'DESC') {
 
 }
 
@@ -26,11 +26,11 @@ ChannelInfoRepository.prototype.removeMemberAndReturn = async function (chid, ui
 
 }
 
-ChannelInfoRepository.prototype.removeByCiid = async function (ciid) {
+ChannelInfoRepository.prototype.removeByChid = async function (chid) {
 
 }
 
-ChannelInfoRepository.prototype.updateLatestSpoke = async function (ciid, latestSpoke) {
+ChannelInfoRepository.prototype.updateLatestSpoke = async function (chid, latestSpoke) {
 
 }
 

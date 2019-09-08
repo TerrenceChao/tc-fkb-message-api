@@ -2,11 +2,6 @@ const mongoose = require('mongoose')
 const mongodbErrorHandler = require('mongoose-mongodb-errors')
 
 const ChannelRecordSchema = new mongoose.Schema({
-  ciid: {
-    type: String,
-    ref: 'ChannelInfo',
-    required: true
-  },
   chid: {
     type: String,
     ref: 'ChannelInfo',

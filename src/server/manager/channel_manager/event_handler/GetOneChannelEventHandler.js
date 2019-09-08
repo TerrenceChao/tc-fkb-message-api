@@ -27,9 +27,8 @@ GetOneChannelEventHandler.prototype.handle = function (requestInfo) {
   var storageService = this.globalContext['storageService']
   var uid = requestInfo.packet.uid
   var chid = requestInfo.packet.chid
-  var ciid = requestInfo.packet.ciid
 
-  Promise.resolve(storageService.getUserChannelInfo({ uid, chid, ciid }))
+  Promise.resolve(storageService.getUserChannelInfo({ uid, chid }))
     .then(channelInfo => this.sendChInfo(channelInfo, requestInfo),
       err => this.alertException(err.message, requestInfo))
 }

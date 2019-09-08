@@ -35,7 +35,7 @@ JoinChannelEventHandler.prototype.handle = function (requestInfo) {
    * 再來執行 channelJoined, then getChannelInfo, 最後 user 才會拿到整個 channelInfo ???
    *
    * 結論：
-   * 沒有必要。在未加入 channel 前，除了 chid 以外，其他關於 channelInfo 的 name, ciid, members ... etc
+   * 沒有必要。在未加入 channel 前，除了 chid 以外，其他關於 channelInfo 的 name, chid, members ... etc
    * 都拿不到，沒有辦法傳送/接收訊息，僅僅讓其他成員搶先一步知道有新的成員即將加入沒有太大意義。
    */
 
@@ -47,14 +47,14 @@ JoinChannelEventHandler.prototype.handle = function (requestInfo) {
 
 JoinChannelEventHandler.prototype.executeJoin = function (channelInfo, requestInfo) {
   var socketService = this.globalContext['socketService']
-  // socketServer.of('/').adapter.remoteJoin(requestInfo.socket.id, channelInfo.ciid)
+  // socketServer.of('/').adapter.remoteJoin(requestInfo.socket.id, channelInfo.chid)
 
   // join 應該是該 userId 下的所有 socketId List 一起加入，不是只有 browser 的其中一個分頁加入
-  // socketService.join(requestInfo.socket.id, channelInfo.ciid)
+  // socketService.join(requestInfo.socket.id, channelInfo.chid)
   socketService.joinChannelSync(
     () => this.broadcastRecipientJoined(channelInfo, requestInfo),
     requestInfo.packet.targetUid,
-    channelInfo.ciid
+    channelInfo.chid
   )
 }
 
@@ -68,7 +68,7 @@ JoinChannelEventHandler.prototype.broadcastRecipientJoined = function (channelIn
     .assignProtocol(requestInfo)
     .setHeader({
       to: TO.CHANNEL,
-      receiver: channelInfo.ciid,
+      receiver: channelInfo.chid,
       responseEvent: RESPONSE_EVENTS.CHANNEL_JOINED // notify in channel
     })
     .setPacket({

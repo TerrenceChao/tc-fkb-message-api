@@ -142,7 +142,7 @@ UserRepository.prototype.getSentInvitationIds = async function (uid, limit, skip
 }
 
 UserRepository.prototype.getChannelRecord = async function (uid, query) {
-  if (typeof query.chid !== 'string' && typeof query.ciid !== 'string') {
+  if (typeof query.chid !== 'string') {
     throw TypeError('UserRepository.getChannelRecord: param(s) of query is(are) wrong')
   }
 
@@ -151,9 +151,7 @@ UserRepository.prototype.getChannelRecord = async function (uid, query) {
   })
     .select('channelRecords')
 
-  return doc['channelRecords'].find(chRecord => {
-    return chRecord.chid === query.chid || chRecord.ciid === query.ciid
-  })
+  return doc['channelRecords'].find(chRecord => chRecord.chid === query.chid)
 }
 
 UserRepository.prototype.appendChannelRecord = async function (uid, record) {
@@ -180,7 +178,7 @@ UserRepository.prototype.appendChannelRecord = async function (uid, record) {
 }
 
 UserRepository.prototype.removeChannelRecord = async function (uid, record) {
-  if (typeof record.chid !== 'string' && typeof record.ciid !== 'string') {
+  if (typeof record.chid !== 'string') {
     throw TypeError('UserRepository.removeChannelRecord: param(s) of record is(are) wrong')
   }
 

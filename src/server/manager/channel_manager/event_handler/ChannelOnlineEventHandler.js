@@ -35,8 +35,8 @@ ChannelOnlineEventHandler.prototype.handle = function (requestInfo) {
 ChannelOnlineEventHandler.prototype.joinChannels = function (channelIds, requestInfo) {
   var socketService = this.globalContext['socketService']
   // var socket = requestInfo.socket
-  // // channelIds.forEach(ciid => {
-  // //   socketServer.of('/').adapter.remoteJoin(socket.id, ciid)
+  // // channelIds.forEach(chid => {
+  // //   socketServer.of('/').adapter.remoteJoin(socket.id, chid)
   // // })
   // socketService.collectiveJoin(socket.id, channelIds)
   var uid = requestInfo.packet.uid

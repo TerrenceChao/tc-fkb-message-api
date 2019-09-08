@@ -70,7 +70,7 @@ LoginEventHandler.prototype.sendChannelInfoAndConversations = function (userChan
   var convLimit = packet.convLimit || CONV_LIMIT
 
   Promise.all(userChannelInfoList.map(async chInfo => {
-      var conversationList = await storageService.getConversationList(uid, chInfo.ciid, convLimit)
+      var conversationList = await storageService.getConversationList(uid, chInfo.chid, convLimit)
       chInfo.conversations = conversationList
       return chInfo
     }))

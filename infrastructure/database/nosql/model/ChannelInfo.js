@@ -2,11 +2,6 @@ const mongoose = require('mongoose')
 const mongodbErrorHandler = require('mongoose-mongodb-errors')
 
 const ChannelInfoSchema = new mongoose.Schema({
-  ciid: {
-    type: mongoose.Schema.Types.String,
-    required: true,
-    unique: true
-  },
   name: {
     type: String,
     required: true

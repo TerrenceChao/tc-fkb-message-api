@@ -69,7 +69,7 @@ DealWithInvitationEventHandler.prototype.broadcastRecipientCanceled = function (
     .assignProtocol(requestInfo)
     .setHeader({
       to: TO.CHANNEL,
-      receiver: invitation.sensitive.ciid,
+      receiver: invitation.sensitive.chid,
       responseEvent: RESPONSE_EVENTS.CONVERSATION_FROM_CHANNEL // notify in channel
     })
     .setPacket({

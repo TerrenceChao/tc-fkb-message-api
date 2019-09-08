@@ -27,7 +27,7 @@ GetConversationEventHandler.prototype.handle = function (requestInfo) {
   var storageService = this.globalContext['storageService']
   var packet = requestInfo.packet
 
-  Promise.resolve(storageService.getConversationList(packet.uid, packet.ciid, packet.convLimit, packet.convSkip))
+  Promise.resolve(storageService.getConversationList(packet.uid, packet.chid, packet.convLimit, packet.convSkip))
     .then(conversationList => this.sendConversationList(conversationList, requestInfo),
       err => this.alertException(err.message, requestInfo))
 }
@@ -37,7 +37,7 @@ GetConversationEventHandler.prototype.sendConversationList = function (conversat
   var packet = requestInfo.packet
   var {
     uid,
-    ciid,
+    chid,
     convLimit,
     convSkip
   } = packet
@@ -52,7 +52,7 @@ GetConversationEventHandler.prototype.sendConversationList = function (conversat
     .setPacket({
       msgCode: `get conversations from ${convSkip} to ${convSkip + convLimit}`,
       data: {
-        ciid,
+        chid,
         list: conversationList
       }
     })
@@ -64,7 +64,7 @@ GetConversationEventHandler.prototype.isValid = function (requestInfo) {
   var packet = requestInfo.packet
   return packet !== undefined &&
     typeof packet.uid === 'string' &&
-    packet.ciid != null &&
+    packet.chid != null &&
     packet.convLimit != null &&
     packet.convSkip != null
 }

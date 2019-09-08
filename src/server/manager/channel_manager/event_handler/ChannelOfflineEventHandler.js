@@ -37,8 +37,8 @@ ChannelOfflineEventHandler.prototype.leaveChannels = function (channelIds, reque
 
   var socketService = this.globalContext['socketService']
   // // var socket = requestInfo.socket
-  // // channelIds.forEach(ciid => {
-  // //   socketServer.of('/').adapter.remoteLeave(socket.id, ciid)
+  // // channelIds.forEach(chid => {
+  // //   socketServer.of('/').adapter.remoteLeave(socket.id, chid)
   // // })
   // socketService.collectiveLeave(socket.id, channelIds)
   var uid = requestInfo.packet.uid

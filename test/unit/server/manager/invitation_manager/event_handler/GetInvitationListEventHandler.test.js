@@ -36,7 +36,6 @@ describe('GetInvitationListEventHandler test', () => {
         content: 'HTML string',
         sensitive: {
           chid: 'chid: sdfghjklcbvghikliuyuii7g',
-          ciid: 'ciid A'
         },
         create_at: Date.now()
       }, {
@@ -47,7 +46,6 @@ describe('GetInvitationListEventHandler test', () => {
         content: 'another HTML string',
         sensitive: {
           chid: 'chid: aert5hewinaslgsi584waesr',
-          ciid: 'ciid B'
         },
         create_at: Date.now()
       }]
