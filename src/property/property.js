@@ -51,7 +51,7 @@ const EVENTS = {
   // CONFIG_SETTING: '?'
 
   // MessageManager
-  SERVER_PUSH: 'req_message_server_push',
+  PUSH_NOTIFICATION: 'req_push_notification',
   SEND_MESSAGE: 'req_message_send_message'
 }
 
@@ -121,7 +121,7 @@ const BUSINESS_EVENTS = {
   USER_OFFLINE: EVENTS.USER_OFFLINE,
 
   // MessageManager
-  SERVER_PUSH: EVENTS.SERVER_PUSH,
+  PUSH_NOTIFICATION: EVENTS.PUSH_NOTIFICATION,
   SEND_MESSAGE: EVENTS.SEND_MESSAGE
 }
 
@@ -151,7 +151,10 @@ const RESPONSE_EVENTS = {
   // Conversation (realtime) (to.CHANNEL)
   CONVERSATION_FROM_CHANNEL: 'conversation_from_channel',
   // Conversation (non-realtime) (to.USER)
-  CONVERSATION_LIST: 'conversation_list'
+  CONVERSATION_LIST: 'conversation_list',
+
+  // Notification (realtime) (to.USER)
+  NOTIFICATION_PUSHED: 'notification_pushed',
 }
 
 module.exports = {
