@@ -45,9 +45,9 @@ PushNotificationEventHandler.prototype.handle = function (requestInfo) {
         return true
       })
     ))
-    .then(() => res.status(201).json({
+    .then(() => res.status(200).json({
       msgCode: `100000`,
-      msg: `notification pushed`
+      msg: `notification pushed as event: ${notificationPacket.event}`
     }))
     .catch(err => res.status(500).json({
       msgCode: `999999`,
