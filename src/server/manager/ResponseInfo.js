@@ -8,6 +8,7 @@ const {
 function ResponseInfo () {
   this.req = null
   this.res = null
+  this.next = null
   this.socket = null
 
   this.header = null
@@ -17,6 +18,7 @@ function ResponseInfo () {
 ResponseInfo.prototype.assignProtocol = function (requestInfo) {
   this.req = requestInfo.req
   this.res = requestInfo.res
+  this.next = requestInfo.next
   this.socket = requestInfo.socket
 
   return this

@@ -10,6 +10,7 @@ const {
 } = require(path.join(config.get('src.property'), 'property'))
 var EventHandler = require(path.join(config.get('src.manager'), 'EventHandler'))
 var ResponseInfo = require(path.join(config.get('src.manager'), 'ResponseInfo'))
+var generalRes = require(path.join(config.get('src.httpProtocol'), 'response', 'generalRes'))
 
 util.inherits(PushNotificationEventHandler, EventHandler)
 
@@ -23,6 +24,7 @@ PushNotificationEventHandler.prototype.handle = function (requestInfo) {
   var businessEvent = this.globalContext['businessEvent']
 
   var res = requestInfo.res
+  var next = requestInfo.next
   var packet = requestInfo.packet
   var notificationPacket = _.omit(packet, ['receivers'])
 
@@ -45,15 +47,10 @@ PushNotificationEventHandler.prototype.handle = function (requestInfo) {
         return true
       })
     ))
-    .then(() => res.status(201).json({
-      msgCode: `100000`,
-      msg: `notification pushed`
-    }))
-    .catch(err => res.status(500).json({
-      msgCode: `999999`,
-      error: typeof err === 'string' ? err : `Error: An unknown error occurred during the push notification`
-    }))
-  
+    .then(() => res.locals.data.event = notificationPacket.event)
+    .then(() => next())
+    .catch(err => next(err || new Error(`Error occurred during push notification`)))
+
 }
 
 module.exports = {

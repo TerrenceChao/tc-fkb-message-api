@@ -12,8 +12,8 @@ function logger (err) {
 
 function StorageService () {}
 
-StorageService.prototype.getUser = async function (uid) {
-  return Promise.resolve(userRepository.findById(uid))
+StorageService.prototype.getUser = async function (uid, selectFields = []) {
+  return Promise.resolve(userRepository.findById(uid, selectFields))
     .catch(err => {
       logger(err)
       return Promise.reject(err)
@@ -26,6 +26,11 @@ StorageService.prototype.createUser = async function (uid) {
       logger(err)
       return Promise.reject(err)
     })
+}
+
+StorageService.prototype.findOrCreateUser = function (uid, selectFields = []) {
+  return Promise.resolve(this.getUser(uid, selectFields))
+    .then(user => user == null ? this.createUser(uid) : user)
 }
 
 StorageService.prototype.updateLastGlimpse = async function (uid, jsonGlimpses) {

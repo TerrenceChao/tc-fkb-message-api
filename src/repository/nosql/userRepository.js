@@ -1,15 +1,27 @@
 const path = require('path')
 const config = require('config')
 const mongoose = require('mongoose')
+const _ = require('lodash')
+const VALID_FIELDS = [
+  '_id',
+  'uid',
+  'receivedInvitations',
+  'sentInvitations',
+  'channelRecords',
+  'updatedAt',
+  'createdAt',
+]
 
 var User = require(path.join(config.get('database.nosql.model'), 'User'))
 
 function UserRepository () {}
 
-UserRepository.prototype.findById = async function (uid) {
+UserRepository.prototype.findById = async function (uid, selectFields = []) {
+  selectFields = selectFields.length === 0 ? VALID_FIELDS : _.intersection(VALID_FIELDS, selectFields)
   var user = await User.findOne({
     uid
   })
+  .select(selectFields)
 
   return user
 }

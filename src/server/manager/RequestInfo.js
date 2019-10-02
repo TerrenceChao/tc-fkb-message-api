@@ -1,6 +1,7 @@
 function RequestInfo () {
   this.req = null
   this.res = null
+  this.next = null
   this.socket = null
   this.packet = null
 }

@@ -1,6 +1,6 @@
 function UserRepository () {}
 
-UserRepository.prototype.findById = async function (uid) {
+UserRepository.prototype.findById = async function (uid, selectFields) {
 
 }
 

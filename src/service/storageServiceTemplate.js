@@ -41,7 +41,7 @@ function StorageServiceTemplate () {}
 
 const TESTED_UID = 'xxx-xxx-xxx'
 
-StorageServiceTemplate.prototype.getUser = async function (uid) {
+StorageServiceTemplate.prototype.getUser = async function (uid, selectFields = []) {
   var user = {
     uid,
     receivedInvitations: [],
@@ -57,6 +57,10 @@ StorageServiceTemplate.prototype.getUser = async function (uid) {
 StorageServiceTemplate.prototype.createUser = async function (uid) {
   return true || false
   // throw err
+}
+
+StorageServiceTemplate.prototype.findOrCreateUser = async function (uid, selectFields = []) {
+
 }
 
 StorageServiceTemplate.prototype.updateLastGlimpse = async function (uid, jsonGlimpses) {
@@ -341,8 +345,8 @@ StorageServiceTemplate.prototype.getConversationList = async function (uid, chid
  * record in redis/cache, to lock specify resource.
  * ===================================================
  */
-// StorageServiceTemplate.prototype.competeLock = function() { }
-// StorageServiceTemplate.prototype.releaseLock = function() { }
+// StorageServiceTemplate.prototype.competeLock = function () { }
+// StorageServiceTemplate.prototype.releaseLock = function () { }
 
 module.exports = {
   storageService: new StorageServiceTemplate()
