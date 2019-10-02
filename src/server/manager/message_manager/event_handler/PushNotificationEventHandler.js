@@ -10,7 +10,6 @@ const {
 } = require(path.join(config.get('src.property'), 'property'))
 var EventHandler = require(path.join(config.get('src.manager'), 'EventHandler'))
 var ResponseInfo = require(path.join(config.get('src.manager'), 'ResponseInfo'))
-var generalRes = require(path.join(config.get('src.httpProtocol'), 'response', 'generalRes'))
 
 util.inherits(PushNotificationEventHandler, EventHandler)
 
