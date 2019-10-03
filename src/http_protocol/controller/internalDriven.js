@@ -2,6 +2,8 @@ var config = require('config')
 var path = require('path')
 var RequestInfo = require(path.join(config.get('src.manager'), 'RequestInfo'))
 var globalContext = require(path.join(config.get('src.manager'), 'globalContext'))
+var recordAuthorization = require(path.join(config.get('src.httpProtocol'), 'util')).recordAuthorization
+const BUSINESS_EVENTS = require(path.join(config.get('src.property'), 'property')).BUSINESS_EVENTS
 
 
 /**
@@ -19,7 +21,7 @@ var globalContext = require(path.join(config.get('src.manager'), 'globalContext'
  */
 exports.obtainAuthorization = (req, res, next) => {
   Promise.resolve(globalContext.storageService.findOrCreateUser(req.headers.uid, ['uid', 'updatedAt']))
-    .then(user => console.log(`user gets authorization`, user))
+    .then(user => recordAuthorization(user))
     .then(() => globalContext.authService.obtainAuthorization(req.headers))
     .then(authorization => res.locals.data = authorization)
     .then(() => next())

@@ -10,6 +10,17 @@ function logger (err) {
   console.error(`database error: ${err.message}`)
 }
 
+/**
+ * 你可能會覺得奇怪，為什 StorageService 中的 repository [不透過注入(DI)方式]？
+ * 以往 repository 會透過注入的方式(DI)以方便用替身(stub)測試，
+ * 但是請注意：[StorageService本身就是只關注Database的操作]，
+ * 所以測試時，請將 StorageService 當作以往的 repository 做單元測試。
+ * 
+ * 最主要的原因是專案（程式）架構上的差異。這裡不像傳統的：
+ * Controller, Service, Repository. 因為大部分的操作跟 socket 有關，
+ * 所以專案架構整體採用 Command Pattern 的方式去設計：
+ * [Server,Manager,Handler]
+ */
 function StorageService () {}
 
 StorageService.prototype.getUser = async function (uid, selectFields = []) {
@@ -28,7 +39,7 @@ StorageService.prototype.createUser = async function (uid) {
     })
 }
 
-StorageService.prototype.findOrCreateUser = function (uid, selectFields = []) {
+StorageService.prototype.findOrCreateUser = async function (uid, selectFields = []) {
   return Promise.resolve(this.getUser(uid, selectFields))
     .then(user => user == null ? this.createUser(uid) : user)
 }

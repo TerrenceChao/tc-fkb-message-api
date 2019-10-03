@@ -23,6 +23,17 @@ Responsible for broadcasting / receiving messages to the Fakebook project.
 * Generate secret(JWT) for individual user obtains a bad performance.
 * 目前 channelInfo 依賴 chid 在交換訊息。
 
+## Other Notes
+ * 你可能會覺得奇怪，為什 StorageService 中的 repository "不透過注入(DI)方式"？ 
+ 以往 repository 會透過注入的方式(DI)以方便用替身(stub)測試，
+但是請注意：StorageService 本身就是只關注 Database 的操作，
+所以測試時，請將 StorageService 當作以往的 repository 做單元測試。
+
+最主要的原因是專案（程式）架構上的差異。這裡不像傳統的：
+Controller, Service, Repository. 因為大部分的操作跟 socket 有關，
+所以專案架構整體採用 Command Pattern 的方式去設計：
+Server, Manager, Handler.
+
 ## References
 ### run in ES6
 * ex: use startWith

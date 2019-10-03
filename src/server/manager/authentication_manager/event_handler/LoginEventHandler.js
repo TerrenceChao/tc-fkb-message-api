@@ -62,7 +62,24 @@ LoginEventHandler.prototype.sendChannelInfoAndConversations = function (userChan
   var uid = packet.uid
   var convLimit = packet.convLimit || CONV_LIMIT
 
-  Promise.all(userChannelInfoList.map(async chInfo => {
+  if (userChannelInfoList.length === 0) {
+    var resInfo = new ResponseInfo()
+      .assignProtocol(requestInfo)
+      .setHeader({
+        to: TO.USER,
+        receiver: uid,
+        responseEvent: RESPONSE_EVENTS.CHANNEL_LIST
+      })
+      .setPacket({
+        msgCode: `user doesn't join any channel yet`,
+        data: []
+      })
+
+    businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
+    return
+  }
+
+  return Promise.all(userChannelInfoList.map(async chInfo => {
       var conversationList = await storageService.getConversationList(uid, chInfo.chid, convLimit)
       chInfo.conversations = conversationList
       return chInfo
@@ -82,7 +99,6 @@ LoginEventHandler.prototype.sendChannelInfoAndConversations = function (userChan
 
       businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
     })
-    .catch(err => this.alertException(err.message, requestInfo))
 }
 
 LoginEventHandler.prototype.isValid = function (requestInfo) {

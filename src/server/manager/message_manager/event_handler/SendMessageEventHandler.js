@@ -63,7 +63,7 @@ SendMessageEventHandler.prototype.handle = function (responseInfo) {
             socketService.emitInChannel(receiver, responseEvent, packet)
             console.log(`"${EVENTS.SEND_MESSAGE}": {"emit to ${header.to}": ${JSON.stringify(receiver, null, 2)}, "responseEvent": "${responseEvent}"}`, `, "packet": ${JSON.stringify(packet, null, 2)},`)
           } else {
-            console.error(`${EVENTS.SEND_MESSAGE}:`, `type of receiver is unkonw or invalid`)
+            console.error(`${EVENTS.SEND_MESSAGE}:`, `type of receiver is unknown or invalid:`, receiver)
           }
 
           break

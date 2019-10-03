@@ -1,8 +1,10 @@
+var config = require('config')
 const Validator = require('validatorjs')
+const UID_PATTERN = config.get('app.uidPattern')
 
 const HTTP = {
   AUTHENTICATE_RULES: {
-    uid: 'required|string',
+    uid: ['required', `regex:${UID_PATTERN}`],
     clientuseragent: 'required|string'
   },
   PUSH_NOTIFICATION_RULES: {

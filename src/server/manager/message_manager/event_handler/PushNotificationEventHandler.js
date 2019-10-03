@@ -20,8 +20,6 @@ function PushNotificationEventHandler () {
 PushNotificationEventHandler.prototype.eventName = EVENTS.PUSH_NOTIFICATION
 
 PushNotificationEventHandler.prototype.handle = function (requestInfo) {
-  var businessEvent = this.globalContext['businessEvent']
-
   var res = requestInfo.res
   var next = requestInfo.next
   var packet = requestInfo.packet
@@ -29,27 +27,35 @@ PushNotificationEventHandler.prototype.handle = function (requestInfo) {
 
   Promise.resolve(requestInfo.packet.receivers)
     .then(receivers => Promise.all(
-      receivers.map(receiver => {
-        var resInfo = new ResponseInfo()
-          .assignProtocol(requestInfo)
-          .setHeader({
-            to: TO.CHANNEL,
-            receiver: receiver.uid,
-            responseEvent: RESPONSE_EVENTS.NOTIFICATION_PUSHED
-          })
-          .setPacket({
-            msgCode: `notification pushed`,
-            data: notificationPacket
-          })
-        
-        businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
-        return true
-      })
+      receivers.map(
+        receiver => this.emitNotification(
+          requestInfo,
+          receiver,
+          notificationPacket
+        )
+      )
     ))
     .then(() => res.locals.data.event = notificationPacket.event)
     .then(() => next())
     .catch(err => next(err || new Error(`Error occurred during push notification`)))
 
+}
+
+PushNotificationEventHandler.prototype.emitNotification = function (reqInfo, receiver, notificationPacket) {
+  var responseInfo = new ResponseInfo()
+    .assignProtocol(reqInfo)
+    .setHeader({
+      to: TO.CHANNEL,
+      receiver: receiver.uid,
+      responseEvent: RESPONSE_EVENTS.NOTIFICATION_PUSHED
+    })
+    .setPacket({
+      msgCode: `notification pushed`,
+      data: notificationPacket
+    })
+  
+  this.globalContext['businessEvent'].emit(EVENTS.SEND_MESSAGE, responseInfo)
+  return true
 }
 
 module.exports = {

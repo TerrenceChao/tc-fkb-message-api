@@ -34,7 +34,7 @@ SocketService.prototype.listen = function (callback) {
 // // multi-join (online) (need improve)
 // SocketService.prototype.collectiveJoin = function (socketId, channelIdList, namespace = '/') {
 //   if (!Array.isArray(channelIdList)) {
-//     throw new Error(`channelIdList isn't an array`)
+//     Xthrow new Error(`channelIdList isn't an array`)
 //   }
 
 //   channelIdList.forEach(channelId => {
@@ -45,7 +45,7 @@ SocketService.prototype.listen = function (callback) {
 // // multi-leave (offline) (need improve)
 // SocketService.prototype.collectiveLeave = function (socketId, channelIdList, namespace = '/') {
 //   if (!Array.isArray(channelIdList)) {
-//     throw new Error(`channelIdList isn't an array`)
+//     Xthrow new Error(`channelIdList isn't an array`)
 //   }
 
 //   channelIdList.forEach(channelId => {
@@ -62,49 +62,81 @@ SocketService.prototype.dissociateUser = function (socketId, userId, namespace =
 }
 
 SocketService.prototype.joinChannel = function (userId, channelId, namespace = '/') {
-  this.socketServer.in(userId).clients((err, socketIdList) => {
-    if (err) {
-      throw err
-    }
-
-    socketIdList.forEach(socketId => {
-      this.socketServer.of(namespace).adapter.remoteJoin(socketId, channelId)
+  new Promise((_, reject) => {
+    this.socketServer.in(userId).clients((err, socketIdList) => {
+      if (err) {
+        return reject(err)
+      }
+  
+      socketIdList.forEach(socketId => {
+        this.socketServer.of(namespace).adapter.remoteJoin(socketId, channelId)
+      })
     })
   })
+  .catch(err => console.error(`caught`, err))
 }
 
 SocketService.prototype.joinChannelSync = function (callback, userId, channelId, namespace = '/') {
-  this.socketServer.in(userId).clients((err, socketIdList) => {
-    if (err) {
-      throw err
-    }
+  // this.socketServer.in(userId).clients((err, socketIdList) => {
+  //   if (err) {
+  //     Xthrow err
+  //   }
 
-    Promise.all(socketIdList.map(socketId => this.socketServer.of(namespace).adapter.remoteJoin(socketId, channelId)))
-      .then(() => callback())
+  //   Promise.all(socketIdList.map(socketId => this.socketServer.of(namespace).adapter.remoteJoin(socketId, channelId)))
+  //     .then(() => callback())
+  // })
+  return new Promise((resolve, reject) => {
+    this.socketServer.in(userId).clients((err, socketIdList) => {
+      if (err) {
+        return reject(err)
+      }
+  
+      Promise.all(socketIdList.map(socketId => {
+        this.socketServer.of(namespace).adapter.remoteJoin(socketId, channelId)
+      }))
+        .then(() => resolve(callback()))
+    })
   })
+  .catch(err => console.error(`caught`, err))
 }
 
 SocketService.prototype.leaveChannel = function (userId, channelId, namespace = '/') {
-  this.socketServer.in(userId).clients((err, socketIdList) => {
-    if (err) {
-      throw err
-    }
-
-    socketIdList.forEach(socketId => {
-      this.socketServer.of(namespace).adapter.remoteLeave(socketId, channelId)
+  new Promise((_, reject) => {
+    this.socketServer.in(userId).clients((err, socketIdList) => {
+      if (err) {
+        return reject(err)
+      }
+  
+      socketIdList.forEach(socketId => {
+        this.socketServer.of(namespace).adapter.remoteLeave(socketId, channelId)
+      })
     })
   })
+  .catch(err => console.error(`caught`, err))
 }
 
 SocketService.prototype.leaveChannelSync = function (callback, userId, channelId, namespace = '/') {
-  this.socketServer.in(userId).clients((err, socketIdList) => {
-    if (err) {
-      throw err
-    }
+  // this.socketServer.in(userId).clients((err, socketIdList) => {
+  //   if (err) {
+  //     Xthrow err
+  //   }
 
-    Promise.all(socketIdList.map(socketId => this.socketServer.of(namespace).adapter.remoteLeave(socketId, channelId)))
-      .then(() => callback())
+  //   Promise.all(socketIdList.map(socketId => this.socketServer.of(namespace).adapter.remoteLeave(socketId, channelId)))
+  //     .then(() => callback())
+  // })
+  return new Promise((resolve, reject) => {
+    this.socketServer.in(userId).clients((err, socketIdList) => {
+      if (err) {
+        return reject(err)
+      }
+  
+      Promise.all(socketIdList.map(socketId => {
+        this.socketServer.of(namespace).adapter.remoteLeave(socketId, channelId)
+      }))
+        .then(() => resolve(callback()))
+    })
   })
+  .catch(err => console.error(`caught`, err))
 }
 
 SocketService.prototype.onlineChannelList = function (userId, channelIdList, namespace = '/') {

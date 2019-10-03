@@ -56,9 +56,9 @@ GetInvitationListEventHandler.prototype.sendInvitationList = function (invitatio
   var businessEvent = this.globalContext['businessEvent']
   var packet = requestInfo.packet
 
-  invitationList.forEach(invitation => {
-    _.unset(invitation, 'sensitive')
-  })
+  if (invitationList.length !== 0) {
+    invitationList.map(invitation => _.omit(invitation, ['sensitive']))
+  }
 
   var resInfo = new ResponseInfo()
     .assignProtocol(requestInfo)
@@ -68,7 +68,7 @@ GetInvitationListEventHandler.prototype.sendInvitationList = function (invitatio
       responseEvent: RESPONSE_EVENTS.INVITATION_LIST // non-realtime invitation list
     })
     .setPacket({
-      msgCode: `get ${packet.inviType} invitation list`,
+      msgCode: `get ${packet.inviType} invitation list. list size: ${invitationList.length}`,
       data: invitationList
     })
 
