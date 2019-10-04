@@ -1,43 +1,30 @@
-var config = require('config')
+const path = require('path')
+const config = require('config')
 const Validator = require('validatorjs')
-const UID_PATTERN = config.get('app.uidPattern')
+const validateError = require(path.join(config.get('src.httpProtocol'), 'util')).validateError
+const RULES = require(path.join(config.get('src.property'), 'validation')).HTTP
+const META = require(path.join(config.get('src.property'), 'messageStatus')).HTTP
+const { AUTHENTICATE, PUSH_NOTIFICATION } = require(path.join(config.get('src.property'), 'property')).EVENTS
 
-const HTTP = {
-  AUTHENTICATE_RULES: {
-    uid: ['required', `regex:${UID_PATTERN}`],
-    clientuseragent: 'required|string'
-  },
-  PUSH_NOTIFICATION_RULES: {
-    receivers: 'required|array',
-    event: 'required|string',
-    content: 'required'
-  }
-}
 
 exports.authenticateValidator = function (req, res, next) {
-  let validation = new Validator(req.headers, HTTP.AUTHENTICATE_RULES)
+  res.locals.data = {}
+
+  let validation = new Validator(req.headers, RULES[AUTHENTICATE])
   if (validation.fails()) {
-    return res.status(422).json({
-      msgCode: `200001`,
-      msg: `request 'headers' format error`,
-      error: validation.errors.all()
-    })
+    return next(validateError(META.AUTH_HEADERS_FORMAT_ERR, validation))
   }
 
-  res.locals.data = {}
   next()
 }
 
 exports.notificationValidator = function (req, res, next) {
-  let validation = new Validator(req.body, HTTP.PUSH_NOTIFICATION_RULES)
+  res.locals.data = {}
+
+  let validation = new Validator(req.body, RULES[PUSH_NOTIFICATION])
   if (validation.fails()) {
-    return res.status(422).json({
-      msgCode: `200004`,
-      msg: `request 'body' format error`,
-      error: validation.errors.all()
-    })
+    return next(validateError(META.PUSH_BODY_FORMAT_ERR, validation))
   }
 
-  res.locals.data = {}
   next()
 }
