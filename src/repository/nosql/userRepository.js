@@ -1,15 +1,27 @@
 const path = require('path')
 const config = require('config')
 const mongoose = require('mongoose')
+const _ = require('lodash')
+const VALID_FIELDS = [
+  '_id',
+  'uid',
+  'receivedInvitations',
+  'sentInvitations',
+  'channelRecords',
+  'updatedAt',
+  'createdAt',
+]
 
 var User = require(path.join(config.get('database.nosql.model'), 'User'))
 
 function UserRepository () {}
 
-UserRepository.prototype.findById = async function (uid) {
+UserRepository.prototype.findById = async function (uid, selectFields = []) {
+  selectFields = selectFields.length === 0 ? VALID_FIELDS : _.intersection(VALID_FIELDS, selectFields)
   var user = await User.findOne({
     uid
   })
+  .select(selectFields)
 
   return user
 }
@@ -54,10 +66,10 @@ UserRepository.prototype.updateLastGlimpse = async function (uid, newChRecordLis
   return updatedResult
 }
 
-UserRepository.prototype.recordInvitation = async function (iid, inviter, invitee) {
+UserRepository.prototype.recordInvitation = async function (iid, inviter, recipient) {
   // return Promise.all([
   //   User.updateOne({ uid: inviter }, { '$addToSet': { 'sentInvitations': mongoose.Types.ObjectId(iid) } }),
-  //   User.updateOne({ uid: invitee }, { '$addToSet': { 'receivedInvitations': mongoose.Types.ObjectId(iid) } })
+  //   User.updateOne({ uid: recipient }, { '$addToSet': { 'receivedInvitations': mongoose.Types.ObjectId(iid) } })
   // ])
   //   .catch(err => Promise.reject(err))
   var now = Date.now()
@@ -77,7 +89,7 @@ UserRepository.prototype.recordInvitation = async function (iid, inviter, invite
   {
     updateOne: {
       filter: {
-        uid: invitee
+        uid: recipient
       },
       update: {
         '$addToSet': {
@@ -91,7 +103,7 @@ UserRepository.prototype.recordInvitation = async function (iid, inviter, invite
     .then(res => res.modifiedCount)
 }
 
-UserRepository.prototype.deleteInvitation = async function (iid, inviter, invitee) {
+UserRepository.prototype.deleteInvitation = async function (iid, inviter, recipient) {
   var now = Date.now()
   return User.bulkWrite([{
     updateOne: {
@@ -109,7 +121,7 @@ UserRepository.prototype.deleteInvitation = async function (iid, inviter, invite
   {
     updateOne: {
       filter: {
-        uid: invitee
+        uid: recipient
       },
       update: {
         '$pull': {
@@ -142,7 +154,7 @@ UserRepository.prototype.getSentInvitationIds = async function (uid, limit, skip
 }
 
 UserRepository.prototype.getChannelRecord = async function (uid, query) {
-  if (typeof query.chid !== 'string' && typeof query.ciid !== 'string') {
+  if (typeof query.chid !== 'string') {
     throw TypeError('UserRepository.getChannelRecord: param(s) of query is(are) wrong')
   }
 
@@ -151,9 +163,7 @@ UserRepository.prototype.getChannelRecord = async function (uid, query) {
   })
     .select('channelRecords')
 
-  return doc['channelRecords'].find(chRecord => {
-    return chRecord.chid === query.chid || chRecord.ciid === query.ciid
-  })
+  return doc['channelRecords'].find(chRecord => chRecord.chid === query.chid)
 }
 
 UserRepository.prototype.appendChannelRecord = async function (uid, record) {
@@ -180,7 +190,7 @@ UserRepository.prototype.appendChannelRecord = async function (uid, record) {
 }
 
 UserRepository.prototype.removeChannelRecord = async function (uid, record) {
-  if (typeof record.chid !== 'string' && typeof record.ciid !== 'string') {
+  if (typeof record.chid !== 'string') {
     throw TypeError('UserRepository.removeChannelRecord: param(s) of record is(are) wrong')
   }
 

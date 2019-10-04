@@ -68,7 +68,7 @@ ExtendValidityEventHandler.prototype.sendValidationToUser = function (token, ref
     .setHeader({
       to: TO.USER,
       receiver: packet.uid,
-      responseEvent: RESPONSE_EVENTS.PERSONAL_INFO
+      responseEvent: RESPONSE_EVENTS.REFRESHED_TOKEN
     })
     .setPacket({
       msgCode: `extend validity`,

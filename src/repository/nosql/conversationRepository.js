@@ -5,7 +5,7 @@ var Conversation = require(path.join(config.get('database.nosql.model'), 'Conver
 
 function getAttributes (doc) {
   return {
-    ciid: doc.ciid,
+    chid: doc.chid,
     sender: doc.sender,
     content: doc.content,
     type: doc.type,
@@ -15,9 +15,9 @@ function getAttributes (doc) {
 
 function ConversationRepository () {}
 
-ConversationRepository.prototype.create = async function (ciid, uid, content, type, datetime) {
+ConversationRepository.prototype.create = async function (chid, uid, content, type, datetime) {
   var conversation = await new Conversation({
-    ciid,
+    chid,
     sender: uid,
     content,
     type,
@@ -29,14 +29,14 @@ ConversationRepository.prototype.create = async function (ciid, uid, content, ty
   return getAttributes(conversation)
 }
 
-ConversationRepository.prototype.getListByCiid = async function (ciid, limit, skip = 0, sort = 'DESC') {
+ConversationRepository.prototype.getListByChid = async function (chid, limit, skip = 0, sort = 'DESC') {
   var list = await Conversation.find({
-    ciid
+    chid
   })
     .sort({
       datetime: sort.toLowerCase()
     })
-    .select(['ciid', 'sender', 'content', 'type', 'datetime'])
+    .select(['chid', 'sender', 'content', 'type', 'datetime'])
     .limit(limit)
     .skip(skip)
 
@@ -45,26 +45,26 @@ ConversationRepository.prototype.getListByCiid = async function (ciid, limit, sk
 
 ConversationRepository.prototype.getListByUserChannelRecord = async function (chRecord, limit, skip = 0, sort = 'DESC') {
   var {
-    ciid,
+    chid,
     joinedAt
   } = chRecord
   var list = await Conversation.find({
-    ciid,
+    chid,
     datetime: { $gte: joinedAt }
   })
     .sort({
       datetime: sort.toLowerCase()
     })
-    .select(['ciid', 'sender', 'content', 'type', 'datetime'])
+    .select(['chid', 'sender', 'content', 'type', 'datetime'])
     .limit(limit)
     .skip(skip)
 
   return list.map(doc => getAttributes(doc))
 }
 
-ConversationRepository.prototype.removeListByCiid = async function (ciid) {
+ConversationRepository.prototype.removeListByChid = async function (chid) {
   var confirm = await Conversation.deleteMany({
-    ciid
+    chid
   })
 
   return confirm.ok === 1

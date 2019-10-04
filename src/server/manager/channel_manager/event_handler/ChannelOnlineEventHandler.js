@@ -33,11 +33,19 @@ ChannelOnlineEventHandler.prototype.handle = function (requestInfo) {
 }
 
 ChannelOnlineEventHandler.prototype.joinChannels = function (channelIds, requestInfo) {
-  var socketServer = this.globalContext['socketServer']
-  var socket = requestInfo.socket
-  channelIds.forEach(ciid => {
-    socketServer.of('/').adapter.remoteJoin(socket.id, ciid)
-  })
+  if (channelIds.length === 0) {
+    return
+  }
+
+  // var socket = requestInfo.socket
+  // // channelIds.forEach(chid => {
+  // //   socketServer.of('/').adapter.remoteJoin(socket.id, chid)
+  // // })
+  // socketService.collectiveJoin(socket.id, channelIds)
+  this.globalContext['socketService'].onlineChannelList(
+    requestInfo.packet.uid,
+    channelIds
+  )
 
   this.broadcast(channelIds, requestInfo)
 }
@@ -55,7 +63,10 @@ ChannelOnlineEventHandler.prototype.broadcast = function (channelIds, requestInf
       responseEvent: RESPONSE_EVENTS.CONVERSATION_FROM_CHANNEL
     })
     .setPacket({
-      msgCode: `user: ${uid} is online`
+      msgCode: `user: ${uid} in channels is online`,
+      data: {
+        uid
+      }
     })
 
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)

@@ -7,7 +7,7 @@ function getAttributes (doc) {
   return {
     iid: doc._id.toString(),
     inviter: doc.inviter,
-    invitee: doc.invitee,
+    recipient: doc.recipient,
     header: doc.header,
     content: doc.content,
     sensitive: doc.sensitive
@@ -16,10 +16,10 @@ function getAttributes (doc) {
 
 function InvitationRepository () { }
 
-InvitationRepository.prototype.create = async function (inviter, invitee, header, content, sensitive) {
+InvitationRepository.prototype.create = async function (inviter, recipient, header, content, sensitive) {
   var invitation = await new Invitation({
     inviter,
-    invitee,
+    recipient,
     header,
     content,
     sensitive,
@@ -44,7 +44,7 @@ InvitationRepository.prototype.getListByIds = async function (iidList, limit, sk
     .sort({
       createdAt: sort.toLowerCase()
     })
-    .select(['inviter', 'invitee', 'header', 'content', 'sensitive'])
+    .select(['inviter', 'recipient', 'header', 'content', 'sensitive'])
     .limit(limit)
     .skip(skip)
 

@@ -31,23 +31,21 @@ describe('GetInvitationListEventHandler test', () => {
     invitationList = [{
         iid: 'mbnht594EokdMvfht54elwTsd98',
         inviter: 'ruby',
-        invitee: 'me',
+        recipient: 'me',
         header: {},
         content: 'HTML string',
         sensitive: {
           chid: 'chid: sdfghjklcbvghikliuyuii7g',
-          ciid: 'ciid A'
         },
         create_at: Date.now()
       }, {
         iid: '9kjnbvcdrtyuiljhgtloytfghjk',
         inviter: 'summer',
-        invitee: 'me',
+        recipient: 'me',
         header: {},
         content: 'another HTML string',
         sensitive: {
           chid: 'chid: aert5hewinaslgsi584waesr',
-          ciid: 'ciid B'
         },
         create_at: Date.now()
       }]

@@ -1,13 +1,10 @@
 var config = require('config')
 var path = require('path')
-var routeIndex = require('express').Router()
-var generalReq = require(path.join(config.get('src.httpProtocol'), 'request', 'generalReq'))
-var internalDriven = require(path.join(config.get('src.httpProtocol'), 'controller', 'internalDriven'))
-var generalRes = require(path.join(config.get('src.httpProtocol'), 'response', 'generalRes'))
+var RequestInfo = require(path.join(config.get('src.manager'), 'RequestInfo'))
+var globalContext = require(path.join(config.get('src.manager'), 'globalContext'))
+var recordAuthorization = require(path.join(config.get('src.httpProtocol'), 'util')).recordAuthorization
 const BUSINESS_EVENTS = require(path.join(config.get('src.property'), 'property')).BUSINESS_EVENTS
 
-
-routeIndex.get(`/index`, generalRes.checkResponse)
 
 /**
  * ==============================================================
@@ -22,12 +19,14 @@ routeIndex.get(`/index`, generalRes.checkResponse)
  *    [多個成對]的 token & refresh-token
  * ==============================================================
  */
-routeIndex.get(`/${BUSINESS_EVENTS.AUTHENTICATE}`,
-  generalReq.authenticateValidator,
-  internalDriven.obtainAuthorization,
-  generalRes.success,
-  generalRes.errorHandler
-)
+exports.obtainAuthorization = (req, res, next) => {
+  Promise.resolve(globalContext.storageService.findOrCreateUser(req.headers.uid, ['uid', 'updatedAt']))
+    .then(user => recordAuthorization(user))
+    .then(() => globalContext.authService.obtainAuthorization(req.headers))
+    .then(authorization => res.locals.data = authorization)
+    .then(() => next())
+    .catch(err => next(err || new Error(`Error occurred during obtain authorization`)))
+}
 
 /**
  * ==============================================================
@@ -35,11 +34,12 @@ routeIndex.get(`/${BUSINESS_EVENTS.AUTHENTICATE}`,
  * folk-api => notify-api => message-api(here)
  * ==============================================================
  */
-routeIndex.patch(`/${BUSINESS_EVENTS.PUSH_NOTIFICATION}`,
-  generalReq.notificationValidator,
-  internalDriven.pushNotification,
-  generalRes.success,
-  generalRes.errorHandler
-)
+exports.pushNotification = (req, res, next) => {
+  let requestInfo = new RequestInfo()
+  requestInfo.req = req
+  requestInfo.res = res
+  requestInfo.next = next
+  requestInfo.packet = req.body
 
-module.exports = routeIndex
+  globalContext.businessEvent.emit(BUSINESS_EVENTS.PUSH_NOTIFICATION, requestInfo)
+}

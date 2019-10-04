@@ -7,10 +7,14 @@ const {
 const {
   storageService
 } = require(path.join(config.get('src.service'), 'storageService'))
+const {
+  socketService
+} = require(path.join(config.get('src.service'), 'socketService'))
 
 module.exports = {
   businessEvent: new EventEmitter(),
-  socketServer: undefined,
   authService,
-  storageService
+  socketServer: undefined,
+  socketService,
+  storageService,
 }

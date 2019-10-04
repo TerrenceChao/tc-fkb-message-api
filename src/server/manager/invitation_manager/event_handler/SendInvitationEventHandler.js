@@ -41,21 +41,21 @@ SendInvitationEventHandler.prototype.createAndGetInvitations = async function (c
   var storageService = this.globalContext['storageService']
   var packet = requestInfo.packet
   var inviter = packet.inviter
-  var newInvitees = packet.invitees
+  var newRecipients = packet.recipients
   var content = packet.content
 
-  var membersOrInviteesHasBeenInvited = channelInfo.members.concat(channelInfo.invitees)
-  var invitees = _.pullAll(newInvitees, membersOrInviteesHasBeenInvited)
+  var membersOrRecipientsHasBeenInvited = channelInfo.members.concat(channelInfo.recipients)
+  var recipients = _.pullAll(newRecipients, membersOrRecipientsHasBeenInvited)
   var inviData = this.getInvitationCreateionData(channelInfo)
 
   var invitationList = []
-  if (invitees.length === 0) {
+  if (recipients.length === 0) {
     return invitationList
   }
 
   invitationList = await storageService.invitationMultiCreated(
     inviter,
-    invitees,
+    recipients,
     inviData.header,
     content,
     inviData.sensitive
@@ -74,7 +74,6 @@ SendInvitationEventHandler.prototype.getInvitationCreateionData = function (chan
     },
     sensitive: {
       chid: channelInfo.chid,
-      ciid: channelInfo.ciid
     }
   }
 }
@@ -91,7 +90,10 @@ SendInvitationEventHandler.prototype.noticeUser = function (requestInfo) {
       responseEvent: RESPONSE_EVENTS.PERSONAL_INFO // inviter self
     })
     .setPacket({
-      msgCode: 'The invitees may have been invited or are members'
+      msgCode: 'The recipients may have been invited or are members',
+      data: {
+        uid: packet.inviter
+      }
     })
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 }
@@ -106,8 +108,8 @@ SendInvitationEventHandler.prototype.sendInvitations = function (invitationList,
       .assignProtocol(requestInfo)
       .setHeader({
         to: TO.USER,
-        receiver: invitation.invitee,
-        responseEvent: RESPONSE_EVENTS.INVITATION_TO_ME // to individual invitees (realtime)
+        receiver: invitation.recipient,
+        responseEvent: RESPONSE_EVENTS.INVITATION_CREATED // to individual recipients (realtime)
       })
       .setPacket({
         msgCode: 'you got an invitation',
@@ -121,7 +123,7 @@ SendInvitationEventHandler.prototype.isValid = function (requestInfo) {
   return (
     requestInfo.packet != null &&
     requestInfo.packet.inviter != null &&
-    Array.isArray(requestInfo.packet.invitees) &&
+    Array.isArray(requestInfo.packet.recipients) &&
     typeof requestInfo.packet.chid === 'string' &&
     requestInfo.packet.content != null
   )
