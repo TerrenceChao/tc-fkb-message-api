@@ -1,13 +1,13 @@
 var config = require('config')
 var path = require('path')
-
-const {
-  PROTOCOL
-} = require(path.join(config.get('src.property'), 'property'))
+var _ = require('lodash')
+const { PROTOCOL, EVENTS } = require(path.join(config.get('src.property'), 'property'))
+const customMetaMsg = require(path.join(config.get('src.property'), 'messageStatus')).customMetaMsg
 
 function ResponseInfo () {
   this.req = null
   this.res = null
+  this.next = null
   this.socket = null
 
   this.header = null
@@ -17,6 +17,7 @@ function ResponseInfo () {
 ResponseInfo.prototype.assignProtocol = function (requestInfo) {
   this.req = requestInfo.req
   this.res = requestInfo.res
+  this.next = requestInfo.next
   this.socket = requestInfo.socket
 
   return this
@@ -39,7 +40,7 @@ ResponseInfo.prototype.setHeader = function (header) {
   this.header.sender = sender || this.header.sender
   this.header.to = to || this.header.to
   this.header.receiver = receiver || this.header.receiver
-  this.header.responseEvent = responseEvent || this.header.responseEvent
+  this.header.responseEvent = responseEvent || this.header.responseEvent || EVENTS.EXCEPTION_ALERT
 
   return this
 }
@@ -49,5 +50,23 @@ ResponseInfo.prototype.setPacket = function (packet) {
 
   return this
 }
+
+ResponseInfo.prototype.responsePacket = function (data, meta) {
+  this.packet = {
+    data,
+    meta
+  }
+
+  return this
+}
+
+ResponseInfo.prototype.responseMsg = function (msg = []) {
+  if (_.get(this.packet, 'meta.msg') !== undefined) {
+    this.packet.meta.msg = Array.isArray(msg) ? customMetaMsg(this.packet.meta, msg) : msg
+  }
+    
+  return this
+}
+
 
 module.exports = ResponseInfo

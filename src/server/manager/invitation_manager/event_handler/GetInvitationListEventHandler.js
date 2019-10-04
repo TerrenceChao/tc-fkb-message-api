@@ -7,10 +7,8 @@ const {
   TO,
   EVENTS,
   RESPONSE_EVENTS
-} = require(path.join(
-  config.get('src.property'),
-  'property'
-))
+} = require(path.join(config.get('src.property'), 'property'))
+const INVITATION_LIST_SUCCESS = require(path.join(config.get('src.property'), 'messageStatus')).SOCKET.INVITATION_LIST_SUCCESS
 var ResponseInfo = require(path.join(config.get('src.manager'), 'ResponseInfo'))
 var EventHandler = require(path.join(config.get('src.manager'), 'EventHandler'))
 
@@ -56,9 +54,9 @@ GetInvitationListEventHandler.prototype.sendInvitationList = function (invitatio
   var businessEvent = this.globalContext['businessEvent']
   var packet = requestInfo.packet
 
-  invitationList.forEach(invitation => {
-    _.unset(invitation, 'sensitive')
-  })
+  if (invitationList.length !== 0) {
+    invitationList.map(invitation => _.omit(invitation, ['sensitive']))
+  }
 
   var resInfo = new ResponseInfo()
     .assignProtocol(requestInfo)
@@ -67,10 +65,8 @@ GetInvitationListEventHandler.prototype.sendInvitationList = function (invitatio
       receiver: packet.uid,
       responseEvent: RESPONSE_EVENTS.INVITATION_LIST // non-realtime invitation list
     })
-    .setPacket({
-      msgCode: `get ${packet.inviType} invitation list`,
-      data: invitationList
-    })
+    .responsePacket(invitationList, INVITATION_LIST_SUCCESS)
+    .responseMsg(`get '${packet.inviType}' invitation list. list size: ${invitationList.length}`)
 
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 }

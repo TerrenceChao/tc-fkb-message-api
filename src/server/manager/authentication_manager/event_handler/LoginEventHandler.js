@@ -13,6 +13,8 @@ var EventHandler = require(path.join(config.get('src.manager'), 'EventHandler'))
 
 util.inherits(LoginEventHandler, EventHandler)
 
+const CONV_LIMIT = 1
+
 function LoginEventHandler () {
   this.name = arguments.callee.name
 }
@@ -36,15 +38,8 @@ LoginEventHandler.prototype.handle = async function (requestInfo) {
     return
   }
 
-  try {
-    var user = await storageService.getUser(packet.uid)
-    if (user == null) {
-      await storageService.createUser(packet.uid)
-    }
-  } catch (err) {
-    console.error(err.message)
-    return
-  }
+  // // NOT waiting DB response here!!
+  // storageService.findOrCreateUser(packet.uid)
 
   // Initial: user makes connections to self & channel
   businessEvent.emit(EVENTS.USER_ONLINE, requestInfo)
@@ -65,31 +60,45 @@ LoginEventHandler.prototype.sendChannelInfoAndConversations = function (userChan
 
   var packet = requestInfo.packet
   var uid = packet.uid
-  var convLimit = packet.convLimit
+  var convLimit = packet.convLimit || CONV_LIMIT
 
-  userChannelInfoList.forEach(async (chInfo) => {
-    var ciid = chInfo.ciid
-
-    Promise.resolve(storageService.getConversationList(uid, ciid, convLimit))
-      .then(conversationList => {
-        chInfo.conversations = conversationList
-
-        var resInfo = new ResponseInfo()
-          .assignProtocol(requestInfo)
-          .setHeader({
-            to: TO.USER,
-            receiver: uid,
-            responseEvent: RESPONSE_EVENTS.CHANNEL_LIST
-          })
-          .setPacket({
-            msgCode: `channel: ${chInfo.name} and conversations`,
-            data: [chInfo]
-          })
-
-        businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
+  if (userChannelInfoList.length === 0) {
+    var resInfo = new ResponseInfo()
+      .assignProtocol(requestInfo)
+      .setHeader({
+        to: TO.USER,
+        receiver: uid,
+        responseEvent: RESPONSE_EVENTS.CHANNEL_LIST
       })
-      .catch(err => this.alertException(err.message, requestInfo))
-  })
+      .setPacket({
+        msgCode: `user doesn't join any channel yet`,
+        data: []
+      })
+
+    businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
+    return
+  }
+
+  return Promise.all(userChannelInfoList.map(async chInfo => {
+      var conversationList = await storageService.getConversationList(uid, chInfo.chid, convLimit)
+      chInfo.conversations = conversationList
+      return chInfo
+    }))
+    .then(chInfoList => {
+      var resInfo = new ResponseInfo()
+        .assignProtocol(requestInfo)
+        .setHeader({
+          to: TO.USER,
+          receiver: uid,
+          responseEvent: RESPONSE_EVENTS.CHANNEL_LIST
+        })
+        .setPacket({
+          msgCode: `channel list with conversations`,
+          data: chInfoList
+        })
+
+      businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
+    })
 }
 
 LoginEventHandler.prototype.isValid = function (requestInfo) {
@@ -99,8 +108,7 @@ LoginEventHandler.prototype.isValid = function (requestInfo) {
     typeof packet[TOKEN] === 'string' &&
     typeof packet.uid === 'string' &&
     packet.inviLimit != null &&
-    packet.chanLimit != null &&
-    packet.convLimit != null
+    packet.chanLimit != null
 }
 
 module.exports = {

@@ -2,7 +2,7 @@ const mongoose = require('mongoose')
 const mongodbErrorHandler = require('mongoose-mongodb-errors')
 
 const ConversationSchema = new mongoose.Schema({
-  ciid: {
+  chid: {
     type: String,
     ref: 'ChannelInfo',
     required: true

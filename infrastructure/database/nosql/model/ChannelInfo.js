@@ -2,11 +2,6 @@ const mongoose = require('mongoose')
 const mongodbErrorHandler = require('mongoose-mongodb-errors')
 
 const ChannelInfoSchema = new mongoose.Schema({
-  ciid: {
-    type: mongoose.Schema.Types.String,
-    required: true,
-    unique: true
-  },
   name: {
     type: String,
     required: true
@@ -16,7 +11,7 @@ const ChannelInfoSchema = new mongoose.Schema({
     ref: 'User',
     required: true
   },
-  invitees: [{
+  recipients: [{
     type: String,
     ref: 'User',
     required: true
