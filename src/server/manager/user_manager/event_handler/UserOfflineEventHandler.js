@@ -7,8 +7,12 @@ const {
   EVENTS,
   RESPONSE_EVENTS
 } = require(path.join(config.get('src.property'), 'property'))
+const RES_META = require(path.join(config.get('src.property'), 'messageStatus')).SOCKET
 var ResponseInfo = require(path.join(config.get('src.manager'), 'ResponseInfo'))
 var EventHandler = require(path.join(config.get('src.manager'), 'EventHandler'))
+
+const USER_OFFLINE_INFO = RES_META.USER_OFFLINE_INFO
+
 
 util.inherits(UserOfflineEventHandler, EventHandler)
 
@@ -37,12 +41,14 @@ UserOfflineEventHandler.prototype.handle = function (requestInfo) {
       receiver: uid,
       responseEvent: RESPONSE_EVENTS.PERSONAL_INFO
     })
-    .setPacket({
-      msgCode: `user is offline`,
-      data: {
-        uid
-      }
-    })
+    // .setPacket({
+    //   msgCode: `user is offline`,
+    //   data: {
+    //     uid
+    //   }
+    // })
+    .responsePacket({ uid }, USER_OFFLINE_INFO)
+  
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 
   // socketServer.of('/').adapter.remoteLeave(socket.id, uid)

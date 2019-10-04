@@ -8,8 +8,12 @@ const {
   BUSINESS_EVENTS,
   RESPONSE_EVENTS
 } = require(path.join(config.get('src.property'), 'property'))
+const RES_META = require(path.join(config.get('src.property'), 'messageStatus')).SOCKET
 var ResponseInfo = require(path.join(config.get('src.manager'), 'ResponseInfo'))
 var EventHandler = require(path.join(config.get('src.manager'), 'EventHandler'))
+
+const INVITATION_CANCELED_INFO = RES_META.INVITATION_CANCELED_INFO
+var respondErr = RES_META.REPLY_INVITATION_ERR
 
 util.inherits(DealWithInvitationEventHandler, EventHandler)
 
@@ -43,7 +47,7 @@ DealWithInvitationEventHandler.prototype.handle = function (requestInfo) {
     // [BUG] 當 dealWith === 'y', 執行 joinChannel, 無法刪除 invitation.
     // dealWith !== 'y' 卻可以成功刪除！
     .then(() => businessEvent.emit(EVENTS.REMOVE_INVITATION, requestInfo),
-      err => this.alertException(err.message, requestInfo))
+      err => this.alertException(respondErr(err), requestInfo))
 }
 
 DealWithInvitationEventHandler.prototype.joinChannel = function (invitation, requestInfo) {
@@ -72,12 +76,15 @@ DealWithInvitationEventHandler.prototype.broadcastRecipientCanceled = function (
       receiver: invitation.sensitive.chid,
       responseEvent: RESPONSE_EVENTS.CONVERSATION_FROM_CHANNEL // notify in channel
     })
-    .setPacket({
-      msgCode: `${packet.nickname} is canceled`,
-      data: {
-        uid: packet.targetUid
-      }
-    })
+    // .setPacket({
+    //   msgCode: `${packet.nickname} is canceled`,
+    //   data: {
+    //     uid: packet.targetUid
+    //   }
+    // })
+    .responsePacket({ uid: packet.targetUid }, INVITATION_CANCELED_INFO)
+    .responseMsg(`${packet.nickname} is canceled`)
+  
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 }
 

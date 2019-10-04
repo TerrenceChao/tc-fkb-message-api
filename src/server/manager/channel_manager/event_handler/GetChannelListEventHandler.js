@@ -7,8 +7,13 @@ const {
   EVENTS,
   RESPONSE_EVENTS
 } = require(path.join(config.get('src.property'), 'property'))
+const RES_META = require(path.join(config.get('src.property'), 'messageStatus')).SOCKET
 var ResponseInfo = require(path.join(config.get('src.manager'), 'ResponseInfo'))
 var EventHandler = require(path.join(config.get('src.manager'), 'EventHandler'))
+
+const CHANNEL_LIST_INFO = RES_META.CHANNEL_LIST_INFO
+const GET_CHANNEL_LIST_SUCCESS = RES_META.GET_CHANNEL_LIST_SUCCESS
+var respondErr = RES_META.GET_CHANNEL_LIST_ERR
 
 util.inherits(GetChannelListEventHandler, EventHandler)
 
@@ -33,11 +38,13 @@ GetChannelListEventHandler.prototype.handle = function (requestInfo) {
 
   Promise.resolve(storageService.getUserChannelInfoList(uid, limit, skip))
     .then(userChannelInfoList => this.sendChInfoListBelongedUser(userChannelInfoList, requestInfo),
-      err => this.alertException(err.message, requestInfo))
+      err => this.alertException(respondErr(err), requestInfo))
 }
 
 GetChannelListEventHandler.prototype.sendChInfoListBelongedUser = function (userChannelInfoList, requestInfo) {
   var businessEvent = this.globalContext['businessEvent']
+  const META = userChannelInfoList.length === 0 ? CHANNEL_LIST_INFO : GET_CHANNEL_LIST_SUCCESS
+
   var resInfo = new ResponseInfo()
     .assignProtocol(requestInfo)
     .setHeader({
@@ -45,11 +52,12 @@ GetChannelListEventHandler.prototype.sendChInfoListBelongedUser = function (user
       receiver: requestInfo.packet.uid,
       responseEvent: RESPONSE_EVENTS.CHANNEL_LIST
     })
-    .setPacket({
-      msgCode: `channel list`,
-      data: userChannelInfoList
-    })
-
+    // .setPacket({
+    //   msgCode: `channel list`,
+    //   data: userChannelInfoList
+    // })
+    .responsePacket(userChannelInfoList, META)
+  
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 }
 

@@ -7,8 +7,12 @@ const {
   EVENTS,
   RESPONSE_EVENTS
 } = require(path.join(config.get('src.property'), 'property'))
+const RES_META = require(path.join(config.get('src.property'), 'messageStatus')).SOCKET
 var ResponseInfo = require(path.join(config.get('src.manager'), 'ResponseInfo'))
 var EventHandler = require(path.join(config.get('src.manager'), 'EventHandler'))
+
+const USER_ONLINE_INFO = RES_META.USER_ONLINE_INFO
+
 
 util.inherits(UserOnlineEventHandler, EventHandler)
 
@@ -41,12 +45,14 @@ UserOnlineEventHandler.prototype.handle = function (requestInfo) {
       receiver: uid,
       responseEvent: RESPONSE_EVENTS.PERSONAL_INFO
     })
-    .setPacket({
-      msgCode: `user is online`,
-      data: {
-        uid
-      }
-    })
+    // .setPacket({
+    //   msgCode: `user is online`,
+    //   data: {
+    //     uid
+    //   }
+    // })
+    .responsePacket({ uid }, USER_ONLINE_INFO)
+  
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 }
 

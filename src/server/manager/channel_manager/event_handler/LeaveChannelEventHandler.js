@@ -8,8 +8,13 @@ const {
   BUSINESS_EVENTS,
   RESPONSE_EVENTS
 } = require(path.join(config.get('src.property'), 'property'))
+const RES_META = require(path.join(config.get('src.property'), 'messageStatus')).SOCKET
 var ResponseInfo = require(path.join(config.get('src.manager'), 'ResponseInfo'))
 var EventHandler = require(path.join(config.get('src.manager'), 'EventHandler'))
+
+const CHANNEL_LEFT_SUCCESS = RES_META.CHANNEL_LEFT_SUCCESS
+var respondErr = RES_META.LEAVE_CHANNEL_ERR
+
 
 util.inherits(LeaveChannelEventHandler, EventHandler)
 
@@ -46,7 +51,7 @@ LeaveChannelEventHandler.prototype.handle = function (requestInfo) {
   // channelLeaved: refresh channelInfo FIRST
   Promise.resolve(storageService.channelLeaved(targetUid, chid))
     .then(refreshedChannelInfo => this.executeLeave(refreshedChannelInfo, requestInfo),
-      err => this.alertException(err.message, requestInfo))
+      err => this.alertException(respondErr(err), requestInfo))
     .then(refreshedChannelInfo => {
       // remove entire channel & belonged conversations if there's no member
       if (refreshedChannelInfo.members.length === 0) {
@@ -80,16 +85,24 @@ LeaveChannelEventHandler.prototype.broadcastUserHasLeft = function (channelInfo,
       receiver: channelInfo.chid,
       responseEvent: RESPONSE_EVENTS.CHANNEL_LEFT // RESPONSE_EVENTS.CONVERSATION_FROM_CHANNEL
     })
-    .setPacket({
-      msgCode: `${nickname} has left`,
-      data: {
+    // .setPacket({
+    //   msgCode: `${nickname} has left`,
+    //   data: {
+    //     uid: targetUid,
+    //     // 1. delete targetUid from channel.members(array) for "each member" in localStorage (frontend)
+    //     // 2. 其他使用者登入時，只載入了少數的 channelInfo, 有可能沒載入此 channelInfo 的資訊。當有成員離開時可提供更新後的 channelInfo 給前端
+    //     channelInfo,
+    //     datetime: Date.now()
+    //   }
+    // })
+    .responsePacket({
         uid: targetUid,
         // 1. delete targetUid from channel.members(array) for "each member" in localStorage (frontend)
         // 2. 其他使用者登入時，只載入了少數的 channelInfo, 有可能沒載入此 channelInfo 的資訊。當有成員離開時可提供更新後的 channelInfo 給前端
         channelInfo,
         datetime: Date.now()
-      }
-    })
+      }, CHANNEL_LEFT_SUCCESS)
+    .responseMsg(`${nickname} has left`)
 
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 }

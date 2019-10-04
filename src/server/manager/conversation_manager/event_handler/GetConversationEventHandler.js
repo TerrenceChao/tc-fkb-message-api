@@ -7,8 +7,14 @@ const {
   EVENTS,
   RESPONSE_EVENTS
 } = require(path.join(config.get('src.property'), 'property'))
+const RES_META = require(path.join(config.get('src.property'), 'messageStatus')).SOCKET
 var ResponseInfo = require(path.join(config.get('src.manager'), 'ResponseInfo'))
 var EventHandler = require(path.join(config.get('src.manager'), 'EventHandler'))
+
+const CONVERSATION_LIST_INFO = RES_META.CONVERSATION_LIST_INFO
+const GET_CONVERSATION_LIST_SUCCESS = RES_META.GET_CONVERSATION_LIST_SUCCESS
+var respondErr = RES_META.GET_CONVERSATION_LIST_ERR
+
 
 util.inherits(GetConversationEventHandler, EventHandler)
 
@@ -29,7 +35,7 @@ GetConversationEventHandler.prototype.handle = function (requestInfo) {
 
   Promise.resolve(storageService.getConversationList(packet.uid, packet.chid, packet.convLimit, packet.convSkip))
     .then(conversationList => this.sendConversationList(conversationList, requestInfo),
-      err => this.alertException(err.message, requestInfo))
+      err => this.alertException(respondErr(err), requestInfo))
 }
 
 GetConversationEventHandler.prototype.sendConversationList = function (conversationList, requestInfo) {
@@ -41,6 +47,12 @@ GetConversationEventHandler.prototype.sendConversationList = function (conversat
     convLimit,
     convSkip
   } = packet
+  
+  var meta = CONVERSATION_LIST_INFO
+  if (conversationList.length !== 0) {
+    meta = GET_CONVERSATION_LIST_SUCCESS
+    meta.msg = `get conversations from ${convSkip} to ${convSkip + convLimit}`
+  }
 
   var resInfo = new ResponseInfo()
     .assignProtocol(requestInfo)
@@ -49,13 +61,20 @@ GetConversationEventHandler.prototype.sendConversationList = function (conversat
       receiver: uid,
       responseEvent: RESPONSE_EVENTS.CONVERSATION_LIST
     })
-    .setPacket({
-      msgCode: `get conversations from ${convSkip} to ${convSkip + convLimit}`,
-      data: {
-        chid,
-        list: conversationList
-      }
-    })
+    // .setPacket({
+    //   msgCode: `get conversations from ${convSkip} to ${convSkip + convLimit}`,
+    //   data: {
+    //     chid,
+    //     list: conversationList
+    //   }
+    // })
+  /**
+   * TODO: 重命名？
+   */
+    .responsePacket({
+      chid,
+      list: conversationList
+    }, meta)
 
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 }

@@ -7,8 +7,13 @@ const {
   EVENTS,
   RESPONSE_EVENTS
 } = require(path.join(config.get('src.property'), 'property'))
+const RES_META = require(path.join(config.get('src.property'), 'messageStatus')).SOCKET
 var ResponseInfo = require(path.join(config.get('src.manager'), 'ResponseInfo'))
 var EventHandler = require(path.join(config.get('src.manager'), 'EventHandler'))
+
+const CHANNEL_REMOVED_SUCCESS = RES_META.CHANNEL_REMOVED_SUCCESS
+var respondErr = RES_META.REMOVE_CHANNEL_ERR
+  
 
 util.inherits(RemoveChannelEventHandler, EventHandler)
 
@@ -32,7 +37,7 @@ RemoveChannelEventHandler.prototype.handle = function (requestInfo) {
 
   Promise.resolve(storageService.channelInfoRemoved(query))
     .then(confirm => this.notifyUser(requestInfo),
-      err => this.alertException(err.message, requestInfo))
+      err => this.alertException(respondErr(err), requestInfo))
 }
 
 RemoveChannelEventHandler.prototype.notifyUser = function (requestInfo) {
@@ -48,12 +53,13 @@ RemoveChannelEventHandler.prototype.notifyUser = function (requestInfo) {
       receiver: uid,
       responseEvent: RESPONSE_EVENTS.CHANNEL_REMOVED
     })
-    .setPacket({
-      msgCode: `channel is removed`,
-      data: {
-        chid
-      }
-    })
+    // .setPacket({
+    //   msgCode: `channel is removed`,
+    //   data: {
+    //     chid
+    //   }
+    // })
+    .responsePacket({ chid }, CHANNEL_REMOVED_SUCCESS)
 
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 }

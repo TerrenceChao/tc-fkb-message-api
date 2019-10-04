@@ -41,6 +41,10 @@ LogoutEventHandler.prototype.handle = async function (requestInfo) {
   var config = packet.config
 
   try {
+    /**
+     * TODO: [updateLastGlimpse] not working: 
+     * msg: [Cannot-read-property-'map'-of-undefined]
+     */
     await storageService.updateLastGlimpse(uid, config.glimpses)
   } catch (err) {
     console.log(err.message)

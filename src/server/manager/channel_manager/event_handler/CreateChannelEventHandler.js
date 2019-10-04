@@ -7,8 +7,12 @@ const {
   EVENTS,
   RESPONSE_EVENTS
 } = require(path.join(config.get('src.property'), 'property'))
+const RES_META = require(path.join(config.get('src.property'), 'messageStatus')).SOCKET
 var ResponseInfo = require(path.join(config.get('src.manager'), 'ResponseInfo'))
 var EventHandler = require(path.join(config.get('src.manager'), 'EventHandler'))
+
+const CHANNEL_CREATED_SUCCESS = RES_META.CHANNEL_CREATED_SUCCESS
+var respondErr = RES_META.CREATE_CHANNEL_ERR
 
 util.inherits(CreateChannelEventHandler, EventHandler)
 
@@ -40,7 +44,7 @@ CreateChannelEventHandler.prototype.handle = function (requestInfo) {
 
   Promise.resolve(storageService.channelInfoCreated(uid, channelName))
     .then(newChannelInfo => this.enterChannel(newChannelInfo, requestInfo),
-      err => this.alertException(err.message, requestInfo))
+      err => this.alertException(respondErr(err), requestInfo))
 }
 
 CreateChannelEventHandler.prototype.enterChannel = function (channelInfo, requestInfo) {
@@ -63,10 +67,13 @@ CreateChannelEventHandler.prototype.sendChannelInfoToUser = function (channelInf
       to: TO.USER,
       receiver: channelInfo.creator,
       responseEvent: RESPONSE_EVENTS.CHANNEL_CREATED
-    }).setPacket({
-      msgCode: `channel: ${channelInfo.name} is created`,
-      data: channelInfo
     })
+    // .setPacket({
+    //   msgCode: `channel: ${channelInfo.name} is created`,
+    //   data: channelInfo
+    // })
+    .responsePacket(channelInfo, CHANNEL_CREATED_SUCCESS)
+    .responseMsg(`channel: ${channelInfo.name} is created`)
 
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 }

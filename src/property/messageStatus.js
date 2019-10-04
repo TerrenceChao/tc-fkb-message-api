@@ -43,6 +43,8 @@
  *  xxx service       = '27' (因 第 67 個 service 引起的)
  *  ...
  * 
+ *  type/format       = 'TX' (型別，格式轉換相關的事件所引起的)
+ *  business process  = 'PX' (程式流程, 業務邏輯的事件所引起的)
  *  unknown           = '??' (無法得知)
  *  multiple services = 'QQ' (2 ~ 多個服務連鎖效應所引起的)
  *  system            = 'XX' (系統本身/伺服器/網路/遠端服務/檔案系統...等物理性因素引起)
@@ -57,10 +59,10 @@
 
 const _ = require('lodash')
 
-const STR_IGNORED = `%:@%`
-const STR_IGNORED_REGEX = /%:@%/g
+const STR_IGNORED = `Ⓢ:@Ⓢ`
+const STR_IGNORED_REGEX = /Ⓢ:@Ⓢ/g
 const EXTRA_SYMBOL = `:@`
-const SPLIT_SYMBOL = `%`
+const SPLIT_SYMBOL = `Ⓢ`
 
 
 // http error categories
@@ -106,27 +108,208 @@ module.exports = {
   // socket 相關的 meta
   SOCKET: {
     // AuthenticationManager
-
+    VALIDITY_EXTENDED_SUCCESS: {
+      msgCode: '1101100',
+      msg: `Validity extended`
+    },
+    GET_CHANNEL_AND_CONVERSATION_LIST_SUCCESS: {
+      msgCode: '1101100',
+      msg: `Get channel list with conversations`
+    },
+    GET_CHANNEL_AND_CONVERSATION_LIST_ERR: function (err) {
+      return {
+        msgCode: '4101102/4101103',
+        error: err.message
+      }
+    },
 
     // ChannelManager
+    CHANNEL_OFFLINE_INFO: {
+      msgCode: '2102300',
+      msg: `User ${STR_IGNORED} in channels is offline.`
+    },
+    CHANNEL_OFFLINE_ERR: function (err) {
+      return {
+        msgCode: '4102302/4102303',
+        error: err.message
+      }
+    },
+
     CHANNEL_ONLINE_INFO: {
       msgCode: '2102300',
-      msg: `user ${STR_IGNORED} in channels is online${STR_IGNORED}.`
+      msg: `User is ONLINE`
+    },
+    CHANNEL_ONLINE_ERR: function (err) {
+      return {
+        msgCode: '4102302/4102303',
+        error: err.message
+      }
+    },
+    CHANNEL_CREATED_SUCCESS: {
+      msgCode: '1102100',
+      msg: `Channel is created`
+    },
+    CREATE_CHANNEL_ERR: function (err) {
+      return {
+        msgCode: '4102102/4102103',
+        error: err.message
+      }
+    },
+    CHANNEL_LIST_INFO: {
+      msgCode: '2102100',
+      msg: `User doesn't join any channel yet`
+    },
+    GET_CHANNEL_LIST_SUCCESS: {
+      msgCode: '1102100',
+      msg: `Get channel list`
+    },
+    GET_CHANNEL_LIST_ERR: function (err) {
+      return {
+        msgCode: '4102103',
+        error: err.message
+      }
+    },
+    GET_ONE_CHANNEL_SUCCESS: {
+      msgCode: '1102100',
+      msg: `Get a specified channel`
+    },
+    GET_ONE_CHANNEL_ERR: function (err) {
+      return {
+        msgCode: '4102103',
+        error: err.message
+      }
+    },
+    CHANNEL_JOINED_SUCCESS: {
+      msgCode: '1102200',
+      msg: `User has joined the channel`
+    },
+    JOIN_CHANNEL_ERR: function (err) {
+      return {
+        msgCode: '4102202/4102203',
+        error: err.message
+      }
+    },
+    CHANNEL_LEFT_SUCCESS: {
+      msgCode: '1102100',
+      msg: `User has left`
+    },
+    LEAVE_CHANNEL_ERR: function (err) {
+      return {
+        msgCode: '4102102/4102103',
+        error: err.message
+      }
+    },
+    CHANNEL_REMOVED_SUCCESS: {
+      msgCode: '1102300',
+      msg: `The channel is removed`
+    },
+    REMOVE_CHANNEL_ERR: function (err) {
+      return {
+        msgCode: '4102303',
+        error: err.message
+      }
     },
 
     // ConnectionManager
 
+
     // ConversationManager
+    CONVERSATION_LIST_INFO: {
+      msgCode: '2104200',
+      msg: `You can start to communicate with others`
+    },
+    GET_CONVERSATION_LIST_SUCCESS: {
+      msgCode: '1104200',
+      msg: `Get conversation list`
+    },
+    GET_CONVERSATION_LIST_ERR: function (err) {
+      return {
+        msgCode: '4104203',
+        error: err.message
+      }
+    },
+    CONVERSATION_SENT_SUCCESS: {
+      msgCode: '1104200',
+      msg: `Conversation sent`
+    },
+    SAVE_CONVERSATION_ERR: function (err) {
+      return {
+        msgCode: '4104203',
+        error: err.message
+      }
+    },
 
     // InvitationManager
-    INVITATION_LIST_SUCCESS: {
+    INVITATION_CANCELED_INFO: {
+      msgCode: '2105100',
+      msg: `The invitation is canceled by user`
+    },
+    REPLY_INVITATION_ERR: function (err) {
+      return {
+        msgCode: '4105103/41051PX',
+        error: err.message
+      }
+    },
+    INVITATION_LIST_INFO: {
+      msgCode: '2105200',
+      msg: `User doesn't have any invitation yet`
+    },
+    GET_INVITATION_LIST_SUCCESS: {
       msgCode: '1105200',
-      msg: `get invitation list.`
+      msg: `Get invitation list`
+    },
+    GET_INVITATION_LIST_ERR: function (err) {
+      return {
+        msgCode: '4105203',
+        error: err.message
+      }
+    },
+    INVITATION_REMOVED_SUCCESS: {
+      msgCode: '1105200',
+      msg: `The invitation is removed`
+    },
+    REMOVE_INVITATION_ERR: function (err) {
+      return {
+        msgCode: '4105203',
+        error: err.message
+      }
+    },
+    HAS_INVITED_INFO: {
+      msgCode: '2105100',
+      msg: 'The recipients may have been invited or are members'
+    },
+    INVITATION_RECEIVED_INFO: {
+      msgCode: '2105100',
+      msg: `You got an invitation`    
+    },
+    CHANNEL_OR_INVITATION_DB_ERR: function (err) {
+      return {
+        msgCode: '4105103',
+        error: err.message
+      }
+    },
+    SEND_INVITATION_ERR: function (err) {
+      return {
+        msgCode: '41051PX',
+        error: err.message
+      }
     },
 
     // MessageManager
+    NOTIFICATION_PUSHED_INFO: {
+      msgCode: '2106300',
+      msg: `Notification pushed`   
+    },
 
     // UserManager
+    USER_OFFLINE_INFO: {
+      msgCode: '2107300',
+      msg: `User is offline`   
+    },
+    USER_ONLINE_INFO: {
+      msgCode: '2107300',
+      msg: `User is ONLINE`   
+    }
   },
 
   customMetaMsg,

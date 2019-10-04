@@ -6,6 +6,7 @@ const {
   EVENTS,
   RESPONSE_EVENTS
 } = require(path.join(config.get('src.property'), 'property'))
+
 var ResponseInfo = require(path.join(config.get('src.manager'), 'ResponseInfo'))
 
 function EventHandler () { }
@@ -16,7 +17,7 @@ EventHandler.prototype.handle = function (requestInfo) {
   throw new Error(`[EventHandler]: You should implement 'handle'.`)
 }
 
-EventHandler.prototype.alertException = function (msgCode, requestInfo, header = null) {
+EventHandler.prototype.alertException = function (meta, requestInfo, header = null) {
   var businessEvent = this.globalContext['businessEvent']
   var packet = requestInfo.packet
   var resHeader = (header === null) ? {
@@ -28,9 +29,8 @@ EventHandler.prototype.alertException = function (msgCode, requestInfo, header =
   var resInfo = new ResponseInfo()
     .assignProtocol(requestInfo)
     .setHeader(resHeader)
-    .setPacket({
-      msgCode
-    })
+    .responsePacket({}, meta)
+  
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 }
 

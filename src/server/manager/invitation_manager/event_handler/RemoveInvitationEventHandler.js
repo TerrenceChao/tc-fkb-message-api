@@ -7,8 +7,13 @@ const {
   EVENTS,
   RESPONSE_EVENTS
 } = require(path.join(config.get('src.property'), 'property'))
+const RES_META = require(path.join(config.get('src.property'), 'messageStatus')).SOCKET
 var ResponseInfo = require(path.join(config.get('src.manager'), 'ResponseInfo'))
 var EventHandler = require(path.join(config.get('src.manager'), 'EventHandler'))
+
+const INVITATION_REMOVED_SUCCESS = RES_META.INVITATION_REMOVED_SUCCESS
+var respondErr = RES_META.REMOVE_INVITATION_ERR
+
 
 util.inherits(RemoveInvitationEventHandler, EventHandler)
 
@@ -30,7 +35,7 @@ RemoveInvitationEventHandler.prototype.handle = function (requestInfo) {
 
   Promise.resolve(storageService.invitationRemoved(iid))
     .then(() => this.notify(requestInfo))
-    .catch(err => this.alertException(err.message, requestInfo))
+    .catch(err => this.alertException(respondErr(err), requestInfo))
 }
 
 RemoveInvitationEventHandler.prototype.notify = function (requestInfo) {
@@ -44,13 +49,19 @@ RemoveInvitationEventHandler.prototype.notify = function (requestInfo) {
       receiver: packet.uid,
       responseEvent: RESPONSE_EVENTS.INVITATION_REMOVED
     })
-    .setPacket({
-      msgCode: `Invitation is removed. iid: ${packet.iid}`,
-      data: {
-        uid: packet.uid,
-        iid: packet.iid
-      }
-    })
+    // .setPacket({
+    //   msgCode: `Invitation is removed. iid: ${packet.iid}`,
+    //   data: {
+    //     uid: packet.uid,
+    //     iid: packet.iid
+    //   }
+    // })
+    .responsePacket({
+      uid: packet.uid,
+      iid: packet.iid
+    }, INVITATION_REMOVED_SUCCESS)
+    .responseMsg(`Invitation is removed. iid: ${packet.iid}`)
+  
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 }
 

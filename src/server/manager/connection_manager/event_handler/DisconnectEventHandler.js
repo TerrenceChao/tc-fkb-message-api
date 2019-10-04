@@ -6,7 +6,6 @@ const {
   EVENTS
 } = require(path.join(config.get('src.property'), 'property'))
 var EventHandler = require(path.join(config.get('src.manager'), 'EventHandler'))
-
 util.inherits(DisconnectEventHandler, EventHandler)
 
 function DisconnectEventHandler () {

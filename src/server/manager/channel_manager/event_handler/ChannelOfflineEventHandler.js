@@ -7,8 +7,13 @@ const {
   EVENTS,
   RESPONSE_EVENTS
 } = require(path.join(config.get('src.property'), 'property'))
+const RES_META = require(path.join(config.get('src.property'), 'messageStatus')).SOCKET
 var ResponseInfo = require(path.join(config.get('src.manager'), 'ResponseInfo'))
 var EventHandler = require(path.join(config.get('src.manager'), 'EventHandler'))
+
+const CHANNEL_OFFLINE_INFO = RES_META.CHANNEL_OFFLINE_INFO
+var respondErr = RES_META.CHANNEL_OFFLINE_ERR
+
 
 util.inherits(ChannelOfflineEventHandler, EventHandler)
 
@@ -29,7 +34,7 @@ ChannelOfflineEventHandler.prototype.handle = function (requestInfo) {
 
   Promise.resolve(storageService.getAllChannelIds(uid))
     .then(channelIds => this.leaveChannels(channelIds, requestInfo),
-      err => this.alertException(err.message, requestInfo))
+      err => thisthis.alertException(respondErr(err), requestInfo))
 }
 
 ChannelOfflineEventHandler.prototype.leaveChannels = function (channelIds, requestInfo) {
@@ -60,12 +65,8 @@ ChannelOfflineEventHandler.prototype.broadcast = function (channelIds, requestIn
       receiver: channelIds,
       responseEvent: RESPONSE_EVENTS.CONVERSATION_FROM_CHANNEL
     })
-    .setPacket({
-      msgCode: `user: ${uid} is offline`,
-      data: {
-        uid
-      }
-    })
+    .responsePacket({ uid }, CHANNEL_OFFLINE_INFO)
+    .responseMsg(`user: ${uid} is offline`)
 
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 }
