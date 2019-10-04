@@ -55,7 +55,10 @@ describe('UserOnlineEventHandler test', () => {
         responseEvent: RESPONSE_EVENTS.PERSONAL_INFO
       })
       .setPacket({
-        msgCode: `user is online`
+        msgCode: `user is online`,
+        data: {
+          uid: userPayload.uid
+        }
       })
 
     // act

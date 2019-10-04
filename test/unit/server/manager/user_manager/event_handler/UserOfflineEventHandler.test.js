@@ -55,7 +55,10 @@ describe('UserOfflineEventHandler test', () => {
         responseEvent: RESPONSE_EVENTS.PERSONAL_INFO
       })
       .setPacket({
-        msgCode: `user is offline`
+        msgCode: `user is offline`,
+        data: {
+          uid: userPayload.uid
+        }
       })
 
     // act

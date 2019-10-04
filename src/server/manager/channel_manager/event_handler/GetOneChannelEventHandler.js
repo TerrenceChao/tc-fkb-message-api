@@ -10,53 +10,53 @@ const {
 var ResponseInfo = require(path.join(config.get('src.manager'), 'ResponseInfo'))
 var EventHandler = require(path.join(config.get('src.manager'), 'EventHandler'))
 
-util.inherits(ConfirmInvitationEventHandler, EventHandler)
+util.inherits(GetOneChannelEventHandler, EventHandler)
 
-function ConfirmInvitationEventHandler () {
+function GetOneChannelEventHandler() {
   this.name = arguments.callee.name
 }
 
-ConfirmInvitationEventHandler.prototype.eventName = EVENTS.CONFIRM_INVITATION
+GetOneChannelEventHandler.prototype.eventName = EVENTS.GET_ONE_CHANNEL
 
-ConfirmInvitationEventHandler.prototype.handle = function (requestInfo) {
+GetOneChannelEventHandler.prototype.handle = function (requestInfo) {
   if (!this.isValid(requestInfo)) {
     console.warn(`${this.eventName}: request info is invalid.`)
     return
   }
 
   var storageService = this.globalContext['storageService']
-  var packet = requestInfo.packet
-  var iid = packet.iid
+  var uid = requestInfo.packet.uid
+  var chid = requestInfo.packet.chid
 
-  Promise.resolve(storageService.invitationRemoved(iid))
-    .then(() => this.confirmToRemoveInvitation(requestInfo))
-    .catch(err => this.alertException(err.message, requestInfo))
+  Promise.resolve(storageService.getUserChannelInfo({ uid, chid }))
+    .then(channelInfo => this.sendChInfo(channelInfo, requestInfo),
+      err => this.alertException(err.message, requestInfo))
 }
 
-ConfirmInvitationEventHandler.prototype.confirmToRemoveInvitation = function (requestInfo) {
+GetOneChannelEventHandler.prototype.sendChInfo = function (channelInfo, requestInfo) {
   var businessEvent = this.globalContext['businessEvent']
-  var packet = requestInfo.packet
-
   var resInfo = new ResponseInfo()
     .assignProtocol(requestInfo)
     .setHeader({
       to: TO.USER,
-      receiver: packet.uid,
-      responseEvent: RESPONSE_EVENTS.PERSONAL_INFO
+      receiver: requestInfo.packet.uid,
+      responseEvent: RESPONSE_EVENTS.SPECIFIED_CHANNEL
     })
     .setPacket({
-      msgCode: `Invitation is removed. iid: ${packet.iid}`
+      msgCode: `get a specified channel`,
+      data: channelInfo
     })
+
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 }
 
-ConfirmInvitationEventHandler.prototype.isValid = function (requestInfo) {
+GetOneChannelEventHandler.prototype.isValid = function (requestInfo) {
   var packet = requestInfo.packet
   return packet !== undefined &&
     typeof packet.uid === 'string' &&
-    typeof packet.iid === 'string'
+    typeof packet.chid === 'string'
 }
 
 module.exports = {
-  handler: new ConfirmInvitationEventHandler()
+  handler: new GetOneChannelEventHandler()
 }

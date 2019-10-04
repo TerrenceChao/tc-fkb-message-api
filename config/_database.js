@@ -16,6 +16,7 @@ function NosqlShell() {
   mongoose.connection.on('error', console.error.bind(console, 'connection error:'))
   mongoose.connection.on('open', () => {
     console.log('mongodb is connecting ...')
+    this.attempts = 1
   })
 
   mongoose.connection.on('disconnected', () => {

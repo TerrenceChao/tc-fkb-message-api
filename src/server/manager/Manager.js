@@ -53,6 +53,7 @@ Manager.prototype.listenRequestEvent = function (protocol, handler) {
   const {
     req,
     res,
+    next,
     socket
   } = protocol
   let requestInfo = new RequestInfo()
@@ -76,6 +77,7 @@ Manager.prototype.listenRequestEvent = function (protocol, handler) {
   } else if (req !== undefined && res !== undefined) {
     requestInfo.req = req
     requestInfo.res = res
+    requestInfo.next = next
     handler.handle(requestInfo)
     thisManager.receiveAlert(handler.eventName, requestInfo)
   }

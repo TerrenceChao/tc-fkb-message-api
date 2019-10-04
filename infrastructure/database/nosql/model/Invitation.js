@@ -7,7 +7,7 @@ const InvitationSchema = new mongoose.Schema({
     ref: 'User',
     required: true
   },
-  invitee: {
+  recipient: {
     type: String,
     ref: 'User',
     required: true
