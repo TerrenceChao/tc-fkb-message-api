@@ -53,12 +53,6 @@ RemoveChannelEventHandler.prototype.notifyUser = function (requestInfo) {
       receiver: uid,
       responseEvent: RESPONSE_EVENTS.CHANNEL_REMOVED
     })
-    // .setPacket({
-    //   msgCode: `channel is removed`,
-    //   data: {
-    //     chid
-    //   }
-    // })
     .responsePacket({ chid }, CHANNEL_REMOVED_SUCCESS)
 
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
