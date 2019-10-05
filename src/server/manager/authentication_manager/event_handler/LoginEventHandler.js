@@ -2,7 +2,7 @@ var config = require('config')
 var util = require('util')
 var path = require('path')
 
-const TOKEN = config.get('auth.token')
+// const TOKEN = config.get('auth.token')
 const {
   TO,
   EVENTS,
