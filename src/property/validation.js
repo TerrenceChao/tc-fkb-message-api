@@ -154,6 +154,9 @@ module.exports = {
     },
 
     // MessageManager
+    [EVENTS.PUSH_NOTIFICATION]: function (requestInfo) {
+      return true
+    },
     [EVENTS.SEND_MESSAGE]: function (responseInfo) {
       return responseInfo instanceof ResponseInfo &&
         responseInfo.header != null &&
