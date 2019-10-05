@@ -24,10 +24,10 @@ function RemoveInvitationEventHandler () {
 RemoveInvitationEventHandler.prototype.eventName = EVENTS.REMOVE_INVITATION
 
 RemoveInvitationEventHandler.prototype.handle = function (requestInfo) {
-  if (!this.isValid(requestInfo)) {
-    console.warn(`${this.eventName}: request info is invalid.`)
-    return
-  }
+  // if (!this.isValid(requestInfo)) {
+  //   console.warn(`${this.eventName}: request info is invalid.`)
+  //   return
+  // }
 
   var storageService = this.globalContext['storageService']
   var packet = requestInfo.packet
@@ -65,12 +65,12 @@ RemoveInvitationEventHandler.prototype.notify = function (requestInfo) {
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 }
 
-RemoveInvitationEventHandler.prototype.isValid = function (requestInfo) {
-  var packet = requestInfo.packet
-  return packet !== undefined &&
-    typeof packet.uid === 'string' &&
-    typeof packet.iid === 'string'
-}
+// RemoveInvitationEventHandler.prototype.isValid = function (requestInfo) {
+//   var packet = requestInfo.packet
+//   return packet !== undefined &&
+//     typeof packet.uid === 'string' &&
+//     typeof packet.iid === 'string'
+// }
 
 module.exports = {
   handler: new RemoveInvitationEventHandler()

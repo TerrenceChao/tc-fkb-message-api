@@ -24,10 +24,10 @@ function SendConversationEventHandler () {
 SendConversationEventHandler.prototype.eventName = EVENTS.SEND_CONVERSATION
 
 SendConversationEventHandler.prototype.handle = async function (requestInfo) {
-  if (!this.isValid(requestInfo)) {
-    console.warn(`${this.eventName}: request info is invalid.`)
-    return
-  }
+  // if (!this.isValid(requestInfo)) {
+  //   console.warn(`${this.eventName}: request info is invalid.`)
+  //   return
+  // }
 
   var storageService = this.globalContext['storageService']
   var socket = requestInfo.socket
@@ -92,14 +92,14 @@ SendConversationEventHandler.prototype.executeSend = function (datetime, request
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 }
 
-SendConversationEventHandler.prototype.isValid = function (requestInfo) {
-  var packet = requestInfo.packet
-  return packet !== undefined &&
-    packet.chid != null &&
-    typeof packet.uid === 'string' &&
-    packet.content != null &&
-    packet.convType != null
-}
+// SendConversationEventHandler.prototype.isValid = function (requestInfo) {
+//   var packet = requestInfo.packet
+//   return packet !== undefined &&
+//     packet.chid != null &&
+//     typeof packet.uid === 'string' &&
+//     packet.content != null &&
+//     packet.convType != null
+// }
 
 module.exports = {
   handler: new SendConversationEventHandler()

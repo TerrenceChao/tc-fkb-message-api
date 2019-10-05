@@ -19,10 +19,10 @@ function SendMessageEventHandler () {
 SendMessageEventHandler.prototype.eventName = EVENTS.SEND_MESSAGE
 
 SendMessageEventHandler.prototype.handle = function (responseInfo) {
-  if (!this.isValid(responseInfo)) {
-    console.warn(`${this.eventName}: response info is invalid.`)
-    return
-  }
+  // if (!this.isValid(responseInfo)) {
+  //   console.warn(`${this.eventName}: response info is invalid.`)
+  //   return
+  // }
 
   var header = responseInfo.header
   var packet = responseInfo.packet
@@ -97,14 +97,14 @@ SendMessageEventHandler.prototype.handle = function (responseInfo) {
 //   }
 // }
 
-SendMessageEventHandler.prototype.isValid = function (responseInfo) {
-  return responseInfo instanceof ResponseInfo &&
-    responseInfo.header != null &&
-    typeof responseInfo.header.protocol === 'string' &&
-    typeof responseInfo.header.to === 'string' &&
-    (typeof responseInfo.header.receiver === 'string' || Array.isArray(responseInfo.header.receiver)) &&
-    (typeof responseInfo.header.responseEvent === 'string' || Array.isArray(responseInfo.header.responseEvent))
-}
+// SendMessageEventHandler.prototype.isValid = function (responseInfo) {
+//   return responseInfo instanceof ResponseInfo &&
+//     responseInfo.header != null &&
+//     typeof responseInfo.header.protocol === 'string' &&
+//     typeof responseInfo.header.to === 'string' &&
+//     (typeof responseInfo.header.receiver === 'string' || Array.isArray(responseInfo.header.receiver)) &&
+//     (typeof responseInfo.header.responseEvent === 'string' || Array.isArray(responseInfo.header.responseEvent))
+// }
 
 module.exports = {
   handler: new SendMessageEventHandler()

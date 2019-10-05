@@ -26,10 +26,10 @@ function DealWithInvitationEventHandler () {
 DealWithInvitationEventHandler.prototype.eventName = EVENTS.DEAL_WITH_INVITATION
 
 DealWithInvitationEventHandler.prototype.handle = function (requestInfo) {
-  if (!this.isValid(requestInfo)) {
-    console.warn(`${this.eventName}: request info is invalid.`)
-    return
-  }
+  // if (!this.isValid(requestInfo)) {
+  //   console.warn(`${this.eventName}: request info is invalid.`)
+  //   return
+  // }
 
   var businessEvent = this.globalContext['businessEvent']
   var storageService = this.globalContext['storageService']
@@ -98,14 +98,14 @@ DealWithInvitationEventHandler.prototype.broadcastRecipientCanceled = function (
   return requestInfo
 }
 
-DealWithInvitationEventHandler.prototype.isValid = function (requestInfo) {
-  var packet = requestInfo.packet
-  return packet !== undefined &&
-    typeof packet.targetUid === 'string' &&
-    typeof packet.nickname === 'string' &&
-    typeof packet.iid === 'string' &&
-    typeof packet.dealWith === 'string'
-}
+// DealWithInvitationEventHandler.prototype.isValid = function (requestInfo) {
+//   var packet = requestInfo.packet
+//   return packet !== undefined &&
+//     typeof packet.targetUid === 'string' &&
+//     typeof packet.nickname === 'string' &&
+//     typeof packet.iid === 'string' &&
+//     typeof packet.dealWith === 'string'
+// }
 
 module.exports = {
   handler: new DealWithInvitationEventHandler()

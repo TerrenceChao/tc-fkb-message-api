@@ -23,10 +23,10 @@ function UserOfflineEventHandler () {
 UserOfflineEventHandler.prototype.eventName = EVENTS.USER_OFFLINE
 
 UserOfflineEventHandler.prototype.handle = function (requestInfo) {
-  if (!this.isValid(requestInfo)) {
-    console.warn(`${this.eventName}`, `request info is invalid`)
-    return
-  }
+  // if (!this.isValid(requestInfo)) {
+  //   console.warn(`${this.eventName}`, `request info is invalid`)
+  //   return
+  // }
 
   var socketService = this.globalContext['socketService']
   var businessEvent = this.globalContext['businessEvent']
@@ -56,10 +56,10 @@ UserOfflineEventHandler.prototype.handle = function (requestInfo) {
   socketService.dissociateUser(socket.id, uid)
 }
 
-UserOfflineEventHandler.prototype.isValid = function (requestInfo) {
-  return requestInfo.packet != null &&
-    requestInfo.packet.uid != null
-}
+// UserOfflineEventHandler.prototype.isValid = function (requestInfo) {
+//   return requestInfo.packet != null &&
+//     requestInfo.packet.uid != null
+// }
 
 module.exports = {
   handler: new UserOfflineEventHandler()

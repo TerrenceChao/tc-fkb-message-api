@@ -23,10 +23,10 @@ function UserOnlineEventHandler () {
 UserOnlineEventHandler.prototype.eventName = EVENTS.USER_ONLINE
 
 UserOnlineEventHandler.prototype.handle = function (requestInfo) {
-  if (!this.isValid(requestInfo)) {
-    console.warn(`${this.eventName}: request info is invalid.`)
-    return
-  }
+  // if (!this.isValid(requestInfo)) {
+  //   console.warn(`${this.eventName}: request info is invalid.`)
+  //   return
+  // }
 
   var socketService = this.globalContext['socketService']
   var businessEvent = this.globalContext['businessEvent']
@@ -56,10 +56,10 @@ UserOnlineEventHandler.prototype.handle = function (requestInfo) {
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 }
 
-UserOnlineEventHandler.prototype.isValid = function (requestInfo) {
-  return requestInfo.packet != null &&
-    requestInfo.packet.uid != null
-}
+// UserOnlineEventHandler.prototype.isValid = function (requestInfo) {
+//   return requestInfo.packet != null &&
+//     requestInfo.packet.uid != null
+// }
 
 module.exports = {
   handler: new UserOnlineEventHandler()

@@ -24,10 +24,10 @@ function ChannelOfflineEventHandler () {
 ChannelOfflineEventHandler.prototype.eventName = EVENTS.CHANNEL_OFFLINE
 
 ChannelOfflineEventHandler.prototype.handle = function (requestInfo) {
-  if (!this.isValid(requestInfo)) {
-    console.warn(`${this.eventName}`, `request info is invalid`)
-    return
-  }
+  // if (!this.isValid(requestInfo)) {
+  //   console.warn(`${this.eventName}`, `request info is invalid`)
+  //   return
+  // }
 
   var storageService = this.globalContext['storageService']
   var uid = requestInfo.packet.uid
@@ -71,10 +71,10 @@ ChannelOfflineEventHandler.prototype.broadcast = function (channelIds, requestIn
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 }
 
-ChannelOfflineEventHandler.prototype.isValid = function (requestInfo) {
-  return requestInfo.packet != null &&
-    requestInfo.packet.uid != null
-}
+// ChannelOfflineEventHandler.prototype.isValid = function (requestInfo) {
+//   return requestInfo.packet != null &&
+//     requestInfo.packet.uid != null
+// }
 
 module.exports = {
   handler: new ChannelOfflineEventHandler()

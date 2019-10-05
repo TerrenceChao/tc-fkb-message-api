@@ -32,7 +32,7 @@ module.exports = {
       content: `required`
     },
   },
-  SOCKET: {
+  ALL: {
     // AuthenticationManager
     [EVENTS.LOGIN]: function (requestInfo) {
       var packet = requestInfo.packet
@@ -113,7 +113,7 @@ module.exports = {
         packet.content != null &&
         packet.convType != null
     },
-    [EVENTS.GET_CONVERSATION]: function (requestInfo) {
+    [EVENTS.GET_CONVERSATION_LIST]: function (requestInfo) {
       var packet = requestInfo.packet
       return packet !== undefined &&
         typeof packet.uid === 'string' &&

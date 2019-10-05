@@ -25,10 +25,10 @@ function LeaveChannelEventHandler () {
 LeaveChannelEventHandler.prototype.eventName = EVENTS.LEAVE_CHANNEL
 
 LeaveChannelEventHandler.prototype.handle = function (requestInfo) {
-  if (!this.isValid(requestInfo)) {
-    console.warn(`${this.eventName}: request info is invalid.`)
-    return
-  }
+  // if (!this.isValid(requestInfo)) {
+  //   console.warn(`${this.eventName}: request info is invalid.`)
+  //   return
+  // }
 
   var businessEvent = this.globalContext['businessEvent']
   var storageService = this.globalContext['storageService']
@@ -107,13 +107,13 @@ LeaveChannelEventHandler.prototype.broadcastUserHasLeft = function (channelInfo,
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 }
 
-LeaveChannelEventHandler.prototype.isValid = function (requestInfo) {
-  var packet = requestInfo.packet
-  return packet !== undefined &&
-    typeof packet.targetUid === 'string' &&
-    typeof packet.nickname === 'string' &&
-    typeof packet.chid === 'string'
-}
+// LeaveChannelEventHandler.prototype.isValid = function (requestInfo) {
+//   var packet = requestInfo.packet
+//   return packet !== undefined &&
+//     typeof packet.targetUid === 'string' &&
+//     typeof packet.nickname === 'string' &&
+//     typeof packet.chid === 'string'
+// }
 
 module.exports = {
   handler: new LeaveChannelEventHandler()

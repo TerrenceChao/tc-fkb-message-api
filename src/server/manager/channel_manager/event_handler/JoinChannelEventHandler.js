@@ -24,10 +24,10 @@ function JoinChannelEventHandler () {
 JoinChannelEventHandler.prototype.eventName = EVENTS.JOIN_CHANNEL
 
 JoinChannelEventHandler.prototype.handle = function (requestInfo) {
-  if (!this.isValid(requestInfo)) {
-    console.warn(`${this.eventName}: request info is invalid.`)
-    return
-  }
+  // if (!this.isValid(requestInfo)) {
+  //   console.warn(`${this.eventName}: request info is invalid.`)
+  //   return
+  // }
 
   var storageService = this.globalContext['storageService']
   var packet = requestInfo.packet
@@ -98,13 +98,13 @@ JoinChannelEventHandler.prototype.broadcastRecipientJoined = function (channelIn
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 }
 
-JoinChannelEventHandler.prototype.isValid = function (requestInfo) {
-  var packet = requestInfo.packet
-  return packet !== undefined &&
-    typeof packet.targetUid === 'string' &&
-    typeof packet.nickname === 'string' &&
-    typeof packet.chid === 'string'
-}
+// JoinChannelEventHandler.prototype.isValid = function (requestInfo) {
+//   var packet = requestInfo.packet
+//   return packet !== undefined &&
+//     typeof packet.targetUid === 'string' &&
+//     typeof packet.nickname === 'string' &&
+//     typeof packet.chid === 'string'
+// }
 
 module.exports = {
   handler: new JoinChannelEventHandler()

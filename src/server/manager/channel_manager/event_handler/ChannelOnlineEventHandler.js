@@ -24,10 +24,10 @@ function ChannelOnlineEventHandler () {
 ChannelOnlineEventHandler.prototype.eventName = EVENTS.CHANNEL_ONLINE
 
 ChannelOnlineEventHandler.prototype.handle = function (requestInfo) {
-  if (!this.isValid(requestInfo)) {
-    console.warn(`${this.eventName}: request info is invalid.`)
-    return
-  }
+  // if (!this.isValid(requestInfo)) {
+  //   console.warn(`${this.eventName}: request info is invalid.`)
+  //   return
+  // }
 
   var storageService = this.globalContext['storageService']
   var uid = requestInfo.packet.uid
@@ -73,10 +73,10 @@ ChannelOnlineEventHandler.prototype.broadcast = function (channelIds, requestInf
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 }
 
-ChannelOnlineEventHandler.prototype.isValid = function (requestInfo) {
-  return requestInfo.packet != null &&
-    requestInfo.packet.uid != null
-}
+// ChannelOnlineEventHandler.prototype.isValid = function (requestInfo) {
+//   return requestInfo.packet != null &&
+//     requestInfo.packet.uid != null
+// }
 
 module.exports = {
   handler: new ChannelOnlineEventHandler()

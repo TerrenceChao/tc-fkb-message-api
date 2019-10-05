@@ -27,10 +27,10 @@ function SendInvitationEventHandler () {
 SendInvitationEventHandler.prototype.eventName = EVENTS.SEND_INVITATION
 
 SendInvitationEventHandler.prototype.handle = function (requestInfo) {
-  if (!this.isValid(requestInfo)) {
-    console.warn(`${this.eventName}: request info is invalid.`)
-    return
-  }
+  // if (!this.isValid(requestInfo)) {
+  //   console.warn(`${this.eventName}: request info is invalid.`)
+  //   return
+  // }
 
   var storageService = this.globalContext['storageService']
   var packet = requestInfo.packet
@@ -130,15 +130,15 @@ SendInvitationEventHandler.prototype.sendInvitations = function (invitationList,
   })
 }
 
-SendInvitationEventHandler.prototype.isValid = function (requestInfo) {
-  return (
-    requestInfo.packet != null &&
-    requestInfo.packet.inviter != null &&
-    Array.isArray(requestInfo.packet.recipients) &&
-    typeof requestInfo.packet.chid === 'string' &&
-    requestInfo.packet.content != null
-  )
-}
+// SendInvitationEventHandler.prototype.isValid = function (requestInfo) {
+//   return (
+//     requestInfo.packet != null &&
+//     requestInfo.packet.inviter != null &&
+//     Array.isArray(requestInfo.packet.recipients) &&
+//     typeof requestInfo.packet.chid === 'string' &&
+//     requestInfo.packet.content != null
+//   )
+// }
 
 module.exports = {
   handler: new SendInvitationEventHandler()

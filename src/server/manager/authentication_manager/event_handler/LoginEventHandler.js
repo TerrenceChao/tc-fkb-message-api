@@ -27,10 +27,10 @@ function LoginEventHandler () {
 LoginEventHandler.prototype.eventName = EVENTS.LOGIN
 
 LoginEventHandler.prototype.handle = async function (requestInfo) {
-  if (!this.isValid(requestInfo)) {
-    console.warn(`${this.eventName}: request info is invalid.`)
-    return
-  }
+  // if (!this.isValid(requestInfo)) {
+  //   console.warn(`${this.eventName}: request info is invalid.`)
+  //   return
+  // }
 
   var authService = this.globalContext['authService']
   var businessEvent = this.globalContext['businessEvent']
@@ -99,15 +99,15 @@ LoginEventHandler.prototype.sendChannelInfoAndConversations = function (userChan
     })
 }
 
-LoginEventHandler.prototype.isValid = function (requestInfo) {
-  var packet = requestInfo.packet
-  return packet !== undefined &&
-    typeof packet.sessionId === 'string' &&
-    typeof packet[TOKEN] === 'string' &&
-    typeof packet.uid === 'string' &&
-    packet.inviLimit != null &&
-    packet.chanLimit != null
-}
+// LoginEventHandler.prototype.isValid = function (requestInfo) {
+//   var packet = requestInfo.packet
+//   return packet !== undefined &&
+//     typeof packet.sessionId === 'string' &&
+//     typeof packet[TOKEN] === 'string' &&
+//     typeof packet.uid === 'string' &&
+//     packet.inviLimit != null &&
+//     packet.chanLimit != null
+// }
 
 module.exports = {
   handler: new LoginEventHandler()
