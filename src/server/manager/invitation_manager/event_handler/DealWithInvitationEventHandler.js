@@ -26,6 +26,7 @@ DealWithInvitationEventHandler.prototype.handle = function (requestInfo) {
   }
 
   var storageService = this.globalContext['storageService']
+  var businessEvent = this.globalContext['businessEvent']
   var packet = requestInfo.packet
   var iid = packet.iid
   var dealWith = packet.dealWith.toLowerCase()
@@ -33,30 +34,34 @@ DealWithInvitationEventHandler.prototype.handle = function (requestInfo) {
   Promise.resolve(storageService.getInvitation(iid))
     .then(invitation => {
       if (dealWith === 'y') {
-        this.triggerJoinChannelEvent(invitation, requestInfo)
+        this.joinChannel(invitation, requestInfo)
       } else {
-        this.broadcastUserHasCanceled(invitation, requestInfo)
-        this.confirmToCancelInvitation(invitation, requestInfo)
+        this.broadcastRecipientCanceled(invitation, requestInfo)
       }
-    }, err => this.alertException(err.message, requestInfo))
+      return true
+    })
+    // [BUG] 當 dealWith === 'y', 執行 joinChannel, 無法刪除 invitation.
+    // dealWith !== 'y' 卻可以成功刪除！
+    .then(() => businessEvent.emit(EVENTS.REMOVE_INVITATION, requestInfo),
+      err => this.alertException(err.message, requestInfo))
 }
 
-DealWithInvitationEventHandler.prototype.triggerJoinChannelEvent = function (invitation, requestInfo) {
+DealWithInvitationEventHandler.prototype.joinChannel = function (invitation, requestInfo) {
   var businessEvent = this.globalContext['businessEvent']
   var packet = requestInfo.packet
-  var uid = packet.uid
+  var targetUid = packet.targetUid
   var nickname = packet.nickname
 
   businessEvent.emit(
     BUSINESS_EVENTS.JOIN_CHANNEL,
     requestInfo.setPacket({
-      uid,
+      targetUid,
       nickname,
       chid: invitation.sensitive.chid
     }))
 }
 
-DealWithInvitationEventHandler.prototype.broadcastUserHasCanceled = function (invitation, requestInfo) {
+DealWithInvitationEventHandler.prototype.broadcastRecipientCanceled = function (invitation, requestInfo) {
   var businessEvent = this.globalContext['businessEvent']
   var packet = requestInfo.packet
 
@@ -64,41 +69,22 @@ DealWithInvitationEventHandler.prototype.broadcastUserHasCanceled = function (in
     .assignProtocol(requestInfo)
     .setHeader({
       to: TO.CHANNEL,
-      receiver: invitation.sensitive.ciid,
+      receiver: invitation.sensitive.chid,
       responseEvent: RESPONSE_EVENTS.CONVERSATION_FROM_CHANNEL // notify in channel
     })
     .setPacket({
-      msgCode: `${packet.nickname} is canceled`
-    })
-  businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
-}
-
-DealWithInvitationEventHandler.prototype.confirmToCancelInvitation = function (invitation, requestInfo) {
-  var businessEvent = this.globalContext['businessEvent']
-  var packet = requestInfo.packet
-
-  var resInfo = new ResponseInfo()
-    .assignProtocol(requestInfo)
-    .setHeader({
-      to: TO.USER,
-      receiver: packet.uid,
-      responseEvent: RESPONSE_EVENTS.PERSONAL_INFO
-    })
-    .setPacket({
-      msgCode: `I'am canceled to join channel`,
+      msgCode: `${packet.nickname} is canceled`,
       data: {
-        uid: packet.uid,
-        iid: packet.iid
+        uid: packet.targetUid
       }
     })
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
-  businessEvent.emit(EVENTS.CONFIRM_INVITATION, requestInfo)
 }
 
 DealWithInvitationEventHandler.prototype.isValid = function (requestInfo) {
   var packet = requestInfo.packet
   return packet !== undefined &&
-    typeof packet.uid === 'string' &&
+    typeof packet.targetUid === 'string' &&
     typeof packet.nickname === 'string' &&
     typeof packet.iid === 'string' &&
     typeof packet.dealWith === 'string'

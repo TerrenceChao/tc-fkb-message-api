@@ -24,13 +24,15 @@ UserOnlineEventHandler.prototype.handle = function (requestInfo) {
     return
   }
 
-  var socketServer = this.globalContext['socketServer']
+  var socketService = this.globalContext['socketService']
   var businessEvent = this.globalContext['businessEvent']
   var socket = requestInfo.socket
   var packet = requestInfo.packet
   var uid = packet.uid
 
-  socketServer.of('/').adapter.remoteJoin(socket.id, uid)
+  // socketServer.of('/').adapter.remoteJoin(socket.id, uid)
+  // socketService.join(socket.id, uid)
+  socketService.associateUser(socket.id, uid)
 
   var resInfo = new ResponseInfo()
     .assignProtocol(requestInfo)
@@ -40,7 +42,10 @@ UserOnlineEventHandler.prototype.handle = function (requestInfo) {
       responseEvent: RESPONSE_EVENTS.PERSONAL_INFO
     })
     .setPacket({
-      msgCode: `user is online`
+      msgCode: `user is online`,
+      data: {
+        uid
+      }
     })
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 }

@@ -30,7 +30,7 @@ CreateChannelEventHandler.prototype.handle = function (requestInfo) {
 
   /**
    * 待優化？
-   * client 可以自定義 ciid, chid 先建立 channel, 事後再透過 DB 建立紀錄
+   * client 可以自定義 chid 先建立 channel, 事後再透過 DB 建立紀錄
    * [NOTE] 那如果沒接收到 DB 建立成功的訊息？
    *
    * 結論：
@@ -44,11 +44,16 @@ CreateChannelEventHandler.prototype.handle = function (requestInfo) {
 }
 
 CreateChannelEventHandler.prototype.enterChannel = function (channelInfo, requestInfo) {
-  var socketServer = this.globalContext['socketServer']
-  var socket = requestInfo.socket
+  var socketService = this.globalContext['socketService']
+  // var socket = requestInfo.socket
+  // socketServer.of('/').adapter.remoteJoin(socket.id, channelInfo.chid)
+  // socketService.join(socket.id, channelInfo.chid)
 
-  socketServer.of('/').adapter.remoteJoin(socket.id, channelInfo.ciid)
-  this.sendChannelInfoToUser(channelInfo, requestInfo)
+  socketService.joinChannelSync(
+    () => this.sendChannelInfoToUser(channelInfo, requestInfo),
+    requestInfo.packet.uid,
+    channelInfo.chid
+  )
 }
 
 CreateChannelEventHandler.prototype.sendChannelInfoToUser = function (channelInfo, requestInfo) {

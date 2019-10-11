@@ -33,17 +33,26 @@ ChannelOfflineEventHandler.prototype.handle = function (requestInfo) {
 }
 
 ChannelOfflineEventHandler.prototype.leaveChannels = function (channelIds, requestInfo) {
-  this.broadcast(channelIds, requestInfo)
+  if (channelIds.length === 0) {
+    return
+  }
 
-  var socketServer = this.globalContext['socketServer']
-  var socket = requestInfo.socket
-  channelIds.forEach(ciid => {
-    socketServer.of('/').adapter.remoteLeave(socket.id, ciid)
-  })
+  this.broadcast(channelIds, requestInfo)
+  // // var socket = requestInfo.socket
+  // // channelIds.forEach(chid => {
+  // //   socketServer.of('/').adapter.remoteLeave(socket.id, chid)
+  // // })
+  // socketService.collectiveLeave(socket.id, channelIds)
+  this.globalContext['socketService'].offlineChannelList(
+    requestInfo.packet.uid,
+    channelIds
+  )
 }
 
 ChannelOfflineEventHandler.prototype.broadcast = function (channelIds, requestInfo) {
   var businessEvent = this.globalContext['businessEvent']
+  var uid = requestInfo.packet.uid
+
   var resInfo = new ResponseInfo()
     .assignProtocol(requestInfo)
     .setHeader({
@@ -52,7 +61,10 @@ ChannelOfflineEventHandler.prototype.broadcast = function (channelIds, requestIn
       responseEvent: RESPONSE_EVENTS.CONVERSATION_FROM_CHANNEL
     })
     .setPacket({
-      msgCode: `user: ${requestInfo.packet.uid} is offline`
+      msgCode: `user: ${uid} is offline`,
+      data: {
+        uid
+      }
     })
 
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)

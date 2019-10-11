@@ -7,10 +7,9 @@ var ChannelInfo = require(path.join(config.get('database.nosql.model'), 'Channel
 function getAttributes (doc) {
   return {
     chid: doc._id.toString(),
-    ciid: doc.ciid,
     name: doc.name,
     creator: doc.creator,
-    invitees: doc.invitees,
+    recipients: doc.recipients,
     members: doc.members,
     latestSpoke: doc.latestSpoke
   }
@@ -21,7 +20,6 @@ function ChannelInfoRepository () {}
 ChannelInfoRepository.prototype.create = async function (uid, channelName) {
   var now = Date.now()
   var channelInfo = await new ChannelInfo({
-    ciid: uuidv4(),
     name: channelName,
     creator: uid,
     members: [uid],
@@ -35,7 +33,7 @@ ChannelInfoRepository.prototype.create = async function (uid, channelName) {
 }
 
 ChannelInfoRepository.prototype.findOne = async function (query) {
-  if (typeof query.chid !== 'string' && typeof query.ciid !== 'string') {
+  if (typeof query.chid !== 'string') {
     throw TypeError('ChannelInfoRepository.findOne: param(s) of query is(are) wrong')
   }
 
@@ -45,23 +43,39 @@ ChannelInfoRepository.prototype.findOne = async function (query) {
   return getAttributes(channelInfo)
 }
 
-ChannelInfoRepository.prototype.getListByCiids = async function (ciids, limit, skip = 0, sort = 'DESC') {
+ChannelInfoRepository.prototype.findOneByUser = async function (query) {
+  if (typeof query.uid !== 'string' && typeof query.chid !== 'string') {
+    throw TypeError('ChannelInfoRepository.findOneByUser: param(s) of query is(are) wrong')
+  }
+
+  var uid = query.uid
+  delete query.uid
+  query._id = query.chid
+  delete query.chid
+
+  var chInfo = await ChannelInfo.findOne(query)
+
+  var targetUserId = chInfo.members.find((member) => uid === member)
+  return targetUserId === undefined ? [] : getAttributes(chInfo)
+}
+
+ChannelInfoRepository.prototype.getListByChids = async function (chids, limit, skip = 0, sort = 'DESC') {
   var list = await ChannelInfo.find({
-    ciid: {
-      $in: ciids
+    _id: {
+      $in: chids
     }
   })
     .sort({
       latestSpoke: sort.toLowerCase()
     })
-    .select(['chid', 'ciid', 'name', 'creator', 'invitees', 'members', 'latestSpoke'])
+    .select(['chid', 'name', 'creator', 'recipients', 'members', 'latestSpoke'])
     .limit(limit)
     .skip(skip)
 
   return list.map(doc => getAttributes(doc))
 }
 
-ChannelInfoRepository.prototype.appendInviteeAndReturn = async function (chid, uid) {
+ChannelInfoRepository.prototype.appendRecipientAndReturn = async function (chid, uid) {
   const returnNewDoc = {
     new: true
   }
@@ -71,7 +85,7 @@ ChannelInfoRepository.prototype.appendInviteeAndReturn = async function (chid, u
     _id: chid
   }, {
     '$addToSet': {
-      'invitees': uid
+      'recipients': uid
     },
     updatedAt: now
   }, returnNewDoc)
@@ -79,7 +93,7 @@ ChannelInfoRepository.prototype.appendInviteeAndReturn = async function (chid, u
   return getAttributes(refreshedChInfo)
 }
 
-ChannelInfoRepository.prototype.removeInviteeAndReturn = async function (chid, uid) {
+ChannelInfoRepository.prototype.removeRecipientAndReturn = async function (chid, uid) {
   const returnNewDoc = {
     new: true
   }
@@ -89,7 +103,7 @@ ChannelInfoRepository.prototype.removeInviteeAndReturn = async function (chid, u
     _id: chid
   }, {
     '$pull': {
-      'invitees': uid
+      'recipients': uid
     },
     updatedAt: now
   }, returnNewDoc)
@@ -107,7 +121,7 @@ ChannelInfoRepository.prototype.appendMemberAndReturn = async function (chid, ui
     _id: chid
   }, {
     '$pull': {
-      'invitees': uid
+      'recipients': uid
     },
     '$addToSet': {
       'members': uid
@@ -136,17 +150,17 @@ ChannelInfoRepository.prototype.removeMemberAndReturn = async function (chid, ui
   return getAttributes(refreshedChInfo)
 }
 
-ChannelInfoRepository.prototype.removeByCiid = async function (ciid) {
+ChannelInfoRepository.prototype.removeByChid = async function (chid) {
   var confirm = await ChannelInfo.deleteOne({
-    ciid
+    chid
   })
 
   return confirm.n === 1 && confirm.ok === 1
 }
 
-ChannelInfoRepository.prototype.updateLatestSpoke = async function (ciid, latestSpoke) {
+ChannelInfoRepository.prototype.updateLatestSpoke = async function (chid, latestSpoke) {
   var confirm = await ChannelInfo.updateOne({
-    ciid
+    chid
   }, {
     latestSpoke,
     updatedAt: Date.now()

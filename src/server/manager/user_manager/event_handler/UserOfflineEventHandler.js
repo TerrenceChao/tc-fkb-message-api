@@ -24,7 +24,7 @@ UserOfflineEventHandler.prototype.handle = function (requestInfo) {
     return
   }
 
-  var socketServer = this.globalContext['socketServer']
+  var socketService = this.globalContext['socketService']
   var businessEvent = this.globalContext['businessEvent']
   var socket = requestInfo.socket
   var packet = requestInfo.packet
@@ -38,11 +38,16 @@ UserOfflineEventHandler.prototype.handle = function (requestInfo) {
       responseEvent: RESPONSE_EVENTS.PERSONAL_INFO
     })
     .setPacket({
-      msgCode: `user is offline`
+      msgCode: `user is offline`,
+      data: {
+        uid
+      }
     })
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 
-  socketServer.of('/').adapter.remoteLeave(socket.id, uid)
+  // socketServer.of('/').adapter.remoteLeave(socket.id, uid)
+  // socketService.leave(socket.id, uid)
+  socketService.dissociateUser(socket.id, uid)
 }
 
 UserOfflineEventHandler.prototype.isValid = function (requestInfo) {
