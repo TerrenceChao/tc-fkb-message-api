@@ -11,8 +11,12 @@ const {
   EVENTS,
   RESPONSE_EVENTS
 } = require(path.join(config.get('src.property'), 'property'))
+const RES_META = require(path.join(config.get('src.property'), 'messageStatus')).SOCKET
 var ResponseInfo = require(path.join(config.get('src.manager'), 'ResponseInfo'))
 var EventHandler = require(path.join(config.get('src.manager'), 'EventHandler'))
+
+const VALIDITY_EXTENDED_SUCCESS = RES_META.VALIDITY_EXTENDED_SUCCESS
+
 
 util.inherits(ExtendValidityEventHandler, EventHandler)
 
@@ -36,7 +40,7 @@ ExtendValidityEventHandler.prototype.handle = async function (requestInfo) {
 
   if (authService.isAuthenticated(packet)) {
     console.log(`token is still valid`)
-    this.alertException(`token is still valid`, requestInfo)
+    this.alertException(`XXXXXX token is still valid XXXXXX`, requestInfo)
     socket.disconnect(true)
     return
   }
@@ -44,7 +48,7 @@ ExtendValidityEventHandler.prototype.handle = async function (requestInfo) {
   // var secret = await storageService.getUserValidateInfo(packet.uid)
   // if (authService.isValidCert(packet, secret) === false) {
   //   console.log(`refresh token is invalid`)
-  //   this.alertException(`refresh token is invalid`, requestInfo)
+  //   this.alertException(`XXXXXX refresh token is invalid XXXXXX`, requestInfo)
   //   socket.disconnect(true)
   //   return
   // }
@@ -70,13 +74,10 @@ ExtendValidityEventHandler.prototype.sendValidationToUser = function (token, ref
       receiver: packet.uid,
       responseEvent: RESPONSE_EVENTS.REFRESHED_TOKEN
     })
-    .setPacket({
-      msgCode: `extend validity`,
-      data: {
-        [TOKEN]: token,
-        [REFRESH_TOKEN]: refreshToken
-      }
-    })
+    .responsePacket({
+      [TOKEN]: token,
+      [REFRESH_TOKEN]: refreshToken
+    }, VALIDITY_EXTENDED_SUCCESS)
 
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 }

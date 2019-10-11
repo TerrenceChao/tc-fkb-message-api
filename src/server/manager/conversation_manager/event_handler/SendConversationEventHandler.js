@@ -7,8 +7,13 @@ const {
   EVENTS,
   RESPONSE_EVENTS
 } = require(path.join(config.get('src.property'), 'property'))
+const RES_META = require(path.join(config.get('src.property'), 'messageStatus')).SOCKET
 var ResponseInfo = require(path.join(config.get('src.manager'), 'ResponseInfo'))
 var EventHandler = require(path.join(config.get('src.manager'), 'EventHandler'))
+
+const CONVERSATION_SENT_SUCCESS = RES_META.CONVERSATION_SENT_SUCCESS
+var respondErr = RES_META.SAVE_CONVERSATION_ERR
+
 
 util.inherits(SendConversationEventHandler, EventHandler)
 
@@ -19,10 +24,10 @@ function SendConversationEventHandler () {
 SendConversationEventHandler.prototype.eventName = EVENTS.SEND_CONVERSATION
 
 SendConversationEventHandler.prototype.handle = async function (requestInfo) {
-  if (!this.isValid(requestInfo)) {
-    console.warn(`${this.eventName}: request info is invalid.`)
-    return
-  }
+  // if (!this.isValid(requestInfo)) {
+  //   console.warn(`${this.eventName}: request info is invalid.`)
+  //   return
+  // }
 
   var storageService = this.globalContext['storageService']
   var socket = requestInfo.socket
@@ -48,7 +53,7 @@ SendConversationEventHandler.prototype.handle = async function (requestInfo) {
   try {
     await storageService.conversationCreated(chid, uid, content, convType, datetime)
   } catch (err) {
-    this.alertException(err.message, requestInfo, responseHeader)
+    this.alertException(respondErr(err), requestInfo, responseHeader)
   }
 }
 
@@ -63,29 +68,38 @@ SendConversationEventHandler.prototype.executeSend = function (datetime, request
   var resInfo = new ResponseInfo()
     .assignProtocol(requestInfo)
     .setHeader(responseHeader)
-    .setPacket({
-      msgCode: `conversation type: ${type}`,
-      data: {
-        // apply "chid" to make things easy at frontend
-        chid,
-        sender: uid,
-        content,
-        type,
-        datetime
-      }
-    })
+    // .setPacket({
+    //   msgCode: `conversation type: ${type}`,
+    //   data: {
+    //     // apply "chid" to make things easy at frontend
+    //     chid,
+    //     sender: uid,
+    //     content,
+    //     type,
+    //     datetime
+    //   }
+    // })
+    .responsePacket({
+      // apply "chid" to make things easy at frontend
+      chid,
+      sender: uid,
+      content,
+      type,
+      datetime
+    }, CONVERSATION_SENT_SUCCESS)
+    .responseMsg(`conversation sent as type: ${type}`)
 
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 }
 
-SendConversationEventHandler.prototype.isValid = function (requestInfo) {
-  var packet = requestInfo.packet
-  return packet !== undefined &&
-    packet.chid != null &&
-    typeof packet.uid === 'string' &&
-    packet.content != null &&
-    packet.convType != null
-}
+// SendConversationEventHandler.prototype.isValid = function (requestInfo) {
+//   var packet = requestInfo.packet
+//   return packet !== undefined &&
+//     packet.chid != null &&
+//     typeof packet.uid === 'string' &&
+//     packet.content != null &&
+//     packet.convType != null
+// }
 
 module.exports = {
   handler: new SendConversationEventHandler()

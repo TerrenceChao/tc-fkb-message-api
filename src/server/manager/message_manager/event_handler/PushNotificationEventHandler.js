@@ -8,8 +8,12 @@ const {
   EVENTS,
   RESPONSE_EVENTS
 } = require(path.join(config.get('src.property'), 'property'))
+const RES_META = require(path.join(config.get('src.property'), 'messageStatus')).SOCKET
 var EventHandler = require(path.join(config.get('src.manager'), 'EventHandler'))
 var ResponseInfo = require(path.join(config.get('src.manager'), 'ResponseInfo'))
+
+const NOTIFICATION_PUSHED_INFO = RES_META.NOTIFICATION_PUSHED_INFO
+
 
 util.inherits(PushNotificationEventHandler, EventHandler)
 
@@ -45,14 +49,15 @@ PushNotificationEventHandler.prototype.emitNotification = function (reqInfo, rec
   var responseInfo = new ResponseInfo()
     .assignProtocol(reqInfo)
     .setHeader({
-      to: TO.CHANNEL,
+      to: TO.USER,
       receiver: receiver.uid,
       responseEvent: RESPONSE_EVENTS.NOTIFICATION_PUSHED
     })
-    .setPacket({
-      msgCode: `notification pushed`,
-      data: notificationPacket
-    })
+    // .setPacket({
+    //   msgCode: `notification pushed`,
+    //   data: notificationPacket
+    // })
+    .responsePacket(notificationPacket, NOTIFICATION_PUSHED_INFO)
   
   this.globalContext['businessEvent'].emit(EVENTS.SEND_MESSAGE, responseInfo)
   return true

@@ -8,8 +8,15 @@ const {
   EVENTS,
   RESPONSE_EVENTS
 } = require(path.join(config.get('src.property'), 'property'))
+const RES_META = require(path.join(config.get('src.property'), 'messageStatus')).SOCKET
 var ResponseInfo = require(path.join(config.get('src.manager'), 'ResponseInfo'))
 var EventHandler = require(path.join(config.get('src.manager'), 'EventHandler'))
+
+const HAS_INVITED_INFO = RES_META.HAS_INVITED_INFO
+const INVITATION_RECEIVED_INFO = RES_META.INVITATION_RECEIVED_INFO
+var respondDBErr = RES_META.CHANNEL_OR_INVITATION_DB_ERR
+var respondSendErr = RES_META.SEND_INVITATION_ERR
+
 
 util.inherits(SendInvitationEventHandler, EventHandler)
 
@@ -20,10 +27,10 @@ function SendInvitationEventHandler () {
 SendInvitationEventHandler.prototype.eventName = EVENTS.SEND_INVITATION
 
 SendInvitationEventHandler.prototype.handle = function (requestInfo) {
-  if (!this.isValid(requestInfo)) {
-    console.warn(`${this.eventName}: request info is invalid.`)
-    return
-  }
+  // if (!this.isValid(requestInfo)) {
+  //   console.warn(`${this.eventName}: request info is invalid.`)
+  //   return
+  // }
 
   var storageService = this.globalContext['storageService']
   var packet = requestInfo.packet
@@ -31,10 +38,10 @@ SendInvitationEventHandler.prototype.handle = function (requestInfo) {
 
   Promise.resolve(storageService.getChannelInfo({ chid }))
     .then(channelInfo => this.createAndGetInvitations(channelInfo, requestInfo),
-      err => this.alertException(err.message, requestInfo))
+      err => this.alertException(respondDBErr(err), requestInfo))
     .then(invitationList => {
       invitationList.length === 0 ? this.noticeUser(requestInfo) : this.sendInvitations(invitationList, requestInfo)
-    }, err => this.alertException(err.message, requestInfo))
+    }, err => this.alertException(respondSendErr(err), requestInfo))
 }
 
 SendInvitationEventHandler.prototype.createAndGetInvitations = async function (channelInfo, requestInfo) {
@@ -89,12 +96,14 @@ SendInvitationEventHandler.prototype.noticeUser = function (requestInfo) {
       receiver: packet.inviter,
       responseEvent: RESPONSE_EVENTS.PERSONAL_INFO // inviter self
     })
-    .setPacket({
-      msgCode: 'The recipients may have been invited or are members',
-      data: {
-        uid: packet.inviter
-      }
-    })
+    // .setPacket({
+    //   msgCode: 'The recipients may have been invited or are members',
+    //   data: {
+    //     uid: packet.inviter
+    //   }
+    // })
+    .responsePacket({ uid: packet.inviter }, HAS_INVITED_INFO)
+  
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 }
 
@@ -111,23 +120,25 @@ SendInvitationEventHandler.prototype.sendInvitations = function (invitationList,
         receiver: invitation.recipient,
         responseEvent: RESPONSE_EVENTS.INVITATION_CREATED // to individual recipients (realtime)
       })
-      .setPacket({
-        msgCode: 'you got an invitation',
-        data: invitation
-      })
+      // .setPacket({
+      //   msgCode: 'you got an invitation',
+      //   data: invitation
+      // })
+    .responsePacket(invitation, INVITATION_RECEIVED_INFO)
+    
     businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
   })
 }
 
-SendInvitationEventHandler.prototype.isValid = function (requestInfo) {
-  return (
-    requestInfo.packet != null &&
-    requestInfo.packet.inviter != null &&
-    Array.isArray(requestInfo.packet.recipients) &&
-    typeof requestInfo.packet.chid === 'string' &&
-    requestInfo.packet.content != null
-  )
-}
+// SendInvitationEventHandler.prototype.isValid = function (requestInfo) {
+//   return (
+//     requestInfo.packet != null &&
+//     requestInfo.packet.inviter != null &&
+//     Array.isArray(requestInfo.packet.recipients) &&
+//     typeof requestInfo.packet.chid === 'string' &&
+//     requestInfo.packet.content != null
+//   )
+// }
 
 module.exports = {
   handler: new SendInvitationEventHandler()

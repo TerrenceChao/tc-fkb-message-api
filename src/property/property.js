@@ -36,7 +36,7 @@ const EVENTS = {
   COMPETE_LOCK: 'req_conversation_compete_lock',
   RELEASE_LOCK: 'req_conversation_release_lock',
   SEND_CONVERSATION: 'req_conversation_send_conversation',
-  GET_CONVERSATION: 'req_conversation_get_conversation',
+  GET_CONVERSATION_LIST: 'req_conversation_get_conversation_list',
   // MARK_AS_READ: 'req_conversation_mark_as_read',
 
   // InvitationManager
@@ -51,7 +51,7 @@ const EVENTS = {
   // CONFIG_SETTING: '?'
 
   // MessageManager
-  PUSH_NOTIFICATION: 'req_push_notification',
+  PUSH_NOTIFICATION: 'req_message_push_notification',
   SEND_MESSAGE: 'req_message_send_message'
 }
 
@@ -77,7 +77,7 @@ const REQUEST_EVENTS = {
   COMPETE_LOCK: EVENTS.COMPETE_LOCK,
   RELEASE_LOCK: EVENTS.RELEASE_LOCK,
   SEND_CONVERSATION: EVENTS.SEND_CONVERSATION,
-  GET_CONVERSATION: EVENTS.GET_CONVERSATION,
+  GET_CONVERSATION_LIST: EVENTS.GET_CONVERSATION_LIST,
 
   // InvitationManager
   GET_INVITATION_LIST: EVENTS.GET_INVITATION_LIST,
@@ -110,7 +110,7 @@ const BUSINESS_EVENTS = {
   // ConversationManager
   RELEASE_LOCK: EVENTS.RELEASE_LOCK,
   SEND_CONVERSATION: EVENTS.SEND_CONVERSATION,
-  GET_CONVERSATION: EVENTS.GET_CONVERSATION,
+  GET_CONVERSATION_LIST: EVENTS.GET_CONVERSATION_LIST,
 
   // InvitationManager
   GET_INVITATION_LIST: EVENTS.GET_INVITATION_LIST,
