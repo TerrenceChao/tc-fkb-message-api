@@ -51,7 +51,7 @@ const EVENTS = {
   // CONFIG_SETTING: '?'
 
   // MessageManager
-  PUSH_NOTIFICATION: 'req_push_notification',
+  PUSH_NOTIFICATION: 'req_message_push_notification',
   SEND_MESSAGE: 'req_message_send_message'
 }
 
