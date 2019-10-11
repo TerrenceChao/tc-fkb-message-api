@@ -2,18 +2,23 @@ var config = require('config')
 var util = require('util')
 var path = require('path')
 
-const TOKEN = config.get('auth.token')
+// const TOKEN = config.get('auth.token')
 const {
   TO,
   EVENTS,
   RESPONSE_EVENTS
 } = require(path.join(config.get('src.property'), 'property'))
+const RES_META = require(path.join(config.get('src.property'), 'messageStatus')).SOCKET
 var ResponseInfo = require(path.join(config.get('src.manager'), 'ResponseInfo'))
 var EventHandler = require(path.join(config.get('src.manager'), 'EventHandler'))
 
-util.inherits(LoginEventHandler, EventHandler)
-
 const CONV_LIMIT = 1
+const CHANNEL_LIST_INFO = RES_META.CHANNEL_LIST_INFO
+const GET_CHANNEL_AND_CONVERSATION_LIST_SUCCESS = RES_META.GET_CHANNEL_AND_CONVERSATION_LIST_SUCCESS
+var respondErr = RES_META.GET_CHANNEL_AND_CONVERSATION_LIST_ERR
+
+
+util.inherits(LoginEventHandler, EventHandler)
 
 function LoginEventHandler () {
   this.name = arguments.callee.name
@@ -22,10 +27,10 @@ function LoginEventHandler () {
 LoginEventHandler.prototype.eventName = EVENTS.LOGIN
 
 LoginEventHandler.prototype.handle = async function (requestInfo) {
-  if (!this.isValid(requestInfo)) {
-    console.warn(`${this.eventName}: request info is invalid.`)
-    return
-  }
+  // if (!this.isValid(requestInfo)) {
+  //   console.warn(`${this.eventName}: request info is invalid.`)
+  //   return
+  // }
 
   var authService = this.globalContext['authService']
   var businessEvent = this.globalContext['businessEvent']
@@ -51,7 +56,7 @@ LoginEventHandler.prototype.handle = async function (requestInfo) {
   // get user's channel list & belonged conversations
   Promise.resolve(storageService.getUserChannelInfoList(packet.uid, packet.chanLimit))
     .then(userChannelInfoList => this.sendChannelInfoAndConversations(userChannelInfoList, requestInfo))
-    .catch(err => this.alertException(err.message, requestInfo))
+    .catch(err => this.alertException(respondErr(err), requestInfo))
 }
 
 LoginEventHandler.prototype.sendChannelInfoAndConversations = function (userChannelInfoList, requestInfo) {
@@ -70,18 +75,14 @@ LoginEventHandler.prototype.sendChannelInfoAndConversations = function (userChan
         receiver: uid,
         responseEvent: RESPONSE_EVENTS.CHANNEL_LIST
       })
-      .setPacket({
-        msgCode: `user doesn't join any channel yet`,
-        data: []
-      })
+      .responsePacket([], CHANNEL_LIST_INFO)
 
     businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
     return
   }
 
   return Promise.all(userChannelInfoList.map(async chInfo => {
-      var conversationList = await storageService.getConversationList(uid, chInfo.chid, convLimit)
-      chInfo.conversations = conversationList
+      chInfo.conversations = await storageService.getConversationList(uid, chInfo.chid, convLimit)
       return chInfo
     }))
     .then(chInfoList => {
@@ -92,24 +93,21 @@ LoginEventHandler.prototype.sendChannelInfoAndConversations = function (userChan
           receiver: uid,
           responseEvent: RESPONSE_EVENTS.CHANNEL_LIST
         })
-        .setPacket({
-          msgCode: `channel list with conversations`,
-          data: chInfoList
-        })
+        .responsePacket(chInfoList, GET_CHANNEL_AND_CONVERSATION_LIST_SUCCESS)
 
       businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
     })
 }
 
-LoginEventHandler.prototype.isValid = function (requestInfo) {
-  var packet = requestInfo.packet
-  return packet !== undefined &&
-    typeof packet.sessionId === 'string' &&
-    typeof packet[TOKEN] === 'string' &&
-    typeof packet.uid === 'string' &&
-    packet.inviLimit != null &&
-    packet.chanLimit != null
-}
+// LoginEventHandler.prototype.isValid = function (requestInfo) {
+//   var packet = requestInfo.packet
+//   return packet !== undefined &&
+//     typeof packet.sessionId === 'string' &&
+//     typeof packet[TOKEN] === 'string' &&
+//     typeof packet.uid === 'string' &&
+//     packet.inviLimit != null &&
+//     packet.chanLimit != null
+// }
 
 module.exports = {
   handler: new LoginEventHandler()

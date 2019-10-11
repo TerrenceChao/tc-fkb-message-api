@@ -116,7 +116,7 @@ StorageService.prototype.invitationRemoved = async function (iid) {
     ) // return true
     await channelInfoRepository.removeRecipientAndReturn(invitation.sensitive.chid, invitation.recipient)
 
-    return await invitationRepository.removeById(iid) // return true
+    return await invitationRepository.removeById(iid) // return doc(invitation)
   } catch (err) {
     logger(err)
     throw new Error(`remove invitation: ${iid} fail`)
@@ -227,11 +227,16 @@ StorageService.prototype.channelLeaved = async function (uid, chid) {
   }
 }
 
+/**
+ * [query僅有chid]: { chid } = query
+ * 但為了界面的一致性和簡化，這裡用 { param1, param2, ... } 表達輸入參數，
+ * 方便日後因應需求變更而修正
+ * @param{Object} query
+ */
 StorageService.prototype.channelInfoRemoved = async function (query) {
   try {
-    var channelInfo = await channelInfoRepository.findOne(query)
-    await conversationRepository.removeListByChid(channelInfo.chid) // return true
-    await channelInfoRepository.removeByChid(channelInfo.chid) // return true
+    await conversationRepository.removeListByChid(query.chid) // return true
+    await channelInfoRepository.removeByChid(query.chid) // return doc(chInfo)
     return true
   } catch (err) {
     logger(err)

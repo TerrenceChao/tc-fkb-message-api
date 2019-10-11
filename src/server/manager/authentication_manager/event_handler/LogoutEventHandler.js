@@ -16,10 +16,10 @@ function LogoutEventHandler () {
 LogoutEventHandler.prototype.eventName = EVENTS.LOGOUT
 
 LogoutEventHandler.prototype.handle = async function (requestInfo) {
-  if (!this.isValid(requestInfo)) {
-    console.warn(`${this.eventName}: request info is invalid.`)
-    return
-  }
+  // if (!this.isValid(requestInfo)) {
+  //   console.warn(`${this.eventName}: request info is invalid.`)
+  //   return
+  // }
 
   var businessEvent = this.globalContext['businessEvent']
   businessEvent.emit(EVENTS.CHANNEL_OFFLINE, requestInfo)
@@ -41,18 +41,22 @@ LogoutEventHandler.prototype.handle = async function (requestInfo) {
   var config = packet.config
 
   try {
+    /**
+     * TODO: [updateLastGlimpse] not working: 
+     * msg: [Cannot-read-property-'map'-of-undefined]
+     */
     await storageService.updateLastGlimpse(uid, config.glimpses)
   } catch (err) {
     console.log(err.message)
   }
 }
 
-LogoutEventHandler.prototype.isValid = function (requestInfo) {
-  var packet = requestInfo.packet
-  return packet !== undefined &&
-    typeof packet.uid === 'string' &&
-    typeof packet.config === 'object'
-}
+// LogoutEventHandler.prototype.isValid = function (requestInfo) {
+//   var packet = requestInfo.packet
+//   return packet !== undefined &&
+//     typeof packet.uid === 'string' &&
+//     typeof packet.config === 'object'
+// }
 
 module.exports = {
   handler: new LogoutEventHandler()

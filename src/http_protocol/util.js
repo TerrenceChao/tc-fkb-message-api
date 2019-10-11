@@ -23,7 +23,17 @@ function validateError(meta, validation = null) {
   return err
 }
 
+function matchRequestEvent(req, res, eventName) {
+  if (req === undefined || res === undefined) {
+    return false
+  }
+
+  return ['headers', 'params', 'query', 'body']
+    .find(field => req[field].event === eventName) !== undefined
+}
+
 module.exports = {
   recordAuthorization,
   validateError,
+  matchRequestEvent,
 }

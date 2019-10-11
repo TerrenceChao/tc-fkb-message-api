@@ -60,9 +60,9 @@ ResponseInfo.prototype.responsePacket = function (data, meta) {
   return this
 }
 
-ResponseInfo.prototype.responseMsg = function (msg = []) {
+ResponseInfo.prototype.responseMsg = function (resMsg = []) {
   if (_.get(this.packet, 'meta.msg') !== undefined) {
-    this.packet.meta.msg = Array.isArray(msg) ? customMetaMsg(this.packet.meta, msg) : msg
+    this.packet.meta.msg = Array.isArray(resMsg) ? customMetaMsg(this.packet.meta, resMsg) : resMsg
   }
     
   return this

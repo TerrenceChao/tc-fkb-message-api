@@ -7,8 +7,13 @@ const {
   EVENTS,
   RESPONSE_EVENTS
 } = require(path.join(config.get('src.property'), 'property'))
+const RES_META = require(path.join(config.get('src.property'), 'messageStatus')).SOCKET
 var ResponseInfo = require(path.join(config.get('src.manager'), 'ResponseInfo'))
 var EventHandler = require(path.join(config.get('src.manager'), 'EventHandler'))
+
+const CHANNEL_JOINED_SUCCESS = RES_META.CHANNEL_JOINED_SUCCESS
+var respondErr = RES_META.JOIN_CHANNEL_ERR
+
 
 util.inherits(JoinChannelEventHandler, EventHandler)
 
@@ -19,10 +24,10 @@ function JoinChannelEventHandler () {
 JoinChannelEventHandler.prototype.eventName = EVENTS.JOIN_CHANNEL
 
 JoinChannelEventHandler.prototype.handle = function (requestInfo) {
-  if (!this.isValid(requestInfo)) {
-    console.warn(`${this.eventName}: request info is invalid.`)
-    return
-  }
+  // if (!this.isValid(requestInfo)) {
+  //   console.warn(`${this.eventName}: request info is invalid.`)
+  //   return
+  // }
 
   var storageService = this.globalContext['storageService']
   var packet = requestInfo.packet
@@ -42,7 +47,7 @@ JoinChannelEventHandler.prototype.handle = function (requestInfo) {
   // channelJoined: refresh channelInfo FIRST
   Promise.resolve(storageService.channelJoined(targetUid, chid))
     .then(refreshedChannelInfo => this.executeJoin(refreshedChannelInfo, requestInfo),
-      err => this.alertException(err.message, requestInfo))
+      err => this.alertException(respondErr(err), requestInfo))
 }
 
 JoinChannelEventHandler.prototype.executeJoin = function (channelInfo, requestInfo) {
@@ -71,26 +76,35 @@ JoinChannelEventHandler.prototype.broadcastRecipientJoined = function (channelIn
       receiver: channelInfo.chid,
       responseEvent: RESPONSE_EVENTS.CHANNEL_JOINED // notify in channel
     })
-    .setPacket({
-      msgCode: `${nickname} has joined`,
-      data: {
+    // .setPacket({
+    //   msgCode: `${nickname} has joined`,
+    //   data: {
+    //     uid: targetUid,
+    //     // 1. refresh members: add targetUid to channel.members(array), remove targetUid from channel.recipients(array) for "each member" in localStorage (frontend)
+    //     // 2. 其他使用者登入時，只載入了少數的 channelInfo, 有可能沒載入此 channelInfo 的資訊。當新的成員加入時可提供更新後的 channelInfo 給前端
+    //     channelInfo,
+    //     datetime: Date.now()
+    //   }
+    // })
+    .responsePacket({
         uid: targetUid,
         // 1. refresh members: add targetUid to channel.members(array), remove targetUid from channel.recipients(array) for "each member" in localStorage (frontend)
         // 2. 其他使用者登入時，只載入了少數的 channelInfo, 有可能沒載入此 channelInfo 的資訊。當新的成員加入時可提供更新後的 channelInfo 給前端
         channelInfo,
         datetime: Date.now()
-      }
-    })
+      }, CHANNEL_JOINED_SUCCESS)
+    .responseMsg(`${nickname} has joined`)
+  
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 }
 
-JoinChannelEventHandler.prototype.isValid = function (requestInfo) {
-  var packet = requestInfo.packet
-  return packet !== undefined &&
-    typeof packet.targetUid === 'string' &&
-    typeof packet.nickname === 'string' &&
-    typeof packet.chid === 'string'
-}
+// JoinChannelEventHandler.prototype.isValid = function (requestInfo) {
+//   var packet = requestInfo.packet
+//   return packet !== undefined &&
+//     typeof packet.targetUid === 'string' &&
+//     typeof packet.nickname === 'string' &&
+//     typeof packet.chid === 'string'
+// }
 
 module.exports = {
   handler: new JoinChannelEventHandler()

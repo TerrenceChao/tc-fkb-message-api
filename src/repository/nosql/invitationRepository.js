@@ -51,12 +51,26 @@ InvitationRepository.prototype.getListByIds = async function (iidList, limit, sk
   return list.map(doc => getAttributes(doc))
 }
 
+/**
+ * [NOTE]:
+ * as user3344977 said in comment, the function [deleteOne] and [deleteMany] 
+ * no longer exist in mongoose 4. 
+ * @The API documentation is not up to date.
+ * you can use Model.findOneAndRemove(condition, options, callback) 
+ * or Model.findByIdAndRemove(id, options, callback) instead.
+ * ref: https://stackoverflow.com/questions/42798869/mongoose-js-typeerror-model-deleteone-is-not-a-function
+ */
 InvitationRepository.prototype.removeById = async function (iid) {
-  var confirm = await Invitation.deleteOne({
-    _id: iid
-  })
+  return new Promise((resolve, reject) => {
+    Invitation.findOneAndRemove({ _id: iid }, (err, docInvitation) => {
+      if (err) {
+        return reject(err)
+      }
 
-  return confirm.n === 1 && confirm.ok === 1
+      // console.log(`${JSON.stringify(docInvitation)}`, `\n`)
+      resolve(docInvitation)
+    })
+  })
 }
 
 module.exports = new InvitationRepository()

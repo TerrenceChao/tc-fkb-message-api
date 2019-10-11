@@ -150,12 +150,26 @@ ChannelInfoRepository.prototype.removeMemberAndReturn = async function (chid, ui
   return getAttributes(refreshedChInfo)
 }
 
+/**
+ * [NOTE]:
+ * as user3344977 said in comment, the function [deleteOne] and [deleteMany] 
+ * no longer exist in mongoose 4. 
+ * @The API documentation is not up to date.
+ * you can use Model.findOneAndRemove(condition, options, callback) 
+ * or Model.findByIdAndRemove(id, options, callback) instead.
+ * ref: https://stackoverflow.com/questions/42798869/mongoose-js-typeerror-model-deleteone-is-not-a-function
+ */
 ChannelInfoRepository.prototype.removeByChid = async function (chid) {
-  var confirm = await ChannelInfo.deleteOne({
-    chid
+  return new Promise((resolve, reject) => {
+    ChannelInfo.findOneAndRemove({ _id: chid }, (err, docChInfo) => {
+      if (err) {
+        return reject(err)
+      }
+      
+      // console.log(`${JSON.stringify(docChInfo)}`, `\n`)
+      resolve(docChInfo)
+    })
   })
-
-  return confirm.n === 1 && confirm.ok === 1
 }
 
 ChannelInfoRepository.prototype.updateLatestSpoke = async function (chid, latestSpoke) {
