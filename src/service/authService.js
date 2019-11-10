@@ -101,7 +101,7 @@ AuthService.prototype.obtainAuthorization = function (userPayload) {
   }
 
   // save refresh token in DB
-  var refreshToken = `message-service-refresh-token (not ready yet)`
+  var refreshToken = 'message-service-refresh-token (not ready yet)'
 
   return {
     [TOKEN]: jwt.sign(

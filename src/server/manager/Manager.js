@@ -26,16 +26,13 @@ Manager.prototype.init = function (globalContext) {
 
 Manager.prototype.listenBusinessEvent = function (handler) {
   handler.globalContext = this.globalContext
-  const businessEvent = this.globalContext['businessEvent']
-  const thisManager = this
+  const businessEvent = this.globalContext.businessEvent
 
   businessEvent.on(handler.eventName, (requestInfo) => {
     // console.log(` => listenBusinessEvent: handler is ${JSON.stringify(handler, null, 2)}`)
-    
+
     // handler.handle(requestInfo)
-    validator[handler.eventName](requestInfo) ?
-      handler.handle(requestInfo) :
-      console.error(`[business-event] ${handler.eventName}: request info is invalid.`)
+    validator[handler.eventName](requestInfo) ? handler.handle(requestInfo) : console.error(`[business-event] ${handler.eventName}: request info is invalid.`)
   })
 }
 
@@ -52,8 +49,7 @@ Manager.prototype.startListen = function (protocol) {
 
 Manager.prototype.listenRequestEvent = function (protocol, handler) {
   handler.globalContext = this.globalContext
-  const authService = this.globalContext['authService']
-  const thisManager = this
+  const authService = this.globalContext.authService
 
   const {
     req,
@@ -61,7 +57,7 @@ Manager.prototype.listenRequestEvent = function (protocol, handler) {
     next,
     socket
   } = protocol
-  let requestInfo = new RequestInfo()
+  const requestInfo = new RequestInfo()
 
   // client request
   if (socket !== undefined) {
@@ -74,9 +70,7 @@ Manager.prototype.listenRequestEvent = function (protocol, handler) {
       requestInfo.packet = packet
 
       // handler.handle(requestInfo)
-      validator[handler.eventName](requestInfo) ?
-        handler.handle(requestInfo) :
-        console.error(`[socket-request-event] ${handler.eventName}: request info is invalid.`)
+      validator[handler.eventName](requestInfo) ? handler.handle(requestInfo) : console.error(`[socket-request-event] ${handler.eventName}: request info is invalid.`)
     })
   // internal service request
   } else if (matchHttpRequestEvent(req, res, handler.eventName)) {
@@ -85,9 +79,7 @@ Manager.prototype.listenRequestEvent = function (protocol, handler) {
     requestInfo.next = next
 
     // handler.handle(requestInfo)
-    validator[handler.eventName](requestInfo) ? 
-      handler.handle(requestInfo) :
-      console.error(`[http-request-event] ${handler.eventName}: request info is invalid.`)
+    validator[handler.eventName](requestInfo) ? handler.handle(requestInfo) : console.error(`[http-request-event] ${handler.eventName}: request info is invalid.`)
   }
 }
 
@@ -102,17 +94,17 @@ Manager.prototype.getRequestEventHandler = function () {
 }
 
 Manager.prototype.loadEventHandler = function (events) {
-  let dir = path.join(this.rootDir, 'event_handler')
+  const dir = path.join(this.rootDir, 'event_handler')
 
-  let eventHandlers = []
-  let eventContent = new Set()
-  for (let key in events) {
+  const eventHandlers = []
+  const eventContent = new Set()
+  for (const key in events) {
     eventContent.add(events[key])
   }
 
   const files = fs.readdirSync(dir)
   files.forEach((file) => {
-    let {
+    const {
       handler
     } = require(path.join(dir, file))
     if (eventContent.has(handler.eventName)) {
@@ -122,6 +114,5 @@ Manager.prototype.loadEventHandler = function (events) {
 
   return eventHandlers
 }
-
 
 module.exports = Manager

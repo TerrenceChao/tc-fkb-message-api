@@ -14,7 +14,6 @@ var EventHandler = require(path.join(config.get('src.manager'), 'EventHandler'))
 const CHANNEL_OFFLINE_INFO = RES_META.CHANNEL_OFFLINE_INFO
 var respondErr = RES_META.CHANNEL_OFFLINE_ERR
 
-
 util.inherits(ChannelOfflineEventHandler, EventHandler)
 
 function ChannelOfflineEventHandler () {
@@ -29,12 +28,12 @@ ChannelOfflineEventHandler.prototype.handle = function (requestInfo) {
   //   return
   // }
 
-  var storageService = this.globalContext['storageService']
+  var storageService = this.globalContext.storageService
   var uid = requestInfo.packet.uid
 
   Promise.resolve(storageService.getAllChannelIds(uid))
     .then(channelIds => this.leaveChannels(channelIds, requestInfo),
-      err => thisthis.alertException(respondErr(err), requestInfo))
+      err => this.alertException(respondErr(err), requestInfo))
 }
 
 ChannelOfflineEventHandler.prototype.leaveChannels = function (channelIds, requestInfo) {
@@ -48,14 +47,14 @@ ChannelOfflineEventHandler.prototype.leaveChannels = function (channelIds, reque
   // //   socketServer.of('/').adapter.remoteLeave(socket.id, chid)
   // // })
   // socketService.collectiveLeave(socket.id, channelIds)
-  this.globalContext['socketService'].offlineChannelList(
+  this.globalContext.socketService.offlineChannelList(
     requestInfo.packet.uid,
     channelIds
   )
 }
 
 ChannelOfflineEventHandler.prototype.broadcast = function (channelIds, requestInfo) {
-  var businessEvent = this.globalContext['businessEvent']
+  var businessEvent = this.globalContext.businessEvent
   var uid = requestInfo.packet.uid
 
   var resInfo = new ResponseInfo()

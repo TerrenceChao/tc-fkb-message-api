@@ -29,7 +29,7 @@ GetChannelListEventHandler.prototype.handle = function (requestInfo) {
   //   return
   // }
 
-  var storageService = this.globalContext['storageService']
+  var storageService = this.globalContext.storageService
 
   var packet = requestInfo.packet
   var uid = packet.uid
@@ -42,7 +42,7 @@ GetChannelListEventHandler.prototype.handle = function (requestInfo) {
 }
 
 GetChannelListEventHandler.prototype.sendChInfoListBelongedUser = function (userChannelInfoList, requestInfo) {
-  var businessEvent = this.globalContext['businessEvent']
+  var businessEvent = this.globalContext.businessEvent
   const META = userChannelInfoList.length === 0 ? CHANNEL_LIST_INFO : GET_CHANNEL_LIST_SUCCESS
 
   var resInfo = new ResponseInfo()
@@ -57,7 +57,7 @@ GetChannelListEventHandler.prototype.sendChInfoListBelongedUser = function (user
     //   data: userChannelInfoList
     // })
     .responsePacket(userChannelInfoList, META)
-  
+
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 }
 

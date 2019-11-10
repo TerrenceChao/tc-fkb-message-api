@@ -28,7 +28,7 @@ CreateChannelEventHandler.prototype.handle = function (requestInfo) {
   //   return
   // }
 
-  var storageService = this.globalContext['storageService']
+  var storageService = this.globalContext.storageService
   var uid = requestInfo.packet.uid
   var channelName = requestInfo.packet.channelName
 
@@ -48,7 +48,7 @@ CreateChannelEventHandler.prototype.handle = function (requestInfo) {
 }
 
 CreateChannelEventHandler.prototype.enterChannel = function (channelInfo, requestInfo) {
-  var socketService = this.globalContext['socketService']
+  var socketService = this.globalContext.socketService
   // var socket = requestInfo.socket
   // socketServer.of('/').adapter.remoteJoin(socket.id, channelInfo.chid)
   // socketService.join(socket.id, channelInfo.chid)
@@ -61,7 +61,7 @@ CreateChannelEventHandler.prototype.enterChannel = function (channelInfo, reques
 }
 
 CreateChannelEventHandler.prototype.sendChannelInfoToUser = function (channelInfo, requestInfo) {
-  var businessEvent = this.globalContext['businessEvent']
+  var businessEvent = this.globalContext.businessEvent
   var resInfo = new ResponseInfo()
     .assignProtocol(requestInfo).setHeader({
       to: TO.USER,

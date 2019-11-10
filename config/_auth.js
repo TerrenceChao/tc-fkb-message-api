@@ -11,5 +11,5 @@ module.exports = {
   accessProperties,
   properties,
   token,
-  refreshToken,
+  refreshToken
 }

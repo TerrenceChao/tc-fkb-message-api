@@ -13,7 +13,6 @@ var EventHandler = require(path.join(config.get('src.manager'), 'EventHandler'))
 
 const USER_OFFLINE_INFO = RES_META.USER_OFFLINE_INFO
 
-
 util.inherits(UserOfflineEventHandler, EventHandler)
 
 function UserOfflineEventHandler () {
@@ -28,8 +27,8 @@ UserOfflineEventHandler.prototype.handle = function (requestInfo) {
   //   return
   // }
 
-  var socketService = this.globalContext['socketService']
-  var businessEvent = this.globalContext['businessEvent']
+  var socketService = this.globalContext.socketService
+  var businessEvent = this.globalContext.businessEvent
   var socket = requestInfo.socket
   var packet = requestInfo.packet
   var uid = packet.uid
@@ -48,7 +47,7 @@ UserOfflineEventHandler.prototype.handle = function (requestInfo) {
     //   }
     // })
     .responsePacket({ uid }, USER_OFFLINE_INFO)
-  
+
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 
   // socketServer.of('/').adapter.remoteLeave(socket.id, uid)

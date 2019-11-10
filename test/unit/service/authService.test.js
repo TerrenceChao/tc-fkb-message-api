@@ -11,7 +11,6 @@ const EXTRA_INFO = config.get('auth.properties')[1]
 const TOKEN = config.get('auth.token')
 
 describe('authService test', () => {
-
   var userPayload = {}
   before(() => {
     userPayload[USER_ID] = 'an user\'s UUID'

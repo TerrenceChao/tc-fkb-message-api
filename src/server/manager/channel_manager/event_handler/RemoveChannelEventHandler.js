@@ -13,7 +13,6 @@ var EventHandler = require(path.join(config.get('src.manager'), 'EventHandler'))
 
 const CHANNEL_REMOVED_SUCCESS = RES_META.CHANNEL_REMOVED_SUCCESS
 var respondErr = RES_META.REMOVE_CHANNEL_ERR
-  
 
 util.inherits(RemoveChannelEventHandler, EventHandler)
 
@@ -29,7 +28,7 @@ RemoveChannelEventHandler.prototype.handle = function (requestInfo) {
   //   return
   // }
 
-  var storageService = this.globalContext['storageService']
+  var storageService = this.globalContext.storageService
   var chid = requestInfo.packet.chid
   var query = {
     chid
@@ -41,7 +40,7 @@ RemoveChannelEventHandler.prototype.handle = function (requestInfo) {
 }
 
 RemoveChannelEventHandler.prototype.notifyUser = function (requestInfo) {
-  var businessEvent = this.globalContext['businessEvent']
+  var businessEvent = this.globalContext.businessEvent
   var packet = requestInfo.packet
   var uid = packet.uid
   var chid = packet.chid

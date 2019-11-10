@@ -14,7 +14,6 @@ var ResponseInfo = require(path.join(config.get('src.manager'), 'ResponseInfo'))
 
 const NOTIFICATION_PUSHED_INFO = RES_META.NOTIFICATION_PUSHED_INFO
 
-
 util.inherits(PushNotificationEventHandler, EventHandler)
 
 function PushNotificationEventHandler () {
@@ -39,10 +38,9 @@ PushNotificationEventHandler.prototype.handle = function (requestInfo) {
         )
       )
     ))
-    .then(() => res.locals.data.event = notificationPacket.event)
+    .then(() => (res.locals.data.event = notificationPacket.event))
     .then(() => next())
-    .catch(err => next(err || new Error(`Error occurred during push notification`)))
-
+    .catch(err => next(err || new Error('Error occurred during push notification')))
 }
 
 PushNotificationEventHandler.prototype.emitNotification = function (reqInfo, receiver, notificationPacket) {
@@ -58,8 +56,8 @@ PushNotificationEventHandler.prototype.emitNotification = function (reqInfo, rec
     //   data: notificationPacket
     // })
     .responsePacket(notificationPacket, NOTIFICATION_PUSHED_INFO)
-  
-  this.globalContext['businessEvent'].emit(EVENTS.SEND_MESSAGE, responseInfo)
+
+  this.globalContext.businessEvent.emit(EVENTS.SEND_MESSAGE, responseInfo)
   return true
 }
 

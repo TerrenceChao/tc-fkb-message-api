@@ -6,7 +6,7 @@ const Manager = require(path.join(config.get('src.manager'), 'Manager'))
 
 util.inherits(MessageManager, Manager)
 
-function MessageManager() {
+function MessageManager () {
   this.name = arguments.callee.name
   this.rootDir = __dirname
 }

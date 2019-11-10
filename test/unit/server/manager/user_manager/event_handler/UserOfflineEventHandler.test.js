@@ -65,7 +65,7 @@ describe('UserOfflineEventHandler test', () => {
     // assert
     sandbox.assert.calledOnce(spyEmit)
     sinon.assert.calledWith(spyEmit, EVENTS.SEND_MESSAGE, respnseInfo)
-    
+
     sandbox.assert.calledOnce(spyRemoteLeave)
     sinon.assert.calledWith(
       spyRemoteLeave,

@@ -14,11 +14,11 @@ function EventHandler () { }
 EventHandler.prototype.eventName = 'eventName is undefined'
 
 EventHandler.prototype.handle = function (requestInfo) {
-  throw new Error(`[EventHandler]: You should implement 'handle'.`)
+  throw new Error('[EventHandler]: You should implement \'handle\'.')
 }
 
 EventHandler.prototype.alertException = function (meta, requestInfo, header = null) {
-  var businessEvent = this.globalContext['businessEvent']
+  var businessEvent = this.globalContext.businessEvent
   var packet = requestInfo.packet
   var resHeader = (header === null) ? {
     to: TO.USER,
@@ -30,9 +30,8 @@ EventHandler.prototype.alertException = function (meta, requestInfo, header = nu
     .assignProtocol(requestInfo)
     .setHeader(resHeader)
     .responsePacket({}, meta)
-  
+
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 }
 
 module.exports = EventHandler
-

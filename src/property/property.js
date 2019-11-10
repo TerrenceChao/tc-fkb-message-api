@@ -154,7 +154,7 @@ const RESPONSE_EVENTS = {
   CONVERSATION_LIST: 'conversation_list',
 
   // Notification (realtime) (to.USER)
-  NOTIFICATION_PUSHED: 'notification_pushed',
+  NOTIFICATION_PUSHED: 'notification_pushed'
 }
 
 module.exports = {

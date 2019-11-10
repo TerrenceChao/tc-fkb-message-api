@@ -14,7 +14,6 @@ var EventHandler = require(path.join(config.get('src.manager'), 'EventHandler'))
 const INVITATION_REMOVED_SUCCESS = RES_META.INVITATION_REMOVED_SUCCESS
 var respondErr = RES_META.REMOVE_INVITATION_ERR
 
-
 util.inherits(RemoveInvitationEventHandler, EventHandler)
 
 function RemoveInvitationEventHandler () {
@@ -29,7 +28,7 @@ RemoveInvitationEventHandler.prototype.handle = function (requestInfo) {
   //   return
   // }
 
-  var storageService = this.globalContext['storageService']
+  var storageService = this.globalContext.storageService
   var packet = requestInfo.packet
   var iid = packet.iid
 
@@ -39,7 +38,7 @@ RemoveInvitationEventHandler.prototype.handle = function (requestInfo) {
 }
 
 RemoveInvitationEventHandler.prototype.notify = function (requestInfo) {
-  var businessEvent = this.globalContext['businessEvent']
+  var businessEvent = this.globalContext.businessEvent
   var packet = requestInfo.packet
 
   var resInfo = new ResponseInfo()
@@ -61,7 +60,7 @@ RemoveInvitationEventHandler.prototype.notify = function (requestInfo) {
       iid: packet.iid
     }, INVITATION_REMOVED_SUCCESS)
     .responseMsg(`Invitation is removed. iid: ${packet.iid}`)
-  
+
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 }
 

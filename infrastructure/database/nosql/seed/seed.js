@@ -5,32 +5,32 @@ const _ = require('lodash')
 // const jwt = require('jsonwebtoken')
 
 const {
-    REQUEST_EVENTS,
-    BUSINESS_EVENTS
+  REQUEST_EVENTS,
+  BUSINESS_EVENTS
 } = require(path.join(config.get('property'), 'property'))
 
 const {
-    Channel,
-    ChannelInfo,
-    Comment,
-    Conversation,
-    ConversationCache,
-    Invitation,
-    Post,
-    User
+  Channel,
+  ChannelInfo,
+  Comment,
+  Conversation,
+  ConversationCache,
+  Invitation,
+  Post,
+  User
 } = require(path.join(config.get('nosql'), 'nosql'))
 
 // const userId = new ObjectID()
 
 const getRandom = function (items) {
-    if (items == undefined) {
-        return (Math.random() * 100000 + 1).toString()
-    }
+  if (items == undefined) {
+    return (Math.random() * 100000 + 1).toString()
+  }
 
-    const min = 0,
-        max = items.length - 1
-    let result = Math.random() * (max - min) + min
-    return items[Math.floor(result + 0.5)]
+  const min = 0
+  const max = items.length - 1
+  const result = Math.random() * (max - min) + min
+  return items[Math.floor(result + 0.5)]
 }
 
 const firstNames = ['Lydia', 'Ivy', 'Abbie', 'Ford', 'Hank', 'John', 'Sunny', 'Linda', 'Glen', 'Jennifer']
@@ -39,52 +39,51 @@ const genders = ['f', 'm']
 const userAgents = ['chrome', 'firefox', 'safari', 'ie']
 
 const generateClientUsers = function (amount) {
-    let users = []
-    for (let i = 0 i < amount i++) {
-        let user = {
-            uid: getRandom(),
-            firstName: getRandom(firstNames),
-            lastName: getRandom(lastNames),
-            gender: getRandom(genders),
-            online: true,
-            userAgent: getRandom(userAgents)
-        }
-        user.email = `${user.firstName.toLowerCase()}-${getRandom()}@ex.com`
-
-        users.push(user)
+  const users = []
+  for (let i = 0; i < amount; i++) {
+    const user = {
+      uid: getRandom(),
+      firstName: getRandom(firstNames),
+      lastName: getRandom(lastNames),
+      gender: getRandom(genders),
+      online: true,
+      userAgent: getRandom(userAgents)
     }
-    return users
-}
+    user.email = `${user.firstName.toLowerCase()}-${getRandom()}@ex.com`
 
+    users.push(user)
+  }
+  return users
+}
 
 // 'createUsers' is an operation with database
 const createUsers = async function (amount, state) {
-    let users = []
+  const users = []
 
-    if (Array.isArray(amount)) {
-        let clientUsers = amount
-        let databaseRelated = ['firstName', 'lastName', 'gender', 'online']
+  if (Array.isArray(amount)) {
+    const clientUsers = amount
+    const databaseRelated = ['firstName', 'lastName', 'gender', 'online']
 
-        clientUsers.forEach((clientUser) => {
-            let userData = _.pick(clientUser, databaseRelated)
-            let user = await (new User(userData)).save()
-            user.uid = user._id
-            users.push(user)
-        })
-        return users
-    }
-
-    for (let i = 0 i < amount i++) {
-        let user = await (new User({
-            firstName: getRandom(firstNames),
-            lastName: getRandom(lastNames),
-            gender: getRandom(genders),
-            online: (state == null) ? getRandom([true, false]) : state
-        })).save()
-        user.uid = user._id
-        users.push(user)
-    }
+    clientUsers.forEach(async (clientUser) => {
+      const userData = _.pick(clientUser, databaseRelated)
+      const user = await (new User(userData)).save()
+      user.uid = user._id
+      users.push(user)
+    })
     return users
+  }
+
+  for (let i = 0; i < amount; i++) {
+    const user = await (new User({
+      firstName: getRandom(firstNames),
+      lastName: getRandom(lastNames),
+      gender: getRandom(genders),
+      online: (state == null) ? getRandom([true, false]) : state
+    })).save()
+    user.uid = user._id
+    users.push(user)
+  }
+  return users
 }
 
 // function createChannelInfo(chData) {
@@ -99,13 +98,13 @@ const createUsers = async function (amount, state) {
 // }
 
 // function createPost(postData) {
-//     // const { content, 
+//     // const { content,
 //     //         owner, public, // unnecessary
 //     //     } = postData
 //     console.log(`\n postData: ${JSON.stringify(postData, null, 2)}`)
 //     postData.createdAt = Date.now()
 //     return new Post(postData).save()
-// } 
+// }
 
 // function createComment(cmtData) {
 //     // const { post, user, content } = cmtData
@@ -119,17 +118,17 @@ const createUsers = async function (amount, state) {
 //     return new Invitation(inviteData)
 // }
 
-function eventContent(events) {
-    let container = new Set()
-    for (let key in events) {
-        container.add(events[key])
-    }
-    return container
+function eventContent (events) {
+  const container = new Set()
+  for (const key in events) {
+    container.add(events[key])
+  }
+  return container
 }
 
 module.exports = {
-    generateClientUsers,
-    createUsers,
-    eventContent,
-    getRandom,
+  generateClientUsers,
+  createUsers,
+  eventContent,
+  getRandom
 }

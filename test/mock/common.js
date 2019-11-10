@@ -19,7 +19,7 @@ function delayFunc (delay, done, err = null) {
 function StubSocketService () {
   this.adapter = this
 
-  this.of = function (str) { 
+  this.of = function (str) {
     return this
   }
 }
@@ -47,18 +47,18 @@ StubSocketService.prototype.dissociateUser = function (socketId, userId, namespa
 }
 
 StubSocketService.prototype.joinChannel = function (userId, channelId, namespace = '/') {
-  new Promise((_, reject) => {
+  new Promise((resolve, reject) => {
     this.socketServer.in(userId).clients((err, socketIdList) => {
       if (err) {
         return reject(err)
       }
-  
+
       socketIdList.forEach(socketId => {
         this.remoteJoin(socketId, channelId)
       })
     })
   })
-  .catch(err => console.error(`caught`, err))
+    .catch(err => console.error('caught', err))
 }
 
 StubSocketService.prototype.joinChannelSync = function (callback, userId, channelId, namespace = '/') {
@@ -67,29 +67,29 @@ StubSocketService.prototype.joinChannelSync = function (callback, userId, channe
       if (err) {
         return reject(err)
       }
-  
+
       Promise.all(socketIdList.map(socketId => {
         this.remoteJoin(socketId, channelId)
       }))
         .then(() => resolve(callback()))
     })
   })
-  .catch(err => console.error(`caught`, err))
+    .catch(err => console.error('caught', err))
 }
 
 StubSocketService.prototype.leaveChannel = function (userId, channelId, namespace = '/') {
-  new Promise((_, reject) => {
+  new Promise((resolve, reject) => {
     this.socketServer.in(userId).clients((err, socketIdList) => {
       if (err) {
         return reject(err)
       }
-  
+
       socketIdList.forEach(socketId => {
         this.remoteLeave(socketId, channelId)
       })
     })
   })
-  .catch(err => console.error(`caught`, err))
+    .catch(err => console.error('caught', err))
 }
 
 StubSocketService.prototype.leaveChannelSync = function (callback, userId, channelId, namespace = '/') {
@@ -98,19 +98,19 @@ StubSocketService.prototype.leaveChannelSync = function (callback, userId, chann
       if (err) {
         return reject(err)
       }
-  
+
       Promise.all(socketIdList.map(socketId => {
         this.remoteLeave(socketId, channelId)
       }))
         .then(() => resolve(callback()))
     })
   })
-  .catch(err => console.error(`caught`, err))
+    .catch(err => console.error('caught', err))
 }
 
 StubSocketService.prototype.onlineChannelList = function (userId, channelIdList, namespace = '/') {
   if (!Array.isArray(channelIdList)) {
-    throw new Error(`channelIdList isn't an array`)
+    throw new Error('channelIdList isn\'t an array')
   }
 
   channelIdList.forEach(channelId => {
@@ -120,7 +120,7 @@ StubSocketService.prototype.onlineChannelList = function (userId, channelIdList,
 
 StubSocketService.prototype.offlineChannelList = function (userId, channelIdList, namespace = '/') {
   if (!Array.isArray(channelIdList)) {
-    throw new Error(`channelIdList isn't an array`)
+    throw new Error('channelIdList isn\'t an array')
   }
 
   channelIdList.forEach(channelId => {
@@ -141,7 +141,7 @@ StubSocketService.prototype.emitInChannel = function (channel, responseEvent, pa
   } else if (typeof responseEvent === 'string') {
     this.socketServer.sockets.in(channel).emit(responseEvent, packet)
   } else {
-    throw new Error(`The type of responseEvent is illgal`)
+    throw new Error('The type of responseEvent is illgal')
   }
 }
 

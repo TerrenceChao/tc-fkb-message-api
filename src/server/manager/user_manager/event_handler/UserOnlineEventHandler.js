@@ -13,7 +13,6 @@ var EventHandler = require(path.join(config.get('src.manager'), 'EventHandler'))
 
 const USER_ONLINE_INFO = RES_META.USER_ONLINE_INFO
 
-
 util.inherits(UserOnlineEventHandler, EventHandler)
 
 function UserOnlineEventHandler () {
@@ -28,8 +27,8 @@ UserOnlineEventHandler.prototype.handle = function (requestInfo) {
   //   return
   // }
 
-  var socketService = this.globalContext['socketService']
-  var businessEvent = this.globalContext['businessEvent']
+  var socketService = this.globalContext.socketService
+  var businessEvent = this.globalContext.businessEvent
   var socket = requestInfo.socket
   var packet = requestInfo.packet
   var uid = packet.uid
@@ -52,7 +51,7 @@ UserOnlineEventHandler.prototype.handle = function (requestInfo) {
     //   }
     // })
     .responsePacket({ uid }, USER_ONLINE_INFO)
-  
+
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 }
 

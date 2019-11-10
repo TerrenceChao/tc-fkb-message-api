@@ -21,7 +21,7 @@ LogoutEventHandler.prototype.handle = async function (requestInfo) {
   //   return
   // }
 
-  var businessEvent = this.globalContext['businessEvent']
+  var businessEvent = this.globalContext.businessEvent
   businessEvent.emit(EVENTS.CHANNEL_OFFLINE, requestInfo)
   businessEvent.emit(EVENTS.USER_OFFLINE, requestInfo)
 
@@ -35,14 +35,14 @@ LogoutEventHandler.prototype.handle = async function (requestInfo) {
    * 當下次 user login 時，需要透過每個 channel 最後一則 conversation 的 datetime 順序 (desc)
    * 來載入前幾個 channelInfo(s), 此時和 lastGlimpse 比較，就會知道哪些屬於未讀訊息了
    */
-  var storageService = this.globalContext['storageService']
+  var storageService = this.globalContext.storageService
   var packet = requestInfo.packet
   var uid = packet.uid
   var config = packet.config
 
   try {
     /**
-     * TODO: [updateLastGlimpse] not working: 
+     * TODO: [updateLastGlimpse] not working:
      * msg: [Cannot-read-property-'map'-of-undefined]
      */
     await storageService.updateLastGlimpse(uid, config.glimpses)

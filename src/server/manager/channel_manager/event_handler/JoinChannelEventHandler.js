@@ -14,7 +14,6 @@ var EventHandler = require(path.join(config.get('src.manager'), 'EventHandler'))
 const CHANNEL_JOINED_SUCCESS = RES_META.CHANNEL_JOINED_SUCCESS
 var respondErr = RES_META.JOIN_CHANNEL_ERR
 
-
 util.inherits(JoinChannelEventHandler, EventHandler)
 
 function JoinChannelEventHandler () {
@@ -25,11 +24,11 @@ JoinChannelEventHandler.prototype.eventName = EVENTS.JOIN_CHANNEL
 
 JoinChannelEventHandler.prototype.handle = function (requestInfo) {
   // if (!this.isValid(requestInfo)) {
-  //   console.warn(`${this.eventName}: request info is invalid.`)
+  //   console.warn('${this.eventName}: request info is invalid.')
   //   return
   // }
 
-  var storageService = this.globalContext['storageService']
+  var storageService = this.globalContext.storageService
   var packet = requestInfo.packet
   var targetUid = packet.targetUid
   var chid = packet.chid
@@ -51,7 +50,7 @@ JoinChannelEventHandler.prototype.handle = function (requestInfo) {
 }
 
 JoinChannelEventHandler.prototype.executeJoin = function (channelInfo, requestInfo) {
-  var socketService = this.globalContext['socketService']
+  var socketService = this.globalContext.socketService
   // socketServer.of('/').adapter.remoteJoin(requestInfo.socket.id, channelInfo.chid)
 
   // join 應該是該 userId 下的所有 socketId List 一起加入，不是只有 browser 的其中一個分頁加入
@@ -64,7 +63,7 @@ JoinChannelEventHandler.prototype.executeJoin = function (channelInfo, requestIn
 }
 
 JoinChannelEventHandler.prototype.broadcastRecipientJoined = function (channelInfo, requestInfo) {
-  var businessEvent = this.globalContext['businessEvent']
+  var businessEvent = this.globalContext.businessEvent
   var packet = requestInfo.packet
   var targetUid = packet.targetUid
   var nickname = packet.nickname
@@ -87,14 +86,14 @@ JoinChannelEventHandler.prototype.broadcastRecipientJoined = function (channelIn
     //   }
     // })
     .responsePacket({
-        uid: targetUid,
-        // 1. refresh members: add targetUid to channel.members(array), remove targetUid from channel.recipients(array) for "each member" in localStorage (frontend)
-        // 2. 其他使用者登入時，只載入了少數的 channelInfo, 有可能沒載入此 channelInfo 的資訊。當新的成員加入時可提供更新後的 channelInfo 給前端
-        channelInfo,
-        datetime: Date.now()
-      }, CHANNEL_JOINED_SUCCESS)
+      uid: targetUid,
+      // 1. refresh members: add targetUid to channel.members(array), remove targetUid from channel.recipients(array) for "each member" in localStorage (frontend)
+      // 2. 其他使用者登入時，只載入了少數的 channelInfo, 有可能沒載入此 channelInfo 的資訊。當新的成員加入時可提供更新後的 channelInfo 給前端
+      channelInfo,
+      datetime: Date.now()
+    }, CHANNEL_JOINED_SUCCESS)
     .responseMsg(`${nickname} has joined`)
-  
+
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 }
 

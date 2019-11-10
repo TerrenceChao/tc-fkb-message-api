@@ -31,8 +31,8 @@ DealWithInvitationEventHandler.prototype.handle = function (requestInfo) {
   //   return
   // }
 
-  var businessEvent = this.globalContext['businessEvent']
-  var storageService = this.globalContext['storageService']
+  var businessEvent = this.globalContext.businessEvent
+  var storageService = this.globalContext.storageService
   var packet = requestInfo.packet
   var iid = packet.iid
   var dealWith = packet.dealWith.toLowerCase()
@@ -53,12 +53,12 @@ DealWithInvitationEventHandler.prototype.handle = function (requestInfo) {
  * [BUG-FIXED]:
  * 之前只有[取消邀請]時 (broadcastRecipientCanceled) 才能[真的刪除邀請紀錄],
  * 而選擇[確認邀請]時 (joinChannel) 後續[無法刪除邀請紀錄]。
- * 
+ *
  * 因為[原本的requestInfo.packet]為了加入房間，已經被改為不是能正確刪除邀請紀錄的內容了，
  * 所以這裡用新的reqInfo [new-RequestInfo()...]解決。
  */
 DealWithInvitationEventHandler.prototype.joinChannel = function (self, invitation, requestInfo) {
-  var businessEvent = self.globalContext['businessEvent']
+  var businessEvent = self.globalContext.businessEvent
   var packet = requestInfo.packet
   var targetUid = packet.targetUid
   var nickname = packet.nickname
@@ -70,7 +70,7 @@ DealWithInvitationEventHandler.prototype.joinChannel = function (self, invitatio
       nickname,
       chid: invitation.sensitive.chid
     }))
-  
+
   return new RequestInfo()
     .assignProtocol(requestInfo)
     .setPacket({
@@ -80,7 +80,7 @@ DealWithInvitationEventHandler.prototype.joinChannel = function (self, invitatio
 }
 
 DealWithInvitationEventHandler.prototype.broadcastRecipientCanceled = function (self, invitation, requestInfo) {
-  var businessEvent = self.globalContext['businessEvent']
+  var businessEvent = self.globalContext.businessEvent
   var packet = requestInfo.packet
 
   var resInfo = new ResponseInfo()
@@ -92,7 +92,7 @@ DealWithInvitationEventHandler.prototype.broadcastRecipientCanceled = function (
     })
     .responsePacket({ uid: packet.targetUid }, INVITATION_CANCELED_INFO)
     .responseMsg(`${packet.nickname} is canceled`)
-  
+
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 
   return requestInfo

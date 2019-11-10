@@ -15,7 +15,6 @@ var EventHandler = require(path.join(config.get('src.manager'), 'EventHandler'))
 const CHANNEL_LEFT_SUCCESS = RES_META.CHANNEL_LEFT_SUCCESS
 var respondErr = RES_META.LEAVE_CHANNEL_ERR
 
-
 util.inherits(LeaveChannelEventHandler, EventHandler)
 
 function LeaveChannelEventHandler () {
@@ -30,8 +29,8 @@ LeaveChannelEventHandler.prototype.handle = function (requestInfo) {
   //   return
   // }
 
-  var businessEvent = this.globalContext['businessEvent']
-  var storageService = this.globalContext['storageService']
+  var businessEvent = this.globalContext.businessEvent
+  var storageService = this.globalContext.storageService
 
   var packet = requestInfo.packet
   var targetUid = packet.targetUid
@@ -63,7 +62,7 @@ LeaveChannelEventHandler.prototype.handle = function (requestInfo) {
 LeaveChannelEventHandler.prototype.executeLeave = function (channelInfo, requestInfo) {
   this.broadcastUserHasLeft(channelInfo, requestInfo)
 
-  var socketService = this.globalContext['socketService']
+  var socketService = this.globalContext.socketService
   // socketServer.of('/').adapter.remoteLeave(requestInfo.socket.id, channelInfo.chid)
 
   // leave 應該是該 userId 下的所有 socketId List 一起離開，不是只有 browser 的其中一個分頁離開
@@ -74,7 +73,7 @@ LeaveChannelEventHandler.prototype.executeLeave = function (channelInfo, request
 }
 
 LeaveChannelEventHandler.prototype.broadcastUserHasLeft = function (channelInfo, requestInfo) {
-  var businessEvent = this.globalContext['businessEvent']
+  var businessEvent = this.globalContext.businessEvent
   var targetUid = requestInfo.packet.targetUid
   var nickname = requestInfo.packet.nickname
 
@@ -96,12 +95,12 @@ LeaveChannelEventHandler.prototype.broadcastUserHasLeft = function (channelInfo,
     //   }
     // })
     .responsePacket({
-        uid: targetUid,
-        // 1. delete targetUid from channel.members(array) for "each member" in localStorage (frontend)
-        // 2. 其他使用者登入時，只載入了少數的 channelInfo, 有可能沒載入此 channelInfo 的資訊。當有成員離開時可提供更新後的 channelInfo 給前端
-        channelInfo,
-        datetime: Date.now()
-      }, CHANNEL_LEFT_SUCCESS)
+      uid: targetUid,
+      // 1. delete targetUid from channel.members(array) for "each member" in localStorage (frontend)
+      // 2. 其他使用者登入時，只載入了少數的 channelInfo, 有可能沒載入此 channelInfo 的資訊。當有成員離開時可提供更新後的 channelInfo 給前端
+      channelInfo,
+      datetime: Date.now()
+    }, CHANNEL_LEFT_SUCCESS)
     .responseMsg(`${nickname} has left`)
 
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)

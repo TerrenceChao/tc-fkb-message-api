@@ -8,12 +8,12 @@ const MSG_CODE_SUCCESS = '1000000'
 const MSG_CODE_FAIL = '9999999'
 
 /**
- * 
- * @param {request} req 
- * @param {response} res 
- * @param {function} next 
+ *
+ * @param {request} req
+ * @param {response} res
+ * @param {function} next
  */
-function checkResponse(req, res, next) {
+function checkResponse (req, res, next) {
   res.json({
     data: {
       url: `${req.protocol}://${req.get('host')}${req.originalUrl}`
@@ -26,12 +26,12 @@ function checkResponse(req, res, next) {
 }
 
 /**
- * 
- * @param {request} req 
- * @param {response} res 
- * @param {function} next 
+ *
+ * @param {request} req
+ * @param {response} res
+ * @param {function} next
  */
-function success(req, res, next) {
+function success (req, res, next) {
   if (res.locals.meta) {
     res.locals.meta.msgCode = res.locals.meta.msgCode || MSG_CODE_SUCCESS
     res.locals.meta.msg = res.locals.meta.msg || arguments.callee.name
@@ -46,12 +46,12 @@ function success(req, res, next) {
 }
 
 /**
- * 
- * @param {request} req 
- * @param {response} res 
- * @param {function} next 
+ *
+ * @param {request} req
+ * @param {response} res
+ * @param {function} next
  */
-function createdSuccess(req, res, next) {
+function createdSuccess (req, res, next) {
   if (res.locals.meta) {
     res.locals.meta.msgCode = res.locals.meta.msgCode || MSG_CODE_SUCCESS
     res.locals.meta.msg = res.locals.meta.msg || arguments.callee.name
@@ -66,18 +66,18 @@ function createdSuccess(req, res, next) {
 }
 
 /**
- * 
- * @param {Error} err 
- * @param {request} req 
- * @param {response} res 
- * @param {function} next 
+ *
+ * @param {Error} err
+ * @param {request} req
+ * @param {response} res
+ * @param {function} next
  */
-function errorHandler(err, req, res, next) {
+function errorHandler (err, req, res, next) {
   res.locals.meta = {
     msgCode: err.msgCode || MSG_CODE_FAIL,
     error: err.message
   }
-  
+
   res.status(err.statusCode || 500).json(res.locals)
 }
 

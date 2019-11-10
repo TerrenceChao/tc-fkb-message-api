@@ -16,7 +16,7 @@ var respondErr = RES_META.GET_ONE_CHANNEL_ERR
 
 util.inherits(GetOneChannelEventHandler, EventHandler)
 
-function GetOneChannelEventHandler() {
+function GetOneChannelEventHandler () {
   this.name = arguments.callee.name
 }
 
@@ -28,7 +28,7 @@ GetOneChannelEventHandler.prototype.handle = function (requestInfo) {
   //   return
   // }
 
-  var storageService = this.globalContext['storageService']
+  var storageService = this.globalContext.storageService
   var uid = requestInfo.packet.uid
   var chid = requestInfo.packet.chid
 
@@ -38,7 +38,7 @@ GetOneChannelEventHandler.prototype.handle = function (requestInfo) {
 }
 
 GetOneChannelEventHandler.prototype.sendChInfo = function (channelInfo, requestInfo) {
-  var businessEvent = this.globalContext['businessEvent']
+  var businessEvent = this.globalContext.businessEvent
   var resInfo = new ResponseInfo()
     .assignProtocol(requestInfo)
     .setHeader({

@@ -32,8 +32,8 @@ ExtendValidityEventHandler.prototype.handle = async function (requestInfo) {
     return
   }
 
-  var authService = this.globalContext['authService']
-  var storageService = this.globalContext['storageService']
+  var authService = this.globalContext.authService
+  var storageService = this.globalContext.storageService
 
   var socket = requestInfo.socket
   var packet = requestInfo.packet
@@ -64,7 +64,7 @@ ExtendValidityEventHandler.prototype.handle = async function (requestInfo) {
 }
 
 ExtendValidityEventHandler.prototype.sendValidationToUser = function (token, refreshToken, requestInfo) {
-  var businessEvent = this.globalContext['businessEvent']
+  var businessEvent = this.globalContext.businessEvent
   var packet = requestInfo.packet
 
   var resInfo = new ResponseInfo()

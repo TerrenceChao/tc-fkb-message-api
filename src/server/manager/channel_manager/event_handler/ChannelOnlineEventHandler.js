@@ -14,7 +14,6 @@ var EventHandler = require(path.join(config.get('src.manager'), 'EventHandler'))
 const CHANNEL_ONLINE_INFO = RES_META.CHANNEL_ONLINE_INFO
 var respondErr = RES_META.CHANNEL_ONLINE_ERR
 
-
 util.inherits(ChannelOnlineEventHandler, EventHandler)
 
 function ChannelOnlineEventHandler () {
@@ -29,7 +28,7 @@ ChannelOnlineEventHandler.prototype.handle = function (requestInfo) {
   //   return
   // }
 
-  var storageService = this.globalContext['storageService']
+  var storageService = this.globalContext.storageService
   var uid = requestInfo.packet.uid
 
   Promise.resolve(storageService.getAllChannelIds(uid))
@@ -47,7 +46,7 @@ ChannelOnlineEventHandler.prototype.joinChannels = function (channelIds, request
   // //   socketServer.of('/').adapter.remoteJoin(socket.id, chid)
   // // })
   // socketService.collectiveJoin(socket.id, channelIds)
-  this.globalContext['socketService'].onlineChannelList(
+  this.globalContext.socketService.onlineChannelList(
     requestInfo.packet.uid,
     channelIds
   )
@@ -56,7 +55,7 @@ ChannelOnlineEventHandler.prototype.joinChannels = function (channelIds, request
 }
 
 ChannelOnlineEventHandler.prototype.broadcast = function (channelIds, requestInfo) {
-  var businessEvent = this.globalContext['businessEvent']
+  var businessEvent = this.globalContext.businessEvent
   var packet = requestInfo.packet
   var uid = packet.uid
 

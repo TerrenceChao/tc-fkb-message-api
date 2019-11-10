@@ -16,7 +16,6 @@ const INVITATION_LIST_INFO = RES_META.INVITATION_LIST_INFO
 const GET_INVITATION_LIST_SUCCESS = RES_META.GET_INVITATION_LIST_SUCCESS
 var respondErr = RES_META.GET_INVITATION_LIST_ERR
 
-
 util.inherits(GetInvitationListEventHandler, EventHandler)
 
 function GetInvitationListEventHandler () {
@@ -37,7 +36,7 @@ GetInvitationListEventHandler.prototype.handle = function (requestInfo) {
 }
 
 GetInvitationListEventHandler.prototype.getInvitationList = async function (requestInfo) {
-  var storageService = this.globalContext['storageService']
+  var storageService = this.globalContext.storageService
 
   var packet = requestInfo.packet
   var uid = packet.uid
@@ -56,7 +55,7 @@ GetInvitationListEventHandler.prototype.getInvitationList = async function (requ
 }
 
 GetInvitationListEventHandler.prototype.sendInvitationList = function (invitationList, requestInfo) {
-  var businessEvent = this.globalContext['businessEvent']
+  var businessEvent = this.globalContext.businessEvent
   var packet = requestInfo.packet
 
   var meta = INVITATION_LIST_INFO

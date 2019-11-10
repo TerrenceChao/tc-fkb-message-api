@@ -1,6 +1,5 @@
 const path = require('path')
 const config = require('config')
-const uuidv4 = require('uuid/v4')
 
 var ChannelInfo = require(path.join(config.get('database.nosql.model'), 'ChannelInfo'))
 
@@ -152,10 +151,10 @@ ChannelInfoRepository.prototype.removeMemberAndReturn = async function (chid, ui
 
 /**
  * [NOTE]:
- * as user3344977 said in comment, the function [deleteOne] and [deleteMany] 
- * no longer exist in mongoose 4. 
+ * as user3344977 said in comment, the function [deleteOne] and [deleteMany]
+ * no longer exist in mongoose 4.
  * @The API documentation is not up to date.
- * you can use Model.findOneAndRemove(condition, options, callback) 
+ * you can use Model.findOneAndRemove(condition, options, callback)
  * or Model.findByIdAndRemove(id, options, callback) instead.
  * ref: https://stackoverflow.com/questions/42798869/mongoose-js-typeerror-model-deleteone-is-not-a-function
  */
@@ -165,7 +164,7 @@ ChannelInfoRepository.prototype.removeByChid = async function (chid) {
       if (err) {
         return reject(err)
       }
-      
+
       // console.log(`${JSON.stringify(docChInfo)}`, `\n`)
       resolve(docChInfo)
     })

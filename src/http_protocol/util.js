@@ -1,21 +1,19 @@
 /**
- * 
- * @param {Object} user 
+ *
+ * @param {Object} user
  */
-function recordAuthorization(user) {
-  user.createdAt ?
-    console.log(`\nauthorize to newborn:\n`, user, `\n`) :
-    console.log(`client gets authorization`, user)
+function recordAuthorization (user) {
+  user.createdAt ? console.log('\nauthorize to newborn:\n', user, '\n') : console.log('client gets authorization', user)
 }
 
 /**
- * 
+ *
  * @param {Object} meta
- * @param {Validator|null} validation 
+ * @param {Validator|null} validation
  */
-function validateError(meta, validation = null) {
-  let message = validation ? JSON.stringify(validation.errors.all()) : meta.msg
-  let err = new Error(message)
+function validateError (meta, validation = null) {
+  const message = validation ? JSON.stringify(validation.errors.all()) : meta.msg
+  const err = new Error(message)
 
   err.statusCode = meta.statusCode || 422
   err.msgCode = meta.msgCode
@@ -23,7 +21,7 @@ function validateError(meta, validation = null) {
   return err
 }
 
-function matchRequestEvent(req, res, eventName) {
+function matchRequestEvent (req, res, eventName) {
   if (req === undefined || res === undefined) {
     return false
   }
@@ -35,5 +33,5 @@ function matchRequestEvent(req, res, eventName) {
 module.exports = {
   recordAuthorization,
   validateError,
-  matchRequestEvent,
+  matchRequestEvent
 }

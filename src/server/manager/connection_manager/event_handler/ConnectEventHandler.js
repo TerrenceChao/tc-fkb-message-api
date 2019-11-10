@@ -20,7 +20,7 @@ ConnectEventHandler.prototype.handle = function (requestInfo) {
   //   return
   // }
 
-  var businessEvent = this.globalContext['businessEvent']
+  var businessEvent = this.globalContext.businessEvent
   businessEvent.emit(EVENTS.USER_ONLINE, requestInfo)
   businessEvent.emit(EVENTS.CHANNEL_ONLINE, requestInfo)
 }

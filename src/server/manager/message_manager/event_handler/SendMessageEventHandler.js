@@ -51,13 +51,13 @@ SendMessageEventHandler.prototype.handle = function (responseInfo) {
           break
 
         default:
-          console.error(`${EVENTS.SEND_MESSAGE}:`, `there's nothing can provided.`)
+          console.error(`${EVENTS.SEND_MESSAGE}: there's nothing can provided.`)
       }
   }
 }
 
 SendMessageEventHandler.prototype.emitForBroadcast = function (responseInfo) {
-  var socketService = this.globalContext['socketService']
+  var socketService = this.globalContext.socketService
 
   var header = responseInfo.header
   var packet = responseInfo.packet
@@ -65,11 +65,11 @@ SendMessageEventHandler.prototype.emitForBroadcast = function (responseInfo) {
 
   // socketServer.sockets.emit(responseEvent, packet)
   socketService.broadcast(responseEvent, packet)
-  console.log(`${EVENTS.SEND_MESSAGE}:`, `broadcast to all.`, `responseEvent: "${responseEvent}"`, JSON.stringify(packet))
+  console.log(`${EVENTS.SEND_MESSAGE}: broadcast to all. responseEvent: "${responseEvent}"`, JSON.stringify(packet))
 }
 
 SendMessageEventHandler.prototype.emitToChannel = function (responseInfo) {
-  var socketService = this.globalContext['socketService']
+  var socketService = this.globalContext.socketService
 
   var header = responseInfo.header
   var packet = responseInfo.packet
@@ -85,7 +85,7 @@ SendMessageEventHandler.prototype.emitToChannel = function (responseInfo) {
     socketService.emitInChannel(receiver, responseEvent, packet)
     console.log(`"${EVENTS.SEND_MESSAGE}": {"emit to ${header.to}": ${JSON.stringify(receiver, null, 2)}, "responseEvent": "${responseEvent}"}`, `, "packet": ${JSON.stringify(packet, null, 2)},`)
   } else {
-    console.error(`${EVENTS.SEND_MESSAGE}:`, `type of receiver is unknown or invalid:`, receiver)
+    console.error(`${EVENTS.SEND_MESSAGE}: type of receiver is unknown or invalid:`, receiver)
   }
 }
 
@@ -93,12 +93,12 @@ SendMessageEventHandler.prototype.emitToSocket = function (responseInfo) {
   var responseEvent = responseInfo.header.responseEvent
 
   if (responseInfo.socket == null) {
-    console.log(`${EVENTS.SEND_MESSAGE}:`, `socket is undefined.`)
+    console.log(`${EVENTS.SEND_MESSAGE}: socket is undefined.`)
     return
   }
 
   responseInfo.socket.emit(responseEvent, responseInfo.packet)
-  console.log(`${EVENTS.SEND_MESSAGE}:`, `emit to socket`, `responseEvent: "${responseEvent}"`, JSON.stringify(responseInfo.packet))
+  console.log(`${EVENTS.SEND_MESSAGE}: emit to socket`, `responseEvent: "${responseEvent}"`, JSON.stringify(responseInfo.packet))
 }
 
 // SendMessageEventHandler.prototype.emitInChannel = function (channel, responseEvent, packet) {

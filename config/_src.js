@@ -9,7 +9,7 @@ module.exports = function (root) {
     property: path.join(src, 'property'),
     router: path.join(src, 'router'),
     httpProtocol: path.join(src, 'http_protocol'),
-    
+
     service: path.join(src, 'service'),
     repository: path.join(src, 'repository'),
 

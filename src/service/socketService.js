@@ -3,14 +3,14 @@ var {
   adaptor
 } = require('../server/Adapter')
 
-function SocketService() { 
+function SocketService () {
   this.socketServer = {}
 }
 
 SocketService.prototype.init = function (httpServer) {
   this.socketServer = socketIo.listen(httpServer)
   adaptor(this.socketServer)
-  
+
   return this
 }
 
@@ -34,7 +34,7 @@ SocketService.prototype.listen = function (callback) {
 // // multi-join (online) (need improve)
 // SocketService.prototype.collectiveJoin = function (socketId, channelIdList, namespace = '/') {
 //   if (!Array.isArray(channelIdList)) {
-//     Xthrow new Error(`channelIdList isn't an array`)
+//     Xthrow new Error('channelIdList isn\'t an array')
 //   }
 
 //   channelIdList.forEach(channelId => {
@@ -45,7 +45,7 @@ SocketService.prototype.listen = function (callback) {
 // // multi-leave (offline) (need improve)
 // SocketService.prototype.collectiveLeave = function (socketId, channelIdList, namespace = '/') {
 //   if (!Array.isArray(channelIdList)) {
-//     Xthrow new Error(`channelIdList isn't an array`)
+//     Xthrow new Error('channelIdList isn\'t an array')
 //   }
 
 //   channelIdList.forEach(channelId => {
@@ -62,18 +62,18 @@ SocketService.prototype.dissociateUser = function (socketId, userId, namespace =
 }
 
 SocketService.prototype.joinChannel = function (userId, channelId, namespace = '/') {
-  new Promise((_, reject) => {
+  new Promise((resolve, reject) => {
     this.socketServer.in(userId).clients((err, socketIdList) => {
       if (err) {
         return reject(err)
       }
-  
+
       socketIdList.forEach(socketId => {
         this.socketServer.of(namespace).adapter.remoteJoin(socketId, channelId)
       })
     })
   })
-  .catch(err => console.error(`caught`, err))
+    .catch(err => console.error('caught', err))
 }
 
 SocketService.prototype.joinChannelSync = function (callback, userId, channelId, namespace = '/') {
@@ -90,29 +90,29 @@ SocketService.prototype.joinChannelSync = function (callback, userId, channelId,
       if (err) {
         return reject(err)
       }
-  
+
       Promise.all(socketIdList.map(socketId => {
         this.socketServer.of(namespace).adapter.remoteJoin(socketId, channelId)
       }))
         .then(() => resolve(callback()))
     })
   })
-  .catch(err => console.error(`caught`, err))
+    .catch(err => console.error('caught', err))
 }
 
 SocketService.prototype.leaveChannel = function (userId, channelId, namespace = '/') {
-  new Promise((_, reject) => {
+  new Promise((resolve, reject) => {
     this.socketServer.in(userId).clients((err, socketIdList) => {
       if (err) {
         return reject(err)
       }
-  
+
       socketIdList.forEach(socketId => {
         this.socketServer.of(namespace).adapter.remoteLeave(socketId, channelId)
       })
     })
   })
-  .catch(err => console.error(`caught`, err))
+    .catch(err => console.error('caught', err))
 }
 
 SocketService.prototype.leaveChannelSync = function (callback, userId, channelId, namespace = '/') {
@@ -129,19 +129,19 @@ SocketService.prototype.leaveChannelSync = function (callback, userId, channelId
       if (err) {
         return reject(err)
       }
-  
+
       Promise.all(socketIdList.map(socketId => {
         this.socketServer.of(namespace).adapter.remoteLeave(socketId, channelId)
       }))
         .then(() => resolve(callback()))
     })
   })
-  .catch(err => console.error(`caught`, err))
+    .catch(err => console.error('caught', err))
 }
 
 SocketService.prototype.onlineChannelList = function (userId, channelIdList, namespace = '/') {
   if (!Array.isArray(channelIdList)) {
-    throw new Error(`channelIdList isn't an array`)
+    throw new Error('channelIdList isn\'t an array')
   }
 
   channelIdList.forEach(channelId => {
@@ -151,7 +151,7 @@ SocketService.prototype.onlineChannelList = function (userId, channelIdList, nam
 
 SocketService.prototype.offlineChannelList = function (userId, channelIdList, namespace = '/') {
   if (!Array.isArray(channelIdList)) {
-    throw new Error(`channelIdList isn't an array`)
+    throw new Error('channelIdList isn\'t an array')
   }
 
   channelIdList.forEach(channelId => {
@@ -172,12 +172,9 @@ SocketService.prototype.emitInChannel = function (channel, responseEvent, packet
   } else if (typeof responseEvent === 'string') {
     this.socketServer.sockets.in(channel).emit(responseEvent, packet)
   } else {
-    throw new Error(`The type of responseEvent is illgal`)
+    throw new Error('The type of responseEvent is illgal')
   }
 }
-
-
-
 
 module.exports = {
   socketService: new SocketService()

@@ -1,36 +1,33 @@
 var path = require('path')
 var config = require('config')
-var RequestInfo = require(path.join(config.get('src.manager'), 'RequestInfo'))
 var ResponseInfo = require(path.join(config.get('src.manager'), 'ResponseInfo'))
 const UID_PATTERN = config.get('app.UID_PATTERN')
 const TOKEN = config.get('auth.token')
 const REFRESH_TOKEN = config.get('auth.refreshToken')
 const EVENTS = require(path.join(config.get('src.property'), 'property')).EVENTS
 
-
 /**
- * 
- * @param {RequestInfo} requestInfo 
+ *
+ * @param {RequestInfo} requestInfo
  */
 function requireUidOnly (requestInfo) {
   return requestInfo.packet != null &&
     requestInfo.packet.uid != null
 }
 
-
 module.exports = {
   HTTP: {
     // AuthenticationManager
     [EVENTS.AUTHENTICATE]: {
-      uid: [`required`, `regex:${UID_PATTERN}`],
-      clientuseragent: `required|string`
+      uid: ['required', `regex:${UID_PATTERN}`],
+      clientuseragent: 'required|string'
     },
     // MessageManager
     [EVENTS.PUSH_NOTIFICATION]: {
-      receivers: `required|array`,
-      event: `required|string`,
-      content: `required`
-    },
+      receivers: 'required|array',
+      event: 'required|string',
+      content: 'required'
+    }
   },
   ALL: {
     // AuthenticationManager
@@ -172,7 +169,7 @@ module.exports = {
     },
     [EVENTS.USER_OFFLINE]: function (requestInfo) {
       return requireUidOnly(requestInfo)
-    },
+    }
 
   }
 }

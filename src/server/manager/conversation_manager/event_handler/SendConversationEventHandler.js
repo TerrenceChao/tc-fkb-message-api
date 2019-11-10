@@ -14,7 +14,6 @@ var EventHandler = require(path.join(config.get('src.manager'), 'EventHandler'))
 const CONVERSATION_SENT_SUCCESS = RES_META.CONVERSATION_SENT_SUCCESS
 var respondErr = RES_META.SAVE_CONVERSATION_ERR
 
-
 util.inherits(SendConversationEventHandler, EventHandler)
 
 function SendConversationEventHandler () {
@@ -29,7 +28,7 @@ SendConversationEventHandler.prototype.handle = async function (requestInfo) {
   //   return
   // }
 
-  var storageService = this.globalContext['storageService']
+  var storageService = this.globalContext.storageService
   var socket = requestInfo.socket
   var packet = requestInfo.packet
   var chid = packet.chid
@@ -58,7 +57,7 @@ SendConversationEventHandler.prototype.handle = async function (requestInfo) {
 }
 
 SendConversationEventHandler.prototype.executeSend = function (datetime, requestInfo, responseHeader) {
-  var businessEvent = this.globalContext['businessEvent']
+  var businessEvent = this.globalContext.businessEvent
   var packet = requestInfo.packet
   var chid = packet.chid
   var uid = packet.uid

@@ -15,7 +15,7 @@ function logger (err) {
  * 以往 repository 會透過注入的方式(DI)以方便用替身(stub)測試，
  * 但是請注意：[StorageService本身就是只關注Database的操作]，
  * 所以測試時，請將 StorageService 當作以往的 repository 做單元測試。
- * 
+ *
  * 最主要的原因是專案（程式）架構上的差異。這裡不像傳統的：
  * Controller, Service, Repository. 因為大部分的操作跟 socket 有關，
  * 所以專案架構整體採用 Command Pattern 的方式去設計：
@@ -60,7 +60,7 @@ StorageService.prototype.invitationMultiCreated = async function (
   sensitive
 ) {
   if (!Array.isArray(recipients)) {
-    throw new TypeError(`param 'recipients' is not an array`)
+    throw new TypeError('param \'recipients\' is not an array')
   }
 
   return Promise.all(recipients.map(async (recipient) => {
@@ -72,7 +72,7 @@ StorageService.prototype.invitationMultiCreated = async function (
   }))
     .catch(err => {
       logger(err)
-      return Promise.reject(new Error(`create invitation(s) fail`))
+      return Promise.reject(new Error('create invitation(s) fail'))
     })
 }
 
@@ -81,7 +81,7 @@ StorageService.prototype.getInvitation = async function (iid) {
     return await invitationRepository.findById(iid)
   } catch (err) {
     logger(err)
-    throw new Error(`invitation ID(iid) is invalid`)
+    throw new Error('invitation ID(iid) is invalid')
   }
 }
 
@@ -92,7 +92,7 @@ StorageService.prototype.getReceivedInvitationList = async function (uid, limit 
     return invitationList
   } catch (err) {
     logger(err)
-    throw new Error(`invitationList(received) is null`)
+    throw new Error('invitationList(received) is null')
   }
 }
 
@@ -101,7 +101,7 @@ StorageService.prototype.getSentInvitationList = async function (uid, limit = 10
     .then(inviteIds => invitationRepository.getListByIds(inviteIds)) //  (inviteIds, limit, skip, 'DESC')
     .catch(err => {
       logger(err)
-      return Promise.reject(new Error(`invitationList(sent) is null`))
+      return Promise.reject(new Error('invitationList(sent) is null'))
     })
 }
 

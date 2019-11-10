@@ -9,7 +9,7 @@ const VALID_FIELDS = [
   'sentInvitations',
   'channelRecords',
   'updatedAt',
-  'createdAt',
+  'createdAt'
 ]
 
 var User = require(path.join(config.get('database.nosql.model'), 'User'))
@@ -21,7 +21,7 @@ UserRepository.prototype.findById = async function (uid, selectFields = []) {
   var user = await User.findOne({
     uid
   })
-  .select(selectFields)
+    .select(selectFields)
 
   return user
 }

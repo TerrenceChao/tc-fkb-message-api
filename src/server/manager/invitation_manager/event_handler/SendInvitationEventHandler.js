@@ -17,7 +17,6 @@ const INVITATION_RECEIVED_INFO = RES_META.INVITATION_RECEIVED_INFO
 var respondDBErr = RES_META.CHANNEL_OR_INVITATION_DB_ERR
 var respondSendErr = RES_META.SEND_INVITATION_ERR
 
-
 util.inherits(SendInvitationEventHandler, EventHandler)
 
 function SendInvitationEventHandler () {
@@ -32,7 +31,7 @@ SendInvitationEventHandler.prototype.handle = function (requestInfo) {
   //   return
   // }
 
-  var storageService = this.globalContext['storageService']
+  var storageService = this.globalContext.storageService
   var packet = requestInfo.packet
   var chid = packet.chid
 
@@ -45,7 +44,7 @@ SendInvitationEventHandler.prototype.handle = function (requestInfo) {
 }
 
 SendInvitationEventHandler.prototype.createAndGetInvitations = async function (channelInfo, requestInfo) {
-  var storageService = this.globalContext['storageService']
+  var storageService = this.globalContext.storageService
   var packet = requestInfo.packet
   var inviter = packet.inviter
   var newRecipients = packet.recipients
@@ -80,13 +79,13 @@ SendInvitationEventHandler.prototype.getInvitationCreateionData = function (chan
       }
     },
     sensitive: {
-      chid: channelInfo.chid,
+      chid: channelInfo.chid
     }
   }
 }
 
 SendInvitationEventHandler.prototype.noticeUser = function (requestInfo) {
-  var businessEvent = this.globalContext['businessEvent']
+  var businessEvent = this.globalContext.businessEvent
   var packet = requestInfo.packet
 
   var resInfo = new ResponseInfo()
@@ -103,12 +102,12 @@ SendInvitationEventHandler.prototype.noticeUser = function (requestInfo) {
     //   }
     // })
     .responsePacket({ uid: packet.inviter }, HAS_INVITED_INFO)
-  
+
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 }
 
 SendInvitationEventHandler.prototype.sendInvitations = function (invitationList, requestInfo) {
-  var businessEvent = this.globalContext['businessEvent']
+  var businessEvent = this.globalContext.businessEvent
 
   invitationList.forEach(invitation => {
     _.unset(invitation, 'sensitive')
@@ -124,8 +123,8 @@ SendInvitationEventHandler.prototype.sendInvitations = function (invitationList,
       //   msgCode: 'you got an invitation',
       //   data: invitation
       // })
-    .responsePacket(invitation, INVITATION_RECEIVED_INFO)
-    
+      .responsePacket(invitation, INVITATION_RECEIVED_INFO)
+
     businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
   })
 }

@@ -16,5 +16,5 @@ module.exports = {
   authService,
   socketServer: undefined,
   socketService,
-  storageService,
+  storageService
 }

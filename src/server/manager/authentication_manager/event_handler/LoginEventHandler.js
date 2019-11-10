@@ -17,7 +17,6 @@ const CHANNEL_LIST_INFO = RES_META.CHANNEL_LIST_INFO
 const GET_CHANNEL_AND_CONVERSATION_LIST_SUCCESS = RES_META.GET_CHANNEL_AND_CONVERSATION_LIST_SUCCESS
 var respondErr = RES_META.GET_CHANNEL_AND_CONVERSATION_LIST_ERR
 
-
 util.inherits(LoginEventHandler, EventHandler)
 
 function LoginEventHandler () {
@@ -32,9 +31,9 @@ LoginEventHandler.prototype.handle = async function (requestInfo) {
   //   return
   // }
 
-  var authService = this.globalContext['authService']
-  var businessEvent = this.globalContext['businessEvent']
-  var storageService = this.globalContext['storageService']
+  var authService = this.globalContext.authService
+  var businessEvent = this.globalContext.businessEvent
+  var storageService = this.globalContext.storageService
 
   var socket = requestInfo.socket
   var packet = requestInfo.packet
@@ -60,8 +59,8 @@ LoginEventHandler.prototype.handle = async function (requestInfo) {
 }
 
 LoginEventHandler.prototype.sendChannelInfoAndConversations = function (userChannelInfoList, requestInfo) {
-  var storageService = this.globalContext['storageService']
-  var businessEvent = this.globalContext['businessEvent']
+  var storageService = this.globalContext.storageService
+  var businessEvent = this.globalContext.businessEvent
 
   var packet = requestInfo.packet
   var uid = packet.uid
@@ -82,9 +81,9 @@ LoginEventHandler.prototype.sendChannelInfoAndConversations = function (userChan
   }
 
   return Promise.all(userChannelInfoList.map(async chInfo => {
-      chInfo.conversations = await storageService.getConversationList(uid, chInfo.chid, convLimit)
-      return chInfo
-    }))
+    chInfo.conversations = await storageService.getConversationList(uid, chInfo.chid, convLimit)
+    return chInfo
+  }))
     .then(chInfoList => {
       var resInfo = new ResponseInfo()
         .assignProtocol(requestInfo)

@@ -10,7 +10,7 @@ mongoose.envParams = {
   }
 }
 
-function NosqlShell() {
+function NosqlShell () {
   this.attempts = 1
 
   mongoose.connection.on('error', console.error.bind(console, 'connection error:'))

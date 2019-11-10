@@ -64,9 +64,8 @@ ResponseInfo.prototype.responseMsg = function (resMsg = []) {
   if (_.get(this.packet, 'meta.msg') !== undefined) {
     this.packet.meta.msg = Array.isArray(resMsg) ? customMetaMsg(this.packet.meta, resMsg) : resMsg
   }
-    
+
   return this
 }
-
 
 module.exports = ResponseInfo
