@@ -26,11 +26,6 @@ function SendInvitationEventHandler () {
 SendInvitationEventHandler.prototype.eventName = EVENTS.SEND_INVITATION
 
 SendInvitationEventHandler.prototype.handle = function (requestInfo) {
-  // if (!this.isValid(requestInfo)) {
-  //   console.warn(`${this.eventName}: request info is invalid.`)
-  //   return
-  // }
-
   var storageService = this.globalContext.storageService
   var packet = requestInfo.packet
   var chid = packet.chid
@@ -95,12 +90,6 @@ SendInvitationEventHandler.prototype.noticeUser = function (requestInfo) {
       receiver: packet.inviter,
       responseEvent: RESPONSE_EVENTS.PERSONAL_INFO // inviter self
     })
-    // .setPacket({
-    //   msgCode: 'The recipients may have been invited or are members',
-    //   data: {
-    //     uid: packet.inviter
-    //   }
-    // })
     .responsePacket({ uid: packet.inviter }, HAS_INVITED_INFO)
 
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
@@ -119,25 +108,11 @@ SendInvitationEventHandler.prototype.sendInvitations = function (invitationList,
         receiver: invitation.recipient,
         responseEvent: RESPONSE_EVENTS.INVITATION_CREATED // to individual recipients (realtime)
       })
-      // .setPacket({
-      //   msgCode: 'you got an invitation',
-      //   data: invitation
-      // })
       .responsePacket(invitation, INVITATION_RECEIVED_INFO)
 
     businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
   })
 }
-
-// SendInvitationEventHandler.prototype.isValid = function (requestInfo) {
-//   return (
-//     requestInfo.packet != null &&
-//     requestInfo.packet.inviter != null &&
-//     Array.isArray(requestInfo.packet.recipients) &&
-//     typeof requestInfo.packet.chid === 'string' &&
-//     requestInfo.packet.content != null
-//   )
-// }
 
 module.exports = {
   handler: new SendInvitationEventHandler()

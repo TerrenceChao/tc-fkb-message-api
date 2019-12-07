@@ -14,7 +14,6 @@ const {
 module.exports = {
   businessEvent: new EventEmitter(),
   authService,
-  socketServer: undefined,
   socketService,
   storageService
 }

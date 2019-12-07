@@ -23,11 +23,6 @@ function RemoveChannelEventHandler () {
 RemoveChannelEventHandler.prototype.eventName = EVENTS.REMOVE_CHANNEL
 
 RemoveChannelEventHandler.prototype.handle = function (requestInfo) {
-  // if (!this.isValid(requestInfo)) {
-  //   console.warn(`${this.eventName}: request info is invalid.`)
-  //   return
-  // }
-
   var storageService = this.globalContext.storageService
   var chid = requestInfo.packet.chid
   var query = {
@@ -56,13 +51,6 @@ RemoveChannelEventHandler.prototype.notifyUser = function (requestInfo) {
 
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 }
-
-// RemoveChannelEventHandler.prototype.isValid = function (requestInfo) {
-//   var packet = requestInfo.packet
-//   return packet !== undefined &&
-//     typeof packet.uid === 'string' &&
-//     packet.chid != null
-// }
 
 module.exports = {
   handler: new RemoveChannelEventHandler()

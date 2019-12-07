@@ -24,11 +24,6 @@ function LeaveChannelEventHandler () {
 LeaveChannelEventHandler.prototype.eventName = EVENTS.LEAVE_CHANNEL
 
 LeaveChannelEventHandler.prototype.handle = function (requestInfo) {
-  // if (!this.isValid(requestInfo)) {
-  //   console.warn(`${this.eventName}: request info is invalid.`)
-  //   return
-  // }
-
   var businessEvent = this.globalContext.businessEvent
   var storageService = this.globalContext.storageService
 
@@ -84,16 +79,6 @@ LeaveChannelEventHandler.prototype.broadcastUserHasLeft = function (channelInfo,
       receiver: channelInfo.chid,
       responseEvent: RESPONSE_EVENTS.CHANNEL_LEFT // RESPONSE_EVENTS.CONVERSATION_FROM_CHANNEL
     })
-    // .setPacket({
-    //   msgCode: `${nickname} has left`,
-    //   data: {
-    //     uid: targetUid,
-    //     // 1. delete targetUid from channel.members(array) for "each member" in localStorage (frontend)
-    //     // 2. 其他使用者登入時，只載入了少數的 channelInfo, 有可能沒載入此 channelInfo 的資訊。當有成員離開時可提供更新後的 channelInfo 給前端
-    //     channelInfo,
-    //     datetime: Date.now()
-    //   }
-    // })
     .responsePacket({
       uid: targetUid,
       // 1. delete targetUid from channel.members(array) for "each member" in localStorage (frontend)
@@ -105,14 +90,6 @@ LeaveChannelEventHandler.prototype.broadcastUserHasLeft = function (channelInfo,
 
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 }
-
-// LeaveChannelEventHandler.prototype.isValid = function (requestInfo) {
-//   var packet = requestInfo.packet
-//   return packet !== undefined &&
-//     typeof packet.targetUid === 'string' &&
-//     typeof packet.nickname === 'string' &&
-//     typeof packet.chid === 'string'
-// }
 
 module.exports = {
   handler: new LeaveChannelEventHandler()

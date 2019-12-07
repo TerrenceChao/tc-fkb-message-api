@@ -24,11 +24,6 @@ function GetConversationEventHandler () {
 GetConversationEventHandler.prototype.eventName = EVENTS.GET_CONVERSATION_LIST
 
 GetConversationEventHandler.prototype.handle = function (requestInfo) {
-  // if (!this.isValid(requestInfo)) {
-  //   console.warn(`${this.eventName}: request info is invalid.`)
-  //   return
-  // }
-
   var storageService = this.globalContext.storageService
   var packet = requestInfo.packet
 
@@ -77,15 +72,6 @@ GetConversationEventHandler.prototype.sendConversationList = function (conversat
 
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 }
-
-// GetConversationEventHandler.prototype.isValid = function (requestInfo) {
-//   var packet = requestInfo.packet
-//   return packet !== undefined &&
-//     typeof packet.uid === 'string' &&
-//     packet.chid != null &&
-//     packet.convLimit != null &&
-//     packet.convSkip != null
-// }
 
 module.exports = {
   handler: new GetConversationEventHandler()

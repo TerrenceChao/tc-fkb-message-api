@@ -23,11 +23,6 @@ function GetOneChannelEventHandler () {
 GetOneChannelEventHandler.prototype.eventName = EVENTS.GET_ONE_CHANNEL
 
 GetOneChannelEventHandler.prototype.handle = function (requestInfo) {
-  // if (!this.isValid(requestInfo)) {
-  //   console.warn(`${this.eventName}: request info is invalid.`)
-  //   return
-  // }
-
   var storageService = this.globalContext.storageService
   var uid = requestInfo.packet.uid
   var chid = requestInfo.packet.chid
@@ -46,21 +41,10 @@ GetOneChannelEventHandler.prototype.sendChInfo = function (channelInfo, requestI
       receiver: requestInfo.packet.uid,
       responseEvent: RESPONSE_EVENTS.SPECIFIED_CHANNEL
     })
-    // .setPacket({
-    //   msgCode: `get a specified channel`,
-    //   data: channelInfo
-    // })
     .responsePacket(channelInfo, GET_ONE_CHANNEL_SUCCESS)
 
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 }
-
-// GetOneChannelEventHandler.prototype.isValid = function (requestInfo) {
-//   var packet = requestInfo.packet
-//   return packet !== undefined &&
-//     typeof packet.uid === 'string' &&
-//     typeof packet.chid === 'string'
-// }
 
 module.exports = {
   handler: new GetOneChannelEventHandler()

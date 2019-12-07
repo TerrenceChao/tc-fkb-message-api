@@ -51,10 +51,6 @@ PushNotificationEventHandler.prototype.emitNotification = function (reqInfo, rec
       receiver: receiver.uid,
       responseEvent: RESPONSE_EVENTS.NOTIFICATION_PUSHED
     })
-    // .setPacket({
-    //   msgCode: `notification pushed`,
-    //   data: notificationPacket
-    // })
     .responsePacket(notificationPacket, NOTIFICATION_PUSHED_INFO)
 
   this.globalContext.businessEvent.emit(EVENTS.SEND_MESSAGE, responseInfo)

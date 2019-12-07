@@ -24,11 +24,6 @@ function GetChannelListEventHandler () {
 GetChannelListEventHandler.prototype.eventName = EVENTS.GET_CHANNEL_LIST
 
 GetChannelListEventHandler.prototype.handle = function (requestInfo) {
-  // if (!this.isValid(requestInfo)) {
-  //   console.warn(`${this.eventName}: request info is invalid.`)
-  //   return
-  // }
-
   var storageService = this.globalContext.storageService
 
   var packet = requestInfo.packet
@@ -52,21 +47,10 @@ GetChannelListEventHandler.prototype.sendChInfoListBelongedUser = function (user
       receiver: requestInfo.packet.uid,
       responseEvent: RESPONSE_EVENTS.CHANNEL_LIST
     })
-    // .setPacket({
-    //   msgCode: `channel list`,
-    //   data: userChannelInfoList
-    // })
     .responsePacket(userChannelInfoList, META)
 
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 }
-
-// GetChannelListEventHandler.prototype.isValid = function (requestInfo) {
-//   var packet = requestInfo.packet
-//   return packet !== undefined &&
-//     typeof packet.uid === 'string' &&
-//     packet.chanLimit != null
-// }
 
 module.exports = {
   handler: new GetChannelListEventHandler()

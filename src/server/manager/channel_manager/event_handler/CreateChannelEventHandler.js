@@ -23,11 +23,6 @@ function CreateChannelEventHandler () {
 CreateChannelEventHandler.prototype.eventName = EVENTS.CREATE_CHANNEL
 
 CreateChannelEventHandler.prototype.handle = function (requestInfo) {
-  // if (!this.isValid(requestInfo)) {
-  //   console.warn(`${this.eventName}: request info is invalid.`)
-  //   return
-  // }
-
   var storageService = this.globalContext.storageService
   var uid = requestInfo.packet.uid
   var channelName = requestInfo.packet.channelName
@@ -68,22 +63,11 @@ CreateChannelEventHandler.prototype.sendChannelInfoToUser = function (channelInf
       receiver: channelInfo.creator,
       responseEvent: RESPONSE_EVENTS.CHANNEL_CREATED
     })
-    // .setPacket({
-    //   msgCode: `channel: ${channelInfo.name} is created`,
-    //   data: channelInfo
-    // })
     .responsePacket(channelInfo, CHANNEL_CREATED_SUCCESS)
     .responseMsg(`channel: ${channelInfo.name} is created`)
 
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 }
-
-// CreateChannelEventHandler.prototype.isValid = function (requestInfo) {
-//   var packet = requestInfo.packet
-//   return packet !== undefined &&
-//     typeof packet.uid === 'string' &&
-//     typeof packet.channelName === 'string'
-// }
 
 module.exports = {
   handler: new CreateChannelEventHandler()

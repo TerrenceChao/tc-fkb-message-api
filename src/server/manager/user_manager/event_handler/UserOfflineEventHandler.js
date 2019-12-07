@@ -22,11 +22,6 @@ function UserOfflineEventHandler () {
 UserOfflineEventHandler.prototype.eventName = EVENTS.USER_OFFLINE
 
 UserOfflineEventHandler.prototype.handle = function (requestInfo) {
-  // if (!this.isValid(requestInfo)) {
-  //   console.warn(`${this.eventName}`, `request info is invalid`)
-  //   return
-  // }
-
   var socketService = this.globalContext.socketService
   var businessEvent = this.globalContext.businessEvent
   var socket = requestInfo.socket
@@ -40,12 +35,6 @@ UserOfflineEventHandler.prototype.handle = function (requestInfo) {
       receiver: uid,
       responseEvent: RESPONSE_EVENTS.PERSONAL_INFO
     })
-    // .setPacket({
-    //   msgCode: `user is offline`,
-    //   data: {
-    //     uid
-    //   }
-    // })
     .responsePacket({ uid }, USER_OFFLINE_INFO)
 
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
@@ -54,11 +43,6 @@ UserOfflineEventHandler.prototype.handle = function (requestInfo) {
   // socketService.leave(socket.id, uid)
   socketService.dissociateUser(socket.id, uid)
 }
-
-// UserOfflineEventHandler.prototype.isValid = function (requestInfo) {
-//   return requestInfo.packet != null &&
-//     requestInfo.packet.uid != null
-// }
 
 module.exports = {
   handler: new UserOfflineEventHandler()

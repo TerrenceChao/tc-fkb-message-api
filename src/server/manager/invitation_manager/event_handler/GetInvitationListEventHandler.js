@@ -25,11 +25,6 @@ function GetInvitationListEventHandler () {
 GetInvitationListEventHandler.prototype.eventName = EVENTS.GET_INVITATION_LIST
 
 GetInvitationListEventHandler.prototype.handle = function (requestInfo) {
-  // if (!this.isValid(requestInfo)) {
-  //   console.warn(`${this.eventName}: request info is invalid.`)
-  //   return
-  // }
-
   Promise.resolve(this.getInvitationList(requestInfo))
     .then(invitationList => this.sendInvitationList(invitationList, requestInfo))
     .catch(err => this.alertException(respondErr(err), requestInfo))
@@ -76,13 +71,6 @@ GetInvitationListEventHandler.prototype.sendInvitationList = function (invitatio
 
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 }
-
-// GetInvitationListEventHandler.prototype.isValid = function (requestInfo) {
-//   return requestInfo.packet != null &&
-//     requestInfo.packet.uid != null &&
-//     typeof requestInfo.packet.inviType === 'string' &&
-//     requestInfo.packet.inviLimit != null
-// }
 
 module.exports = {
   handler: new GetInvitationListEventHandler()
