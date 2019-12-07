@@ -1,9 +1,14 @@
 var config = require('config')
 var path = require('path')
 var uuidv4 = require('uuid/v4')
+var now = require('performance-now')
 var { expect } = require('chai')
 var database = require(config.get('test.mockConfig.database'))(config.root)
 var { storageService } = require(path.join(config.get('src.service'), 'storageService'))
+
+function executionTime (funcName, srt) {
+  console.info(`${funcName} exe time: ${(now() - srt).toFixed(3)} ms`)
+}
 
 describe('storageService test', () => {
   before(() => database.nosql.db.connect())
@@ -13,7 +18,9 @@ describe('storageService test', () => {
     const uid = uuidv4()
 
     // act
+    const srt = now()
     const user = await storageService.getUser(uid)
+    executionTime('getUser (null)', srt)
 
     // assert
     expect(user).to.be.equals(null)
@@ -24,7 +31,9 @@ describe('storageService test', () => {
     const uid = uuidv4()
 
     // act
+    const srt = now()
     const user = await storageService.createUser(uid)
+    executionTime('createUser', srt)
 
     // assert
     expect(user._doc).to.has.keys('__v', '_id', 'uid', 'receivedInvitations', 'sentInvitations', 'channelRecords', 'updatedAt', 'createdAt')
@@ -40,7 +49,9 @@ describe('storageService test', () => {
 
     // act
     await storageService.createUser(uid)
+    const srt = now()
     const user = await storageService.getUser(uid)
+    executionTime('getUser', srt)
 
     // assert
     expect(user._doc).to.has.keys('_id', 'uid', 'receivedInvitations', 'sentInvitations', 'channelRecords', 'updatedAt', 'createdAt')
@@ -55,7 +66,9 @@ describe('storageService test', () => {
     const uid = uuidv4()
 
     // act: create first time
+    const srt = now()
     const user = await storageService.findOrCreateUser(uid)
+    executionTime('findOrCreateUser (create)', srt)
 
     // assert
     expect(user._doc).to.has.keys('__v', '_id', 'uid', 'receivedInvitations', 'sentInvitations', 'channelRecords', 'updatedAt', 'createdAt')
@@ -71,7 +84,9 @@ describe('storageService test', () => {
 
     // act: already has same one
     await storageService.createUser(uid)
+    const srt = now()
     const user = await storageService.findOrCreateUser(uid)
+    executionTime('findOrCreateUser (find old one)', srt)
 
     // assert
     expect(user._doc).to.has.keys('_id', 'uid', 'receivedInvitations', 'sentInvitations', 'channelRecords', 'updatedAt', 'createdAt')
@@ -87,7 +102,9 @@ describe('storageService test', () => {
     await storageService.findOrCreateUser(uid)
 
     // act
+    const srt = now()
     const channelInfo = await storageService.channelInfoCreated(uid, 'A Channel')
+    executionTime('channelInfoCreated', srt)
     const user = await storageService.findOrCreateUser(uid)
 
     // assert
@@ -111,7 +128,9 @@ describe('storageService test', () => {
     const lastGlimpse = Date.now() + 5000
 
     // act
+    const srt = now()
     await storageService.updateLastGlimpse(uid, [{ chid, lastGlimpse }])
+    executionTime('updateLastGlimpse', srt)
     const user = await storageService.findOrCreateUser(uid)
 
     // assert
@@ -127,7 +146,9 @@ describe('storageService test', () => {
     await storageService.findOrCreateUser(uid)
 
     // act
+    const srt = now()
     const channelIds = await storageService.getAllChannelIds(uid)
+    executionTime('getAllChannelIds (empty array)', srt)
 
     // assert
     expect(channelIds).to.be.an('array').that.is.empty
@@ -140,7 +161,9 @@ describe('storageService test', () => {
     const channelInfo = await storageService.channelInfoCreated(uid, 'A Channel')
 
     // act
+    const srt = now()
     const channelIds = await storageService.getAllChannelIds(uid)
+    executionTime('getAllChannelIds', srt)
 
     // assert
     expect(channelIds).to.be.an('array')
@@ -161,7 +184,9 @@ describe('storageService test', () => {
     const chid = channelInfo.chid
 
     // act
+    const srt = now()
     channelInfo = await storageService.getChannelInfo({ chid })
+    executionTime('getChannelInfo', srt)
 
     // assert
     expect(channelInfo.chid).to.be.equals(channelInfo.chid)
@@ -185,7 +210,9 @@ describe('storageService test', () => {
     const chid = channelInfo.chid
 
     // act
+    const srt = now()
     channelInfo = await storageService.getUserChannelInfo({ uid, chid })
+    executionTime('getUserChannelInfo', srt)
 
     // assert
     expect(channelInfo.chid).to.be.equals(channelInfo.chid)
@@ -200,7 +227,9 @@ describe('storageService test', () => {
     const uidB = uuidv4()
 
     // act
+    const srt = now()
     channelInfo = await storageService.getUserChannelInfo({ uid: uidB, chid })
+    executionTime('getUserChannelInfo (not member)', srt)
 
     // assert
     expect(channelInfo).to.be.null
@@ -212,7 +241,9 @@ describe('storageService test', () => {
     await storageService.findOrCreateUser(uid)
 
     // act
+    const srt = now()
     const channelInfoList = await storageService.getUserChannelInfoList(uid, 5, 0)
+    executionTime('getUserChannelInfoList (empty array)', srt)
 
     // assert
     expect(channelInfoList).to.be.an('array').that.is.empty
@@ -225,7 +256,9 @@ describe('storageService test', () => {
     const channelInfo = await storageService.channelInfoCreated(uid, 'A Party')
 
     // act
+    const srt = now()
     const channelInfoList = await storageService.getUserChannelInfoList(uid, 5, 0)
+    executionTime('getUserChannelInfoList', srt)
 
     // assert
     expect(channelInfoList).to.be.an('array')
@@ -242,7 +275,9 @@ describe('storageService test', () => {
     const chid = channelInfo.chid
 
     // act
+    const srt = now()
     channelInfo = await storageService.channelJoined(uidB, chid)
+    executionTime('channelJoined (compare the diffirence between before & after)', srt)
 
     // assert
     // console.log('channelInfo >>>', channelInfo)
@@ -262,7 +297,9 @@ describe('storageService test', () => {
     await storageService.channelJoined(uidB, chid)
 
     // act: uid as the creator leaves the channel
+    const srt = now()
     channelInfo = await storageService.channelLeaved(uid, chid)
+    executionTime('channelLeaved (compare the diffirence between before & after)', srt)
 
     // assert: uidB is still member
     expect(channelInfo.chid).to.be.equals(chid)
@@ -274,11 +311,13 @@ describe('storageService test', () => {
     // arrange
     const uid = uuidv4()
     await storageService.findOrCreateUser(uid)
-    let channelInfo = await storageService.channelInfoCreated(uid, 'A Party')
+    const channelInfo = await storageService.channelInfoCreated(uid, 'A Party')
     const chid = channelInfo.chid
 
     // act
+    const srt = now()
     const result = await storageService.channelInfoRemoved({ chid })
+    executionTime('channelInfoRemoved', srt)
 
     // assert
     expect(result).to.be.true
@@ -290,11 +329,13 @@ describe('storageService test', () => {
     // arrange
     const uid = uuidv4()
     await storageService.findOrCreateUser(uid)
-    let channelInfo = await storageService.channelInfoCreated(uid, 'A Party')
+    const channelInfo = await storageService.channelInfoCreated(uid, 'A Party')
     await storageService.channelInfoRemoved({ chid: channelInfo.chid })
 
     // act
+    const srt = now()
     const result = await storageService.channelInfoRemoved({ chid: channelInfo.chid })
+    executionTime('channelInfoRemoved (has removed)', srt)
 
     // assert
     expect(result).to.be.true
@@ -320,6 +361,7 @@ describe('storageService test', () => {
     }
 
     // act
+    const srt = now()
     const invitationList = await storageService.invitationMultiCreated(
       inviter,
       recipients,
@@ -327,6 +369,7 @@ describe('storageService test', () => {
       content,
       sensitive
     )
+    executionTime('invitationMultiCreated', srt)
     channelInfo = await storageService.getChannelInfo({ chid: channelInfo.chid })
 
     // assert
@@ -353,7 +396,7 @@ describe('storageService test', () => {
     const recipient = uuidv4()
     await storageService.findOrCreateUser(inviter)
     await storageService.findOrCreateUser(recipient)
-    let channelInfo = await storageService.channelInfoCreated(inviter, 'A Channel')
+    const channelInfo = await storageService.channelInfoCreated(inviter, 'A Channel')
     const header = {
       requestEvent: 'invitation_deal_with_invitation',
       data: {
@@ -374,7 +417,9 @@ describe('storageService test', () => {
 
     // act
     const iid = invitationList[0].iid
+    const srt = now()
     const invitation = await storageService.getInvitation(iid)
+    executionTime('getInvitation', srt)
 
     // assert
     expect(invitation.iid).to.be.equals(iid)
@@ -391,7 +436,9 @@ describe('storageService test', () => {
     const user = await storageService.findOrCreateUser(uid)
 
     // act
+    const srt = now()
     const receivedInvitationList = await storageService.getReceivedInvitationList(uid, 2)
+    executionTime('getReceivedInvitationList (empty array)', srt)
 
     // assert
     expect(receivedInvitationList).to.be.an('array').that.is.empty
@@ -403,7 +450,7 @@ describe('storageService test', () => {
     const recipient = uuidv4()
     await storageService.findOrCreateUser(inviter)
     await storageService.findOrCreateUser(recipient)
-    let channelInfo = await storageService.channelInfoCreated(inviter, 'A Channel')
+    const channelInfo = await storageService.channelInfoCreated(inviter, 'A Channel')
     const header = {
       requestEvent: 'invitation_deal_with_invitation',
       data: {
@@ -424,7 +471,9 @@ describe('storageService test', () => {
 
     // act
     const iid = invitationList[0].iid
+    const srt = now()
     const receivedInvitationList = await storageService.getReceivedInvitationList(recipient, 2)
+    executionTime('getReceivedInvitationList', srt)
 
     // assert
     const receivedInvitation = receivedInvitationList[0]
@@ -442,7 +491,9 @@ describe('storageService test', () => {
     const user = await storageService.findOrCreateUser(uid)
 
     // act
+    const srt = now()
     const receivedInvitationList = await storageService.getSentInvitationList(uid, 2)
+    executionTime('getSentInvitationList (empty array)', srt)
 
     // assert
     expect(receivedInvitationList).to.be.an('array').that.is.empty
@@ -454,7 +505,7 @@ describe('storageService test', () => {
     const recipient = uuidv4()
     await storageService.findOrCreateUser(inviter)
     await storageService.findOrCreateUser(recipient)
-    let channelInfo = await storageService.channelInfoCreated(inviter, 'A Channel')
+    const channelInfo = await storageService.channelInfoCreated(inviter, 'A Channel')
     const header = {
       requestEvent: 'invitation_deal_with_invitation',
       data: {
@@ -475,7 +526,9 @@ describe('storageService test', () => {
 
     // act
     const iid = invitationList[0].iid
+    const srt = now()
     const sentInvitationList = await storageService.getSentInvitationList(inviter, 2)
+    executionTime('getSentInvitationList', srt)
 
     // assert
     const sentInvitation = sentInvitationList[0]
@@ -493,7 +546,7 @@ describe('storageService test', () => {
     const recipient = uuidv4()
     await storageService.findOrCreateUser(inviter)
     await storageService.findOrCreateUser(recipient)
-    let channelInfo = await storageService.channelInfoCreated(inviter, 'A Channel')
+    const channelInfo = await storageService.channelInfoCreated(inviter, 'A Channel')
     const header = {
       requestEvent: 'invitation_deal_with_invitation',
       data: {
@@ -514,7 +567,9 @@ describe('storageService test', () => {
     const iid = invitationList[0].iid
 
     // act
+    const srt = now()
     const removedInvitation = await storageService.invitationRemoved(iid)
+    executionTime('invitationRemoved', srt)
 
     // assert
     // expect(removedInvitation._id).to.be.equals(iid)
@@ -531,7 +586,7 @@ describe('storageService test', () => {
     const recipient = uuidv4()
     await storageService.findOrCreateUser(inviter)
     await storageService.findOrCreateUser(recipient)
-    let channelInfo = await storageService.channelInfoCreated(inviter, 'A Channel')
+    const channelInfo = await storageService.channelInfoCreated(inviter, 'A Channel')
     const header = {
       requestEvent: 'invitation_deal_with_invitation',
       data: {
@@ -552,7 +607,9 @@ describe('storageService test', () => {
     const iid = invitationList[0].iid
 
     // act
+    const srt = now()
     await storageService.invitationRemoved(iid)
+    executionTime('invitationRemoved (has removed)', srt)
 
     // assert
     // TODO: to.throw(Error, ...) is NOT WORKING in async/await
@@ -563,14 +620,16 @@ describe('storageService test', () => {
     // arrange
     const uid = uuidv4()
     await storageService.findOrCreateUser(uid)
-    let channelInfo = await storageService.channelInfoCreated(uid, 'A Channel')
+    const channelInfo = await storageService.channelInfoCreated(uid, 'A Channel')
     const chid = channelInfo.chid
     const content = { say: 'content is anything as the JSON format' }
     const type = 'text'
     const sentTime = Date.now()
 
     // act
+    const srt = now()
     const conversation = await storageService.conversationCreated(chid, uid, content, type, sentTime)
+    executionTime('conversationCreated', srt)
 
     // assert
     expect(conversation.chid).to.be.equals(chid)
@@ -584,14 +643,15 @@ describe('storageService test', () => {
     // arrange
     const uid = uuidv4()
     await storageService.findOrCreateUser(uid)
-    let channelInfo = await storageService.channelInfoCreated(uid, 'A Channel')
+    const channelInfo = await storageService.channelInfoCreated(uid, 'A Channel')
     const chid = channelInfo.chid
 
     // act
+    const srt = now()
     const conversationList = await storageService.getConversationList(uid, chid, 5)
+    executionTime('getConversationList (empty array)', srt)
 
     // assert
-    console.log('conversationList >>>', conversationList)
     expect(conversationList).to.be.an('array').that.is.empty
   })
 
@@ -599,7 +659,7 @@ describe('storageService test', () => {
     // arrange
     const uid = uuidv4()
     await storageService.findOrCreateUser(uid)
-    let channelInfo = await storageService.channelInfoCreated(uid, 'A Channel')
+    const channelInfo = await storageService.channelInfoCreated(uid, 'A Channel')
     const chid = channelInfo.chid
     const content = { say: 'content is anything as the JSON format' }
     const type = 'text'
@@ -607,7 +667,9 @@ describe('storageService test', () => {
     await storageService.conversationCreated(chid, uid, content, type, sentTime)
 
     // act
+    const srt = now()
     const conversationList = await storageService.getConversationList(uid, chid, 5)
+    executionTime('getConversationList', srt)
 
     // assert
     const conversation = conversationList[0]
