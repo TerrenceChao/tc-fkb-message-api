@@ -140,7 +140,7 @@ UserRepository.prototype.getReceivedInvitationIds = async function (uid, limit, 
     uid
   })
     .select('receivedInvitations')
-    .then(doc => doc['receivedInvitations'])
+    .then(doc => doc.receivedInvitations)
     .then(iidList => iidList.reverse().slice(skip, skip + limit))
 }
 
@@ -149,7 +149,7 @@ UserRepository.prototype.getSentInvitationIds = async function (uid, limit, skip
     uid
   })
     .select('sentInvitations')
-    .then(doc => doc['sentInvitations'])
+    .then(doc => doc.sentInvitations)
     .then(iidList => iidList.reverse().slice(skip, skip + limit))
 }
 
@@ -163,7 +163,7 @@ UserRepository.prototype.getChannelRecord = async function (uid, query) {
   })
     .select('channelRecords')
 
-  return doc['channelRecords'].find(chRecord => chRecord.chid === query.chid)
+  return doc.channelRecords.find(chRecord => chRecord.chid === query.chid)
 }
 
 UserRepository.prototype.appendChannelRecord = async function (uid, record) {
@@ -212,7 +212,7 @@ UserRepository.prototype.getChannelRecordList = async function (uid) {
     uid
   })
     .select('channelRecords')
-    .then(doc => doc['channelRecords'])
+    .then(doc => doc.channelRecords)
 }
 
 module.exports = new UserRepository()
