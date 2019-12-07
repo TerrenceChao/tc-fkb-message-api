@@ -256,6 +256,17 @@ StorageServiceTemplate.prototype.getChannelInfo = async function (queryCondition
   // throw new Error(`couldn't get channel info with: ${JSON.stringify(queryCondition, null, 2)}`)
 }
 
+StorageService.prototype.getUserChannelInfo = async function (queryCondition) {
+  // var { uid, chid } = query. 'chid' will be saved in local storage (for frontend)
+  return {
+    creator: TESTED_UID,
+    chid: 'chid:l4ehfuvljifgbudvzsugkurliLO4U*T&IYEOW*UGY',
+    name: 'Room 18',
+    recipients: [],
+    members: [TESTED_UID, 'uidA', 'uidB', 'uidC']
+  }
+}
+
 StorageServiceTemplate.prototype.getUserChannelInfoList = async function (uid, limit = 10, skip = 0) {
   // order by conversation's 'createdAt' DESC
   return [{

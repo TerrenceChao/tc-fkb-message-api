@@ -61,7 +61,7 @@ UserRepository.prototype.updateLastGlimpse = async function (uid, newChRecordLis
   })
 
   var updatedResult = await User.bulkWrite(updateChRecordQuery)
-  console.log('the result of modify channelReocrds: ', JSON.stringify(updatedResult, null, 2))
+  // console.log('the result of modify channelReocrds: ', JSON.stringify(updatedResult, null, 2))
 
   return updatedResult
 }
@@ -173,7 +173,7 @@ UserRepository.prototype.appendChannelRecord = async function (uid, record) {
 
   var recordedDoc = await this.getChannelRecord(uid, record)
   if (recordedDoc !== undefined) {
-    console.log(`channelRecord has been appended: ${JSON.stringify(recordedDoc, null, 2)}`)
+    // console.log(`channelRecord has been appended: ${JSON.stringify(recordedDoc, null, 2)}`)
     return recordedDoc
   }
 

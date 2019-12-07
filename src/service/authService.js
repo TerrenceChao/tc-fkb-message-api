@@ -125,7 +125,7 @@ AuthService.prototype.isAuthenticated = function (userPayload) {
 
     return isValid(verification, userPayload)
   } catch (err) {
-    console.log(JSON.stringify(err))
+    console.error(JSON.stringify(err))
     return false
   }
 }

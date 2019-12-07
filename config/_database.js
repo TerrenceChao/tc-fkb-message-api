@@ -1,6 +1,9 @@
 const path = require('path')
 const mongoose = require('mongoose')
 
+const ACTIVE_MODE = 'active'
+process.env.NOSQL_CONNECT_MODE = ACTIVE_MODE
+
 mongoose.Promise = global.Promise
 mongoose.envParams = {
   writeConcern: {
@@ -21,6 +24,10 @@ function NosqlShell () {
 
   mongoose.connection.on('disconnected', () => {
     console.log('\nmongodb is disconnected\n')
+    if (process.env.NOSQL_CONNECT_MODE !== ACTIVE_MODE) {
+      return
+    }
+
     console.log(`re-connectting... attempts: ${this.attempts++}\n`)
     setTimeout(() => {
       this.connect(process.env.MONGODB_HOST)

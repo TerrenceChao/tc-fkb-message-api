@@ -2,6 +2,7 @@ var path = require('path')
 
 module.exports = function (root) {
   var feature = path.join(root, 'test', 'feature')
+  var common = path.join(root, 'test', '_common')
   var mock = path.join(root, 'test', 'mock')
   var unit = path.join(root, 'test', 'unit')
   var managerInUnit = path.join(unit, 'server', 'manager')
@@ -12,6 +13,7 @@ module.exports = function (root) {
       router: path.join(feature, 'router'),
       server: path.join(feature, 'server')
     },
+    common,
     mock,
     mockConfig: {
       database: path.join(mock, 'config', '_database.test')

@@ -1,26 +1,28 @@
 var config = require('config')
 var path = require('path')
+var uuidv4 = require('uuid/v4')
 var assert = require('chai').assert
 
 var {
   authService
 } = require(path.join(config.get('src.service'), 'authService'))
 
-const USER_ID = config.get('auth.properties')[0]
-const EXTRA_INFO = config.get('auth.properties')[1]
+const EXTRA_INFO = config.get('auth.properties')[0]
+const USER_ID = config.get('auth.properties')[1]
 const TOKEN = config.get('auth.token')
 
 describe('authService test', () => {
   var userPayload = {}
   before(() => {
-    userPayload[USER_ID] = 'an user\'s UUID'
+    userPayload[USER_ID] = uuidv4()
     userPayload[EXTRA_INFO] = 'FireFox'
   })
 
   it('[isAuthenticated, Pass]: check the token is valid if user payload is correct', () => {
     // arrange
+    // token = { msgToken: string, refreshMsgToken: string }
     var token = authService.obtainAuthorization(userPayload)
-    userPayload[TOKEN] = token
+    userPayload[TOKEN] = token.msgToken
 
     // act
     var actual = authService.isAuthenticated(userPayload)

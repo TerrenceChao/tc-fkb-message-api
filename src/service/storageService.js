@@ -246,8 +246,8 @@ StorageService.prototype.channelInfoRemoved = async function (query) {
 
 // for channel => conversations
 StorageService.prototype.conversationCreated = async function (chid, uid, content, type, datetime) {
-  return Promise.resolve(conversationRepository.create(chid, uid, content, type, datetime))
-    .then(() => channelInfoRepository.updateLatestSpoke(chid, datetime)) // ???
+  return Promise.resolve(channelInfoRepository.updateLatestSpoke(chid, datetime))
+    .then(() => conversationRepository.create(chid, uid, content, type, datetime))
     .catch(err => {
       logger(err)
       return Promise.reject(new Error(`conversation in channelInfo(chid): ${chid} is failed to created`))

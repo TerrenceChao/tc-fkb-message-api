@@ -55,7 +55,7 @@ ChannelInfoRepository.prototype.findOneByUser = async function (query) {
   var chInfo = await ChannelInfo.findOne(query)
 
   var targetUserId = chInfo.members.find((member) => uid === member)
-  return targetUserId === undefined ? [] : getAttributes(chInfo)
+  return targetUserId === undefined ? null : getAttributes(chInfo)
 }
 
 ChannelInfoRepository.prototype.getListByChids = async function (chids, limit, skip = 0, sort = 'DESC') {

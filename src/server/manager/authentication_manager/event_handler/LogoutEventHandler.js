@@ -47,7 +47,7 @@ LogoutEventHandler.prototype.handle = async function (requestInfo) {
      */
     await storageService.updateLastGlimpse(uid, config.glimpses)
   } catch (err) {
-    console.log(err.message)
+    console.error(err.message)
   }
 }
 
