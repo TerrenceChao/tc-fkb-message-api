@@ -48,6 +48,9 @@ const EVENTS = {
   // UserManager
   USER_ONLINE: 'req_user_user_online',
   USER_OFFLINE: 'req_user_user_offline',
+  CREATE_USER: 'req_user_create_user',
+  UPDATE_USER: 'req_user_update_user',
+  GET_USER_INFO_LIST: 'req_user_get_user_info_list',
   // CONFIG_SETTING: '?'
 
   // MessageManager
@@ -86,6 +89,7 @@ const REQUEST_EVENTS = {
   REMOVE_INVITATION: EVENTS.REMOVE_INVITATION,
 
   // UserManager
+  GET_USER_INFO_LIST: EVENTS.GET_USER_INFO_LIST,
 
   // MessageManager
   SEND_MESSAGE: EVENTS.SEND_MESSAGE
@@ -99,6 +103,7 @@ const BUSINESS_EVENTS = {
   DISCONNECT: EVENTS.DISCONNECT,
 
   // AuthenticationManager
+  // AUTHENTICATE (http)
   AUTHENTICATE: EVENTS.AUTHENTICATE,
 
   // ChannelManager
@@ -119,8 +124,13 @@ const BUSINESS_EVENTS = {
   // UserManager
   USER_ONLINE: EVENTS.USER_ONLINE,
   USER_OFFLINE: EVENTS.USER_OFFLINE,
+  // CREATE_USER (http)
+  CREATE_USER: EVENTS.CREATE_USER,
+  // UPDATE_USER (http)
+  UPDATE_USER: EVENTS.UPDATE_USER,
 
   // MessageManager
+  // PUSH_NOTIFICATION (http)
   PUSH_NOTIFICATION: EVENTS.PUSH_NOTIFICATION,
   SEND_MESSAGE: EVENTS.SEND_MESSAGE
 }
@@ -129,8 +139,11 @@ const BUSINESS_EVENTS = {
 const RESPONSE_EVENTS = {
   // Personal info (to.USER)
   PERSONAL_INFO: 'personal_info',
-  REFRESHED_TOKEN: 'refreshed_token',
+  USER_MAPPING_LIST: 'user_mapping_list',
   EXCEPTION_ALERT: 'exception_alert',
+
+  // [deprecated]
+  REFRESHED_TOKEN: 'refreshed_token',
 
   // Invitation (realtime) (to.USER)
   INVITATION_CREATED: 'invitation_created',

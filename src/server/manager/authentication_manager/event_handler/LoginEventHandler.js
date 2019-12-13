@@ -37,9 +37,6 @@ LoginEventHandler.prototype.handle = async function (requestInfo) {
     return
   }
 
-  // // NOT waiting DB response here!!
-  // storageService.findOrCreateUser(packet.uid)
-
   // Initial: user makes connections to self & channel
   businessEvent.emit(EVENTS.USER_ONLINE, requestInfo)
   businessEvent.emit(EVENTS.CHANNEL_ONLINE, requestInfo)

@@ -47,7 +47,7 @@ GetChannelListEventHandler.prototype.sendChInfoListBelongedUser = function (user
       receiver: requestInfo.packet.uid,
       responseEvent: RESPONSE_EVENTS.CHANNEL_LIST
     })
-    .responsePacket(userChannelInfoList, META)
+    .responsePacket({ list: userChannelInfoList }, META)
 
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 }

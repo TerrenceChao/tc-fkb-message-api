@@ -1,6 +1,7 @@
 var config = require('config')
 var path = require('path')
 
+const { USER_INFO } = config.get('app')
 const userRepository = require(path.join(config.get('src.repository'), 'nosql', 'userRepository'))
 const invitationRepository = require(path.join(config.get('src.repository'), 'nosql', 'invitationRepository'))
 const channelInfoRepository = require(path.join(config.get('src.repository'), 'nosql', 'channelInfoRepository'))
@@ -23,6 +24,15 @@ function logger (err) {
  */
 function StorageService () {}
 
+StorageService.prototype.createUserInfo = async function (userInfo) {
+  !userInfo.info && (userInfo.info = {})
+  return Promise.resolve(userRepository.createInfo(userInfo)) // return user
+    .catch(err => {
+      logger(err)
+      return Promise.reject(err)
+    })
+}
+
 StorageService.prototype.getUser = async function (uid, selectFields = []) {
   return Promise.resolve(userRepository.findById(uid, selectFields))
     .catch(err => {
@@ -31,17 +41,36 @@ StorageService.prototype.getUser = async function (uid, selectFields = []) {
     })
 }
 
-StorageService.prototype.createUser = async function (uid) {
-  return Promise.resolve(userRepository.create(uid)) // return user
+StorageService.prototype.getUserInfoList = async function (uidList) {
+  return Promise.resolve(userRepository.getListByIds(uidList))
     .catch(err => {
       logger(err)
       return Promise.reject(err)
     })
 }
 
-StorageService.prototype.findOrCreateUser = async function (uid, selectFields = []) {
-  return Promise.resolve(this.getUser(uid, selectFields))
-    .then(user => user == null ? this.createUser(uid) : user)
+function mergeUserInfo (info, newInfo) {
+  const updatedInfo = {}
+  USER_INFO.forEach(field => {
+    if (newInfo[field]) { // new data
+      updatedInfo[field] = newInfo[field]
+    } else if (info && info[field]) { // original data
+      updatedInfo[field] = info[field]
+    } else { // info (original data) is NULL
+      updatedInfo[field] = ''
+    }
+  })
+
+  return updatedInfo
+}
+
+StorageService.prototype.updateUserInfo = async function (uid, newInfo, selectFields) {
+  return Promise.resolve(userRepository.findById(uid, ['info']))
+    .then(userRecord => userRepository.updateInfoById(uid, mergeUserInfo(userRecord.info, newInfo), selectFields))
+    .catch(err => {
+      logger(err)
+      return Promise.reject(err)
+    })
 }
 
 StorageService.prototype.updateLastGlimpse = async function (uid, jsonGlimpses) {

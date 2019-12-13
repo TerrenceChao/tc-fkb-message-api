@@ -4,6 +4,10 @@ var path = require('path')
 var _ = require('lodash')
 
 const {
+  USER_INFO,
+  SETTING_EVENT
+} = config.get('app')
+const {
   TO,
   EVENTS,
   RESPONSE_EVENTS
@@ -31,16 +35,34 @@ PushNotificationEventHandler.prototype.handle = function (requestInfo) {
   Promise.resolve(requestInfo.packet.receivers)
     .then(receivers => Promise.all(
       receivers.map(
-        receiver => this.emitNotification(
-          requestInfo,
-          receiver,
-          notificationPacket
-        )
+        receiver => this.action(requestInfo, receiver, notificationPacket)
       )
     ))
     .then(() => (res.locals.data.event = notificationPacket.event))
     .then(() => next())
     .catch(err => next(err || new Error('Error occurred during push notification')))
+}
+
+PushNotificationEventHandler.prototype.action = async function (reqInfo, receiver, notificationPacket) {
+  if (this.isPersonalUpdate(receiver, notificationPacket)) {
+    return this.updateUser(receiver, notificationPacket)
+  }
+
+  return this.emitNotification(reqInfo, receiver, notificationPacket)
+}
+
+PushNotificationEventHandler.prototype.isPersonalUpdate = function (receiver, notificationPacket) {
+  if (notificationPacket.event === SETTING_EVENT.UPDATE_PUBLIC_INFO &&
+    notificationPacket.content.uid === receiver.uid) {
+    return true
+  }
+
+  return false
+}
+
+PushNotificationEventHandler.prototype.updateUser = async function (receiver, notificationPacket) {
+  const info = _.pick(notificationPacket.content, USER_INFO)
+  return Promise.resolve(this.globalContext.storageService.updateUserInfo(receiver.uid, info, ['uid']))
 }
 
 PushNotificationEventHandler.prototype.emitNotification = function (reqInfo, receiver, notificationPacket) {

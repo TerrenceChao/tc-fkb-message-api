@@ -27,6 +27,17 @@ module.exports = {
       receivers: 'required|array',
       event: 'required|string',
       content: 'required'
+    },
+    // UserManager
+    [EVENTS.CREATE_USER]: {
+      uid: ['required', `regex:${UID_PATTERN}`],
+      clientuseragent: 'required|string',
+      info: 'present'
+    },
+    [EVENTS.UPDATE_USER]: {
+      uid: ['required', `regex:${UID_PATTERN}`],
+      clientuseragent: 'required|string',
+      info: 'required'
     }
   },
   ALL: {
@@ -151,9 +162,6 @@ module.exports = {
     },
 
     // MessageManager
-    [EVENTS.PUSH_NOTIFICATION]: function (requestInfo) {
-      return true
-    },
     [EVENTS.SEND_MESSAGE]: function (responseInfo) {
       return responseInfo instanceof ResponseInfo &&
         responseInfo.header != null &&
@@ -169,7 +177,12 @@ module.exports = {
     },
     [EVENTS.USER_OFFLINE]: function (requestInfo) {
       return requireUidOnly(requestInfo)
+    },
+    [EVENTS.GET_USER_INFO_LIST]: function (requestInfo) {
+      var packet = requestInfo.packet
+      return packet != null &&
+        packet.uid != null &&
+        Array.isArray(packet.uidList)
     }
-
   }
 }

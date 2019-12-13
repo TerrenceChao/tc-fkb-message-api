@@ -4,7 +4,15 @@ UserRepository.prototype.findById = async function (uid, selectFields) {
 
 }
 
-UserRepository.prototype.create = async function (uid) {
+UserRepository.prototype.getListByIds = async function (uidList) {
+
+}
+
+UserRepository.prototype.createInfo = async function (user) {
+
+}
+
+UserRepository.prototype.updateInfoById = async function (user) {
 
 }
 

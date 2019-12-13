@@ -5,6 +5,7 @@ const _ = require('lodash')
 const VALID_FIELDS = [
   '_id',
   'uid',
+  'info',
   'receivedInvitations',
   'sentInvitations',
   'channelRecords',
@@ -26,10 +27,20 @@ UserRepository.prototype.findById = async function (uid, selectFields = []) {
   return user
 }
 
-UserRepository.prototype.create = async function (uid) {
+UserRepository.prototype.getListByIds = async function (uidList) {
+  var userList = await User.find({
+    uid: { $in: uidList }
+  })
+    .select(['uid', 'info', 'createdAt'])
+
+  return userList
+}
+
+UserRepository.prototype.createInfo = async function (user) {
   var now = Date.now()
-  var user = await new User({
-    uid,
+  var userInfo = await new User({
+    uid: user.uid,
+    info: user.info,
     receivedInvitations: [],
     sentInvitations: [],
     channelRecords: [],
@@ -38,7 +49,27 @@ UserRepository.prototype.create = async function (uid) {
   })
     .save()
 
-  return user
+  return userInfo
+}
+
+UserRepository.prototype.updateInfoById = async function (uid, info, selectFields = []) {
+  selectFields = selectFields.length === 0 ? VALID_FIELDS : _.intersection(VALID_FIELDS, selectFields)
+  const updatedData = {
+    info,
+    updatedAt: Date.now()
+  }
+
+  const returnNewDoc = {
+    new: true
+  }
+
+  var updatedUserInfo = await User.findOneAndUpdate(
+    { uid },
+    updatedData,
+    returnNewDoc
+  )
+
+  return updatedUserInfo
 }
 
 UserRepository.prototype.updateLastGlimpse = async function (uid, newChRecordList) {
@@ -51,7 +82,7 @@ UserRepository.prototype.updateLastGlimpse = async function (uid, newChRecordLis
           'channelRecords.chid': record.chid
         },
         update: {
-          '$set': {
+          $set: {
             'channelRecords.$.lastGlimpse': record.lastGlimpse
           },
           updatedAt: now
@@ -79,8 +110,8 @@ UserRepository.prototype.recordInvitation = async function (iid, inviter, recipi
         uid: inviter
       },
       update: {
-        '$addToSet': {
-          'sentInvitations': mongoose.Types.ObjectId(iid)
+        $addToSet: {
+          sentInvitations: mongoose.Types.ObjectId(iid)
         },
         updatedAt: now
       }
@@ -92,8 +123,8 @@ UserRepository.prototype.recordInvitation = async function (iid, inviter, recipi
         uid: recipient
       },
       update: {
-        '$addToSet': {
-          'receivedInvitations': mongoose.Types.ObjectId(iid)
+        $addToSet: {
+          receivedInvitations: mongoose.Types.ObjectId(iid)
         },
         updatedAt: now
       }
@@ -111,8 +142,8 @@ UserRepository.prototype.deleteInvitation = async function (iid, inviter, recipi
         uid: inviter
       },
       update: {
-        '$pull': {
-          'sentInvitations': mongoose.Types.ObjectId(iid)
+        $pull: {
+          sentInvitations: mongoose.Types.ObjectId(iid)
         },
         updatedAt: now
       }
@@ -124,8 +155,8 @@ UserRepository.prototype.deleteInvitation = async function (iid, inviter, recipi
         uid: recipient
       },
       update: {
-        '$pull': {
-          'receivedInvitations': mongoose.Types.ObjectId(iid)
+        $pull: {
+          receivedInvitations: mongoose.Types.ObjectId(iid)
         },
         updatedAt: now
       }
@@ -180,8 +211,8 @@ UserRepository.prototype.appendChannelRecord = async function (uid, record) {
   var doc = await User.updateOne({
     uid
   }, {
-    '$addToSet': {
-      'channelRecords': record
+    $addToSet: {
+      channelRecords: record
     },
     updatedAt: now
   })
@@ -198,8 +229,8 @@ UserRepository.prototype.removeChannelRecord = async function (uid, record) {
   var doc = await User.updateOne({
     uid
   }, {
-    '$pull': {
-      'channelRecords': record
+    $pull: {
+      channelRecords: record
     },
     updatedAt: now
   })

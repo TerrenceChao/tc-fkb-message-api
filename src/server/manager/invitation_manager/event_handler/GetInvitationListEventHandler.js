@@ -67,7 +67,7 @@ GetInvitationListEventHandler.prototype.sendInvitationList = function (invitatio
       receiver: packet.uid,
       responseEvent: RESPONSE_EVENTS.INVITATION_LIST // non-realtime invitation list
     })
-    .responsePacket(invitationList, meta)
+    .responsePacket({ list: invitationList }, meta)
 
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
 }

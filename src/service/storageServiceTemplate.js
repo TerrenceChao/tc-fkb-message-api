@@ -41,6 +41,10 @@ function StorageServiceTemplate () {}
 
 const TESTED_UID = 'xxx-xxx-xxx'
 
+StorageServiceTemplate.prototype.createUserInfo = async function (user) {
+
+}
+
 StorageServiceTemplate.prototype.getUser = async function (uid, selectFields = []) {
   var user = {
     uid,
@@ -54,13 +58,8 @@ StorageServiceTemplate.prototype.getUser = async function (uid, selectFields = [
   // throw err
 }
 
-StorageServiceTemplate.prototype.createUser = async function (uid) {
-  return true || false
-  // throw err
-}
-
-StorageServiceTemplate.prototype.findOrCreateUser = async function (uid, selectFields = []) {
-
+StorageServiceTemplate.prototype.updateUserInfo = async function (uid, data, selectFields) {
+  
 }
 
 StorageServiceTemplate.prototype.updateLastGlimpse = async function (uid, jsonGlimpses) {

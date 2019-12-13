@@ -6,6 +6,7 @@ const UID_PATTERN = process.env.UID_PATTERN || '/^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A
 const ROBOT_PATTERN = process.env.ROBOT_PATTERN
 const CONFIRM_INVITE = process.env.CONFIRM_INVITE
 const CANCEL_INVITE = process.env.CANCEL_INVITE
+const USER_INFO = process.env.USER_INFO.split(',')
 
 module.exports = {
   PORT,
@@ -15,5 +16,9 @@ module.exports = {
   UID_PATTERN,
   ROBOT_PATTERN,
   CONFIRM_INVITE,
-  CANCEL_INVITE
+  CANCEL_INVITE,
+  USER_INFO,
+  SETTING_EVENT: {
+    UPDATE_PUBLIC_INFO: 'setting_event_update_public_info'
+  }
 }

@@ -65,11 +65,15 @@ const EXTRA_SYMBOL = ':@'
 const SPLIT_SYMBOL = 'Ⓢ'
 
 // http error categories
-const HEADERS_FORMAT_ERR = {
+const HTTP_FORMAT_ERR = {
+  statusCode: 422,
+  msg: 'request \'headers\' and/or \'body\' format error'
+}
+const HTTP_HEADERS_FORMAT_ERR = {
   statusCode: 422,
   msg: 'request \'headers\' format error'
 }
-const BODY_FORMAT_ERR = {
+const HTTP_BODY_FORMAT_ERR = {
   statusCode: 422,
   msg: 'request \'body\' format error'
 }
@@ -98,8 +102,9 @@ function customMetaMsg (meta, params = []) {
 module.exports = {
   // http 相關的 meta
   HTTP: {
-    AUTH_HEADERS_FORMAT_ERR: _.assign(HEADERS_FORMAT_ERR, { msgCode: '4201100' }),
-    PUSH_BODY_FORMAT_ERR: _.assign(BODY_FORMAT_ERR, { msgCode: '4206100' })
+    USER_INFO_FORMAT_ERR: _.assign(HTTP_FORMAT_ERR, { msgCode: '4207100' }),
+    AUTH_HEADERS_FORMAT_ERR: _.assign(HTTP_HEADERS_FORMAT_ERR, { msgCode: '4201100' }),
+    PUSH_BODY_FORMAT_ERR: _.assign(HTTP_BODY_FORMAT_ERR, { msgCode: '4206100' })
   },
 
   // socket 相關的 meta
@@ -306,6 +311,16 @@ module.exports = {
     USER_ONLINE_INFO: {
       msgCode: '2107300',
       msg: 'User is ONLINE'
+    },
+    GET_USER_INFO_LIST_INFO: {
+      msgCode: '2107300',
+      msg: 'User info list'
+    },
+    GET_USER_INFO_LIST_DB_ERR: function (err) {
+      return {
+        msgCode: '4107303',
+        error: err.message
+      }
     }
   },
 
