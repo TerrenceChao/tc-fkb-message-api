@@ -3,7 +3,6 @@ var config = require('config')
 var ResponseInfo = require(path.join(config.get('src.manager'), 'ResponseInfo'))
 const UID_PATTERN = config.get('app.UID_PATTERN')
 const TOKEN = config.get('auth.token')
-const REFRESH_TOKEN = config.get('auth.refreshToken')
 const EVENTS = require(path.join(config.get('src.property'), 'property')).EVENTS
 
 /**
@@ -162,6 +161,9 @@ module.exports = {
     },
 
     // MessageManager
+    [EVENTS.PUSH_NOTIFICATION]: function (requestInfo) {
+      return true
+    },
     [EVENTS.SEND_MESSAGE]: function (responseInfo) {
       return responseInfo instanceof ResponseInfo &&
         responseInfo.header != null &&

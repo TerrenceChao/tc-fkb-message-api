@@ -62,7 +62,7 @@ Manager.prototype.listenRequestEvent = function (protocol, handler) {
   // client request
   if (socket !== undefined) {
     socket.on(handler.eventName, (packet) => {
-      if (handler.eventName !== REQUEST_EVENTS.EXTEND_VALIDITY && authService.isAuthenticated(packet) === false) {
+      if (authService.isAuthenticated(packet) === false) {
         console.warn(`${handler.eventName}: token validation fail`)
         return
       }

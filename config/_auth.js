@@ -1,5 +1,4 @@
 var authAttributes = process.env.AUTH_ATTRIBUTES.split(',')
-var refreshToken = authAttributes.pop()
 var accessProperties = authAttributes.reverse()
 var token = accessProperties[0]
 var properties = authAttributes.slice(1)
@@ -10,6 +9,5 @@ module.exports = {
   authAttributes,
   accessProperties,
   properties,
-  token,
-  refreshToken
+  token
 }

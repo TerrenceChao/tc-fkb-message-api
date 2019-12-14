@@ -110,10 +110,6 @@ module.exports = {
   // socket 相關的 meta
   SOCKET: {
     // AuthenticationManager
-    VALIDITY_EXTENDED_SUCCESS: {
-      msgCode: '1101100',
-      msg: 'Validity extended'
-    },
     GET_CHANNEL_AND_CONVERSATION_LIST_SUCCESS: {
       msgCode: '1101100',
       msg: 'Get channel list with conversations'

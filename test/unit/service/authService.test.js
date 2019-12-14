@@ -20,7 +20,7 @@ describe('authService test', () => {
 
   it('[isAuthenticated, Pass]: check the token is valid if user payload is correct', () => {
     // arrange
-    // token = { msgToken: string, refreshMsgToken: string }
+    // token = { msgToken: string }
     var token = authService.obtainAuthorization(userPayload)
     userPayload[TOKEN] = token.msgToken
 

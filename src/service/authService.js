@@ -7,7 +7,6 @@ var algorithm = config.get('auth.algorithm')
 var accessProperties = config.get('auth.accessProperties')
 var properties = config.get('auth.properties')
 const TOKEN = config.get('auth.token')
-const REFRESH_TOKEN = config.get('auth.refreshToken')
 
 /**
  * @private
@@ -100,17 +99,13 @@ AuthService.prototype.obtainAuthorization = function (userPayload) {
     return false
   }
 
-  // save refresh token in DB
-  var refreshToken = 'message-service-refresh-token (not ready yet)'
-
   return {
     [TOKEN]: jwt.sign(
       getPropertyWithoutToken(userPayload),
       secretGenerator(userPayload), {
         expiresIn: expiresInEffectiveTime
       }
-    ),
-    [REFRESH_TOKEN]: refreshToken
+    )
   }
 }
 
