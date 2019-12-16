@@ -7,8 +7,12 @@ const {
   EVENTS,
   RESPONSE_EVENTS
 } = require(path.join(config.get('src.property'), 'property'))
+const RES_META = require(path.join(config.get('src.property'), 'messageStatus')).SOCKET
 var ResponseInfo = require(path.join(config.get('src.manager'), 'ResponseInfo'))
 var EventHandler = require(path.join(config.get('src.manager'), 'EventHandler'))
+
+const CHANNEL_OFFLINE_INFO = RES_META.CHANNEL_OFFLINE_INFO
+var respondErr = RES_META.CHANNEL_OFFLINE_ERR
 
 util.inherits(ChannelOfflineEventHandler, EventHandler)
 
@@ -19,31 +23,35 @@ function ChannelOfflineEventHandler () {
 ChannelOfflineEventHandler.prototype.eventName = EVENTS.CHANNEL_OFFLINE
 
 ChannelOfflineEventHandler.prototype.handle = function (requestInfo) {
-  if (!this.isValid(requestInfo)) {
-    console.warn(`${this.eventName}`, `request info is invalid`)
-    return
-  }
-
-  var storageService = this.globalContext['storageService']
+  var storageService = this.globalContext.storageService
   var uid = requestInfo.packet.uid
 
   Promise.resolve(storageService.getAllChannelIds(uid))
     .then(channelIds => this.leaveChannels(channelIds, requestInfo),
-      err => this.alertException(err.message, requestInfo))
+      err => this.alertException(respondErr(err), requestInfo))
 }
 
 ChannelOfflineEventHandler.prototype.leaveChannels = function (channelIds, requestInfo) {
-  this.broadcast(channelIds, requestInfo)
+  if (channelIds.length === 0) {
+    return
+  }
 
-  var socketServer = this.globalContext['socketServer']
-  var socket = requestInfo.socket
-  channelIds.forEach(ciid => {
-    socketServer.of('/').adapter.remoteLeave(socket.id, ciid)
-  })
+  this.broadcast(channelIds, requestInfo)
+  // // var socket = requestInfo.socket
+  // // channelIds.forEach(chid => {
+  // //   socketServer.of('/').adapter.remoteLeave(socket.id, chid)
+  // // })
+  // socketService.collectiveLeave(socket.id, channelIds)
+  this.globalContext.socketService.offlineChannelList(
+    requestInfo.packet.uid,
+    channelIds
+  )
 }
 
 ChannelOfflineEventHandler.prototype.broadcast = function (channelIds, requestInfo) {
-  var businessEvent = this.globalContext['businessEvent']
+  var businessEvent = this.globalContext.businessEvent
+  var uid = requestInfo.packet.uid
+
   var resInfo = new ResponseInfo()
     .assignProtocol(requestInfo)
     .setHeader({
@@ -51,16 +59,10 @@ ChannelOfflineEventHandler.prototype.broadcast = function (channelIds, requestIn
       receiver: channelIds,
       responseEvent: RESPONSE_EVENTS.CONVERSATION_FROM_CHANNEL
     })
-    .setPacket({
-      msgCode: `user: ${requestInfo.packet.uid} is offline`
-    })
+    .responsePacket({ uid }, CHANNEL_OFFLINE_INFO)
+    .responseMsg(`user: ${uid} is offline`)
 
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
-}
-
-ChannelOfflineEventHandler.prototype.isValid = function (requestInfo) {
-  return requestInfo.packet != null &&
-    requestInfo.packet.uid != null
 }
 
 module.exports = {

@@ -8,6 +8,10 @@ const UserSchema = new mongoose.Schema({
     required: true,
     unique: true
   },
+  info: {
+    type: mongoose.Schema.Types.Mixed,
+    required: true
+  },
   receivedInvitations: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Invitation',

@@ -7,12 +7,14 @@ const {
   TO,
   EVENTS,
   RESPONSE_EVENTS
-} = require(path.join(
-  config.get('src.property'),
-  'property'
-))
+} = require(path.join(config.get('src.property'), 'property'))
+const RES_META = require(path.join(config.get('src.property'), 'messageStatus')).SOCKET
 var ResponseInfo = require(path.join(config.get('src.manager'), 'ResponseInfo'))
 var EventHandler = require(path.join(config.get('src.manager'), 'EventHandler'))
+
+const INVITATION_LIST_INFO = RES_META.INVITATION_LIST_INFO
+const GET_INVITATION_LIST_SUCCESS = RES_META.GET_INVITATION_LIST_SUCCESS
+var respondErr = RES_META.GET_INVITATION_LIST_ERR
 
 util.inherits(GetInvitationListEventHandler, EventHandler)
 
@@ -23,18 +25,13 @@ function GetInvitationListEventHandler () {
 GetInvitationListEventHandler.prototype.eventName = EVENTS.GET_INVITATION_LIST
 
 GetInvitationListEventHandler.prototype.handle = function (requestInfo) {
-  if (!this.isValid(requestInfo)) {
-    console.warn(`${this.eventName}: request info is invalid.`)
-    return
-  }
-
   Promise.resolve(this.getInvitationList(requestInfo))
     .then(invitationList => this.sendInvitationList(invitationList, requestInfo))
-    .catch(err => this.alertException(err.message, requestInfo))
+    .catch(err => this.alertException(respondErr(err), requestInfo))
 }
 
 GetInvitationListEventHandler.prototype.getInvitationList = async function (requestInfo) {
-  var storageService = this.globalContext['storageService']
+  var storageService = this.globalContext.storageService
 
   var packet = requestInfo.packet
   var uid = packet.uid
@@ -53,12 +50,15 @@ GetInvitationListEventHandler.prototype.getInvitationList = async function (requ
 }
 
 GetInvitationListEventHandler.prototype.sendInvitationList = function (invitationList, requestInfo) {
-  var businessEvent = this.globalContext['businessEvent']
+  var businessEvent = this.globalContext.businessEvent
   var packet = requestInfo.packet
 
-  invitationList.forEach(invitation => {
-    _.unset(invitation, 'sensitive')
-  })
+  var meta = INVITATION_LIST_INFO
+  if (invitationList.length !== 0) {
+    invitationList.map(invitation => _.omit(invitation, ['sensitive']))
+    meta = GET_INVITATION_LIST_SUCCESS
+    meta.msg = `get '${packet.inviType}' invitation list. list size: ${invitationList.length}`
+  }
 
   var resInfo = new ResponseInfo()
     .assignProtocol(requestInfo)
@@ -67,19 +67,9 @@ GetInvitationListEventHandler.prototype.sendInvitationList = function (invitatio
       receiver: packet.uid,
       responseEvent: RESPONSE_EVENTS.INVITATION_LIST // non-realtime invitation list
     })
-    .setPacket({
-      msgCode: `get ${packet.inviType} invitation list`,
-      data: invitationList
-    })
+    .responsePacket({ list: invitationList }, meta)
 
   businessEvent.emit(EVENTS.SEND_MESSAGE, resInfo)
-}
-
-GetInvitationListEventHandler.prototype.isValid = function (requestInfo) {
-  return requestInfo.packet != null &&
-    requestInfo.packet.uid != null &&
-    typeof requestInfo.packet.inviType === 'string' &&
-    requestInfo.packet.inviLimit != null
 }
 
 module.exports = {

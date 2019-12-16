@@ -66,10 +66,10 @@ if (cluster.isWorker) {
     next()
   })
 
-  var PORT = config.get('app.port')
+  var PORT = config.get('app.PORT')
   var port = parseInt(PORT) + cluster.worker.id
   var server = app
-    .use(`/message_service/v1/`, routeIndex)
+    .use(`/message-service/api/v1/`, routeIndex)
     .listen(port, () => console.log(`Listening on ${port}`))
 
   startUp(server)

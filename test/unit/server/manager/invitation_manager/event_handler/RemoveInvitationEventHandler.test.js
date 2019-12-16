@@ -4,14 +4,14 @@ var sinon = require('sinon')
 
 var {
   handler
-} = require(path.join(config.get('src.invitationEventHandler'), 'ConfirmInvitationEventHandler'))
+} = require(path.join(config.get('src.invitationEventHandler'), 'RemoveInvitationEventHandler'))
 var RequestInfo = require(path.join(config.get('src.manager'), 'RequestInfo'))
 var globalContext = require(path.join(config.get('src.manager'), 'globalContext'))
 var {
   delayFunc
 } = require(path.join(config.get('test.mock'), 'common'))
 
-describe('ConfirmInvitationEventHandler test', () => {
+describe('RemoveInvitationEventHandler test', () => {
   const DELAY_IN_MS = 1
   var stub
   var spyAlertException

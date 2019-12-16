@@ -6,7 +6,7 @@ var expiresInEffectiveTime = config.get('auth.expiresIn')
 var algorithm = config.get('auth.algorithm')
 var accessProperties = config.get('auth.accessProperties')
 var properties = config.get('auth.properties')
-var accessToken = config.get('auth.token')
+const TOKEN = config.get('auth.token')
 
 /**
  * @private
@@ -62,7 +62,7 @@ function secretGenerator (payload) {
   // the time cost is 10 ~ 15 times
   return crypto
     .createHash(algorithm)
-    .update(JSON.stringify(data))
+    .update(JSON.stringify(data), 'utf-8')
     .digest()
 }
 
@@ -99,12 +99,14 @@ AuthService.prototype.obtainAuthorization = function (userPayload) {
     return false
   }
 
-  return jwt.sign(
-    getPropertyWithoutToken(userPayload),
-    secretGenerator(userPayload), {
-      expiresIn: expiresInEffectiveTime
-    }
-  )
+  return {
+    [TOKEN]: jwt.sign(
+      getPropertyWithoutToken(userPayload),
+      secretGenerator(userPayload), {
+        expiresIn: expiresInEffectiveTime
+      }
+    )
+  }
 }
 
 // X). remove "temporary" user's payload if has { uid: payload },
@@ -114,11 +116,11 @@ AuthService.prototype.isAuthenticated = function (userPayload) {
   }
 
   try {
-    var verification = jwt.verify(userPayload[accessToken], secretGenerator(userPayload))
+    var verification = jwt.verify(userPayload[TOKEN], secretGenerator(userPayload))
 
     return isValid(verification, userPayload)
   } catch (err) {
-    console.log(JSON.stringify(err))
+    console.error(JSON.stringify(err))
     return false
   }
 }

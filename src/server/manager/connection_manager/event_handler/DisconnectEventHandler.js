@@ -6,7 +6,6 @@ const {
   EVENTS
 } = require(path.join(config.get('src.property'), 'property'))
 var EventHandler = require(path.join(config.get('src.manager'), 'EventHandler'))
-
 util.inherits(DisconnectEventHandler, EventHandler)
 
 function DisconnectEventHandler () {
@@ -16,19 +15,9 @@ function DisconnectEventHandler () {
 DisconnectEventHandler.prototype.eventName = EVENTS.DISCONNECT
 
 DisconnectEventHandler.prototype.handle = function (requestInfo) {
-  if (!this.isValid(requestInfo)) {
-    console.warn(`${this.eventName}: request info is invalid.`)
-    return
-  }
-
-  var businessEvent = this.globalContext['businessEvent']
+  var businessEvent = this.globalContext.businessEvent
   businessEvent.emit(EVENTS.USER_OFFLINE, requestInfo)
   businessEvent.emit(EVENTS.CHANNEL_OFFLINE, requestInfo)
-}
-
-DisconnectEventHandler.prototype.isValid = function (requestInfo) {
-  return requestInfo.packet != null &&
-    requestInfo.packet.uid != null
 }
 
 module.exports = {

@@ -7,6 +7,7 @@ const {
   EVENTS,
   RESPONSE_EVENTS
 } = require(path.join(config.get('src.property'), 'property'))
+const RES_META = require(path.join(config.get('src.property'), 'messageStatus')).SOCKET
 var {
   handler
 } = require(path.join(config.get('src.userEventHandler'), 'UserOnlineEventHandler'))
@@ -14,8 +15,10 @@ var RequestInfo = require(path.join(config.get('src.manager'), 'RequestInfo'))
 var ResponseInfo = require(path.join(config.get('src.manager'), 'ResponseInfo'))
 var globalContext = require(path.join(config.get('src.manager'), 'globalContext'))
 var {
-  stubSocketServer
+  stubSocketService
 } = require(path.join(config.get('test.mock'), 'common'))
+
+const USER_ONLINE_INFO = RES_META.USER_ONLINE_INFO
 
 describe('UserOnlineEventHandler test', () => {
   var sandbox
@@ -23,7 +26,7 @@ describe('UserOnlineEventHandler test', () => {
   var respnseInfo
   var userPayload
   var businessEvent
-  var socketServer
+  var socketService
   var spyRemoteJoin
   var spyEmit
 
@@ -31,9 +34,9 @@ describe('UserOnlineEventHandler test', () => {
     sandbox = sinon.sandbox.create()
     handler.globalContext = globalContext
     businessEvent = globalContext.businessEvent
-    socketServer = globalContext.socketServer = stubSocketServer
+    socketService = globalContext.socketService = stubSocketService
 
-    spyRemoteJoin = sandbox.spy(socketServer, 'remoteJoin')
+    spyRemoteJoin = sandbox.spy(socketService, 'remoteJoin')
     spyEmit = sandbox.spy(businessEvent, 'emit')
   })
 
@@ -54,9 +57,7 @@ describe('UserOnlineEventHandler test', () => {
         receiver: userPayload.uid,
         responseEvent: RESPONSE_EVENTS.PERSONAL_INFO
       })
-      .setPacket({
-        msgCode: `user is online`
-      })
+      .responsePacket({ uid: userPayload.uid }, USER_ONLINE_INFO)
 
     // act
     handler.handle(requestInfo)

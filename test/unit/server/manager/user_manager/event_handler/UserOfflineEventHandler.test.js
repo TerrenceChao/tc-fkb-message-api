@@ -7,6 +7,7 @@ const {
   EVENTS,
   RESPONSE_EVENTS
 } = require(path.join(config.get('src.property'), 'property'))
+const RES_META = require(path.join(config.get('src.property'), 'messageStatus')).SOCKET
 var {
   handler
 } = require(path.join(config.get('src.userEventHandler'), 'UserOfflineEventHandler'))
@@ -14,8 +15,10 @@ var RequestInfo = require(path.join(config.get('src.manager'), 'RequestInfo'))
 var ResponseInfo = require(path.join(config.get('src.manager'), 'ResponseInfo'))
 var globalContext = require(path.join(config.get('src.manager'), 'globalContext'))
 var {
-  stubSocketServer
+  stubSocketService
 } = require(path.join(config.get('test.mock'), 'common'))
+
+const USER_OFFLINE_INFO = RES_META.USER_OFFLINE_INFO
 
 describe('UserOfflineEventHandler test', () => {
   var sandbox
@@ -23,7 +26,7 @@ describe('UserOfflineEventHandler test', () => {
   var respnseInfo
   var userPayload
   var businessEvent
-  var socketServer
+  var socketService
   var spyEmit
   var spyRemoteLeave
 
@@ -31,10 +34,10 @@ describe('UserOfflineEventHandler test', () => {
     sandbox = sinon.sandbox.create()
     handler.globalContext = globalContext
     businessEvent = globalContext.businessEvent
-    socketServer = globalContext.socketServer = stubSocketServer
+    socketService = globalContext.socketService = stubSocketService
 
     spyEmit = sandbox.spy(businessEvent, 'emit')
-    spyRemoteLeave = sandbox.spy(socketServer, 'remoteLeave')
+    spyRemoteLeave = sandbox.spy(socketService, 'remoteLeave')
   })
 
   it('[handle, Pass] test success while calling connect event', () => {
@@ -54,9 +57,7 @@ describe('UserOfflineEventHandler test', () => {
         receiver: userPayload.uid,
         responseEvent: RESPONSE_EVENTS.PERSONAL_INFO
       })
-      .setPacket({
-        msgCode: `user is offline`
-      })
+      .responsePacket({ uid: userPayload.uid }, USER_OFFLINE_INFO)
 
     // act
     handler.handle(requestInfo)
@@ -64,7 +65,7 @@ describe('UserOfflineEventHandler test', () => {
     // assert
     sandbox.assert.calledOnce(spyEmit)
     sinon.assert.calledWith(spyEmit, EVENTS.SEND_MESSAGE, respnseInfo)
-    
+
     sandbox.assert.calledOnce(spyRemoteLeave)
     sinon.assert.calledWith(
       spyRemoteLeave,

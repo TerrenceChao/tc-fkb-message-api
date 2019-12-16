@@ -6,7 +6,7 @@ const Manager = require(path.join(config.get('src.manager'), 'Manager'))
 
 util.inherits(UserManager, Manager)
 
-function UserManager() {
+function UserManager () {
   this.name = arguments.callee.name
   this.rootDir = __dirname
 }

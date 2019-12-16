@@ -5,6 +5,8 @@ const {
   REQUEST_EVENTS,
   BUSINESS_EVENTS
 } = require(path.join(config.get('src.property'), 'property'))
+var matchHttpRequestEvent = require(path.join(config.get('src.httpProtocol'), 'util')).matchRequestEvent
+var validator = require(path.join(config.get('src.property'), 'validation')).ALL
 var RequestInfo = require('./RequestInfo.js')
 
 function Manager () {}
@@ -24,13 +26,13 @@ Manager.prototype.init = function (globalContext) {
 
 Manager.prototype.listenBusinessEvent = function (handler) {
   handler.globalContext = this.globalContext
-  const businessEvent = this.globalContext['businessEvent']
-  const thisManager = this
+  const businessEvent = this.globalContext.businessEvent
 
   businessEvent.on(handler.eventName, (requestInfo) => {
     // console.log(` => listenBusinessEvent: handler is ${JSON.stringify(handler, null, 2)}`)
-    handler.handle(requestInfo)
-    thisManager.receiveAlert(handler.eventName, requestInfo)
+
+    // handler.handle(requestInfo)
+    validator[handler.eventName](requestInfo) ? handler.handle(requestInfo) : console.error(`[business-event] ${handler.eventName}: request info is invalid.`)
   })
 }
 
@@ -47,34 +49,37 @@ Manager.prototype.startListen = function (protocol) {
 
 Manager.prototype.listenRequestEvent = function (protocol, handler) {
   handler.globalContext = this.globalContext
-  const authService = this.globalContext['authService']
-  const thisManager = this
+  const authService = this.globalContext.authService
 
   const {
     req,
     res,
+    next,
     socket
   } = protocol
-  let requestInfo = new RequestInfo()
+  const requestInfo = new RequestInfo()
 
   // client request
   if (socket !== undefined) {
     socket.on(handler.eventName, (packet) => {
-      if (handler.eventName !== REQUEST_EVENTS.EXTEND_VALIDITY && authService.isAuthenticated(packet) === false) {
+      if (authService.isAuthenticated(packet) === false) {
         console.warn(`${handler.eventName}: token validation fail`)
         return
       }
       requestInfo.socket = socket
       requestInfo.packet = packet
-      handler.handle(requestInfo)
-      thisManager.receiveAlert(handler.eventName, requestInfo)
+
+      // handler.handle(requestInfo)
+      validator[handler.eventName](requestInfo) ? handler.handle(requestInfo) : console.error(`[socket-request-event] ${handler.eventName}: request info is invalid.`)
     })
   // internal service request
-  } else if (req !== undefined && res !== undefined) {
+  } else if (matchHttpRequestEvent(req, res, handler.eventName)) {
     requestInfo.req = req
     requestInfo.res = res
-    handler.handle(requestInfo)
-    thisManager.receiveAlert(handler.eventName, requestInfo)
+    requestInfo.next = next
+
+    // handler.handle(requestInfo)
+    validator[handler.eventName](requestInfo) ? handler.handle(requestInfo) : console.error(`[http-request-event] ${handler.eventName}: request info is invalid.`)
   }
 }
 
@@ -89,17 +94,17 @@ Manager.prototype.getRequestEventHandler = function () {
 }
 
 Manager.prototype.loadEventHandler = function (events) {
-  let dir = path.join(this.rootDir, 'event_handler')
+  const dir = path.join(this.rootDir, 'event_handler')
 
-  let eventHandlers = []
-  let eventContent = new Set()
-  for (let key in events) {
+  const eventHandlers = []
+  const eventContent = new Set()
+  for (const key in events) {
     eventContent.add(events[key])
   }
 
   const files = fs.readdirSync(dir)
   files.forEach((file) => {
-    let {
+    const {
       handler
     } = require(path.join(dir, file))
     if (eventContent.has(handler.eventName)) {
@@ -108,39 +113,6 @@ Manager.prototype.loadEventHandler = function (events) {
   })
 
   return eventHandlers
-}
-
-// for testing
-Manager.prototype.getEventHandler = function (eventName) {
-  if (this.businessEventHandlers) {
-    for (let index in this.businessEventHandlers) {
-      let handler = this.businessEventHandlers[index]
-      if (handler.eventName === eventName) {
-        return handler
-      }
-    }
-  }
-
-  if (this.requestEventHandlers) {
-    for (let index in this.requestEventHandlers) {
-      let handler = this.requestEventHandlers[index]
-      if (handler.eventName === eventName) {
-        return handler
-      }
-    }
-  }
-}
-
-// for testing
-Manager.prototype.testing = function (receivedEvent) {
-  this.receivedEvent = receivedEvent
-  return this
-}
-
-Manager.prototype.receiveAlert = function (event, requestInfo) {
-  if (this.receivedEvent) {
-    this.receivedEvent.emit(event, requestInfo)
-  }
 }
 
 module.exports = Manager

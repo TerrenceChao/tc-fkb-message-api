@@ -22,6 +22,7 @@ function getParentDirPath (currentDir, specifyDir) {
 }
 
 module.exports = {
+  root: ROOT,
   app: require('./_app'),
   auth: require('./_auth'),
   adaptor: require('./_adaptor'),

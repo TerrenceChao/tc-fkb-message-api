@@ -1,6 +1,7 @@
 var config = require('config')
 var path = require('path')
 
+const { USER_INFO } = config.get('app')
 const userRepository = require(path.join(config.get('src.repository'), 'nosql', 'userRepository'))
 const invitationRepository = require(path.join(config.get('src.repository'), 'nosql', 'invitationRepository'))
 const channelInfoRepository = require(path.join(config.get('src.repository'), 'nosql', 'channelInfoRepository'))
@@ -10,18 +11,62 @@ function logger (err) {
   console.error(`database error: ${err.message}`)
 }
 
+/**
+ * 你可能會覺得奇怪，為什 StorageService 中的 repository [不透過注入(DI)方式]？
+ * 以往 repository 會透過注入的方式(DI)以方便用替身(stub)測試，
+ * 但是請注意：[StorageService本身就是只關注Database的操作]，
+ * 所以測試時，請將 StorageService 當作以往的 repository 做單元測試。
+ *
+ * 最主要的原因是專案（程式）架構上的差異。這裡不像傳統的：
+ * Controller, Service, Repository. 因為大部分的操作跟 socket 有關，
+ * 所以專案架構整體採用 Command Pattern 的方式去設計：
+ * [Server,Manager,Handler]
+ */
 function StorageService () {}
 
-StorageService.prototype.getUser = async function (uid) {
-  return Promise.resolve(userRepository.findById(uid))
+StorageService.prototype.createUserInfo = async function (userInfo) {
+  !userInfo.info && (userInfo.info = {})
+  return Promise.resolve(userRepository.createInfo(userInfo)) // return user
     .catch(err => {
       logger(err)
       return Promise.reject(err)
     })
 }
 
-StorageService.prototype.createUser = async function (uid) {
-  return Promise.resolve(userRepository.create(uid)) // return user
+StorageService.prototype.getUser = async function (uid, selectFields = []) {
+  return Promise.resolve(userRepository.findById(uid, selectFields))
+    .catch(err => {
+      logger(err)
+      return Promise.reject(err)
+    })
+}
+
+StorageService.prototype.getUserInfoList = async function (uidList) {
+  return Promise.resolve(userRepository.getListByIds(uidList))
+    .catch(err => {
+      logger(err)
+      return Promise.reject(err)
+    })
+}
+
+function mergeUserInfo (info, newInfo) {
+  const updatedInfo = {}
+  USER_INFO.forEach(field => {
+    if (newInfo[field]) { // new data
+      updatedInfo[field] = newInfo[field]
+    } else if (info && info[field]) { // original data
+      updatedInfo[field] = info[field]
+    } else { // info (original data) is NULL
+      updatedInfo[field] = ''
+    }
+  })
+
+  return updatedInfo
+}
+
+StorageService.prototype.updateUserInfo = async function (uid, newInfo, selectFields) {
+  return Promise.resolve(userRepository.findById(uid, ['info']))
+    .then(userRecord => userRepository.updateInfoById(uid, mergeUserInfo(userRecord.info, newInfo), selectFields))
     .catch(err => {
       logger(err)
       return Promise.reject(err)
@@ -38,25 +83,25 @@ StorageService.prototype.updateLastGlimpse = async function (uid, jsonGlimpses) 
 
 StorageService.prototype.invitationMultiCreated = async function (
   inviter,
-  invitees,
+  recipients,
   header,
   content,
   sensitive
 ) {
-  if (!Array.isArray(invitees)) {
-    throw new TypeError(`param 'invitees' is not an array`)
+  if (!Array.isArray(recipients)) {
+    throw new TypeError('param \'recipients\' is not an array')
   }
 
-  return Promise.all(invitees.map(async (invitee) => {
-    var invitation = await invitationRepository.create(inviter, invitee, header, content, sensitive)
-    await userRepository.recordInvitation(invitation.iid, inviter, invitee) // return true
-    await channelInfoRepository.appendInviteeAndReturn(sensitive.chid, invitee) // recorded in chInfo.invitees
+  return Promise.all(recipients.map(async (recipient) => {
+    var invitation = await invitationRepository.create(inviter, recipient, header, content, sensitive)
+    await userRepository.recordInvitation(invitation.iid, inviter, recipient) // return true
+    await channelInfoRepository.appendRecipientAndReturn(sensitive.chid, recipient) // recorded in chInfo.recipients
 
     return invitation
   }))
     .catch(err => {
       logger(err)
-      return Promise.reject(new Error(`create invitation(s) fail`))
+      return Promise.reject(new Error('create invitation(s) fail'))
     })
 }
 
@@ -65,7 +110,7 @@ StorageService.prototype.getInvitation = async function (iid) {
     return await invitationRepository.findById(iid)
   } catch (err) {
     logger(err)
-    throw new Error(`invitation ID(iid) is invalid`)
+    throw new Error('invitation ID(iid) is invalid')
   }
 }
 
@@ -76,7 +121,7 @@ StorageService.prototype.getReceivedInvitationList = async function (uid, limit 
     return invitationList
   } catch (err) {
     logger(err)
-    throw new Error(`invitationList(received) is null`)
+    throw new Error('invitationList(received) is null')
   }
 }
 
@@ -85,7 +130,7 @@ StorageService.prototype.getSentInvitationList = async function (uid, limit = 10
     .then(inviteIds => invitationRepository.getListByIds(inviteIds)) //  (inviteIds, limit, skip, 'DESC')
     .catch(err => {
       logger(err)
-      return Promise.reject(new Error(`invitationList(sent) is null`))
+      return Promise.reject(new Error('invitationList(sent) is null'))
     })
 }
 
@@ -96,11 +141,11 @@ StorageService.prototype.invitationRemoved = async function (iid) {
     await userRepository.deleteInvitation(
       invitation.iid,
       invitation.inviter,
-      invitation.invitee
+      invitation.recipient
     ) // return true
-    await channelInfoRepository.removeInviteeAndReturn(invitation.sensitive.chid, invitation.invitee)
+    await channelInfoRepository.removeRecipientAndReturn(invitation.sensitive.chid, invitation.recipient)
 
-    return await invitationRepository.removeById(iid) // return true
+    return await invitationRepository.removeById(iid) // return doc(invitation)
   } catch (err) {
     logger(err)
     throw new Error(`remove invitation: ${iid} fail`)
@@ -108,14 +153,13 @@ StorageService.prototype.invitationRemoved = async function (iid) {
 }
 
 StorageService.prototype.channelInfoCreated = async function (uid, channelName) {
-  // ciid will be saved in local storage (for frontend)
+  // chid will be saved in local storage (for frontend)
   try {
     var now = Date.now()
     var channelInfo = await channelInfoRepository.create(uid, channelName)
     // add channel ref(channel record) in User
     await userRepository.appendChannelRecord(
       uid, {
-        ciid: channelInfo.ciid,
         chid: channelInfo.chid,
         joinedAt: now,
         lastGlimpse: now
@@ -128,17 +172,17 @@ StorageService.prototype.channelInfoCreated = async function (uid, channelName) 
 }
 
 StorageService.prototype.getAllChannelIds = async function (uid) {
-  // get ciid(s) !!! (for internal online/offline procedure)
+  // get chid(s) !!! (for internal online/offline procedure)
   return Promise.resolve(userRepository.getChannelRecordList(uid))
-    .then(channelRecords => channelRecords.map(chRecord => chRecord.ciid))
+    .then(channelRecords => channelRecords.map(chRecord => chRecord.chid))
     .catch(err => {
       logger(err)
-      return Promise.reject(new Error(`fail to get user's all channel ciid(s). user: ${uid}`))
+      return Promise.reject(new Error(`fail to get user's all channel chid(s). user: ${uid}`))
     })
 }
 
 StorageService.prototype.getChannelInfo = async function (query) {
-  // ciid will be saved in local storage (for frontend)
+  // chid will be saved in local storage (for frontend)
   try {
     return await channelInfoRepository.findOne(query)
   } catch (err) {
@@ -147,16 +191,26 @@ StorageService.prototype.getChannelInfo = async function (query) {
   }
 }
 
+StorageService.prototype.getUserChannelInfo = async function (query) {
+  // var { uid, chid } = query. 'chid' will be saved in local storage (for frontend)
+  try {
+    return await channelInfoRepository.findOneByUser(query)
+  } catch (err) {
+    logger(err)
+    throw new Error(`couldn't get user's channel info with: ${JSON.stringify(query, null, 2)}`)
+  }
+}
+
 StorageService.prototype.getUserChannelInfoList = async function (uid, limit = 10, skip = 0) {
   // order by conversation's 'createdAt' DESC
   return Promise.resolve(userRepository.getChannelRecordList(uid))
     // the latest news should comes from channelInfo(channelInfo.latestSpoke), not user self
     .then(async channelRecords => {
-      var ciids = channelRecords.map(chRecord => chRecord.ciid)
-      var channelInfoList = await channelInfoRepository.getListByCiids(ciids, limit, skip, 'DESC')
+      var chids = channelRecords.map(chRecord => chRecord.chid)
+      var channelInfoList = await channelInfoRepository.getListByChids(chids, limit, skip, 'DESC')
 
       return channelInfoList.map(channelInfo => {
-        var chRecord = channelRecords.find(chRecord => chRecord.ciid === channelInfo.ciid)
+        var chRecord = channelRecords.find(chRecord => chRecord.chid === channelInfo.chid)
         channelInfo.lastGlimpse = chRecord.lastGlimpse
         return channelInfo
       })
@@ -170,12 +224,11 @@ StorageService.prototype.getUserChannelInfoList = async function (uid, limit = 1
 StorageService.prototype.channelJoined = async function (uid, chid) {
   try {
     var now = Date.now()
-    // In channelInfo(chid): remove uid from invitees, append uid to members.
+    // In channelInfo(chid): remove uid from recipients, append uid to members.
     var channelInfo = await channelInfoRepository.appendMemberAndReturn(chid, uid)
     // add channel ref(channel record) in User
     await userRepository.appendChannelRecord(
       uid, {
-        ciid: channelInfo.ciid,
         chid: channelInfo.chid,
         joinedAt: now,
         lastGlimpse: now
@@ -194,7 +247,6 @@ StorageService.prototype.channelLeaved = async function (uid, chid) {
     // remove channel ref(channel record) in User
     await userRepository.removeChannelRecord(
       uid, {
-        ciid: channelInfo.ciid,
         chid: channelInfo.chid
       })
     return channelInfo
@@ -204,11 +256,16 @@ StorageService.prototype.channelLeaved = async function (uid, chid) {
   }
 }
 
+/**
+ * [query僅有chid]: { chid } = query
+ * 但為了界面的一致性和簡化，這裡用 { param1, param2, ... } 表達輸入參數，
+ * 方便日後因應需求變更而修正
+ * @param{Object} query
+ */
 StorageService.prototype.channelInfoRemoved = async function (query) {
   try {
-    var channelInfo = await channelInfoRepository.findOne(query)
-    await conversationRepository.removeListByCiid(channelInfo.ciid) // return true
-    await channelInfoRepository.removeByCiid(channelInfo.ciid) // return true
+    await conversationRepository.removeListByChid(query.chid) // return true
+    await channelInfoRepository.removeByChid(query.chid) // return doc(chInfo)
     return true
   } catch (err) {
     logger(err)
@@ -217,23 +274,23 @@ StorageService.prototype.channelInfoRemoved = async function (query) {
 }
 
 // for channel => conversations
-StorageService.prototype.conversationCreated = async function (ciid, uid, content, type, datetime) {
-  return Promise.resolve(conversationRepository.create(ciid, uid, content, type, datetime))
-    .then(() => channelInfoRepository.updateLatestSpoke(ciid, datetime)) // ???
+StorageService.prototype.conversationCreated = async function (chid, uid, content, type, datetime) {
+  return Promise.resolve(channelInfoRepository.updateLatestSpoke(chid, datetime))
+    .then(() => conversationRepository.create(chid, uid, content, type, datetime))
     .catch(err => {
       logger(err)
-      return Promise.reject(new Error(`conversation in channelInfo(ciid): ${ciid} is failed to created`))
+      return Promise.reject(new Error(`conversation in channelInfo(chid): ${chid} is failed to created`))
     })
 }
 
-StorageService.prototype.getConversationList = async function (uid, ciid, limit = 10, skip = 0) {
+StorageService.prototype.getConversationList = async function (uid, chid, limit = 10, skip = 0) {
   return Promise.resolve(userRepository.getChannelRecord(uid, {
-    ciid
+    chid
   }))
     .then(chRecord => conversationRepository.getListByUserChannelRecord(chRecord, limit, skip, 'DESC'))
     .catch(err => {
       logger(err)
-      return Promise.reject(new Error(`get conversations in channel(ciid): ${ciid} FAIL`))
+      return Promise.reject(new Error(`get conversations in channel(chid): ${chid} FAIL`))
     })
 }
 
