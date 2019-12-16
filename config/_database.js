@@ -2,7 +2,7 @@ const path = require('path')
 const mongoose = require('mongoose')
 
 const ACTIVE_MODE = 'active'
-process.env.NOSQL_CONNECT_MODE = ACTIVE_MODE
+global.NOSQL_CONNECT_MODE = ACTIVE_MODE
 
 mongoose.Promise = global.Promise
 mongoose.envParams = {
@@ -18,13 +18,13 @@ function NosqlShell () {
 
   mongoose.connection.on('error', console.error.bind(console, 'connection error:'))
   mongoose.connection.on('open', () => {
-    console.log('mongodb is connecting ...')
+    console.log(`mongodb is connecting ... (${global.NOSQL_CONNECT_MODE})`)
     this.attempts = 1
   })
 
   mongoose.connection.on('disconnected', () => {
     console.log('\nmongodb is disconnected\n')
-    if (process.env.NOSQL_CONNECT_MODE !== ACTIVE_MODE) {
+    if (global.NOSQL_CONNECT_MODE !== ACTIVE_MODE) {
       return
     }
 

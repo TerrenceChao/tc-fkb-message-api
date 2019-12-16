@@ -2,9 +2,6 @@ require('dotenv').config()
 const path = require('path')
 const mongoose = require('mongoose')
 
-const TEST_MODE = 'test'
-process.env.NOSQL_CONNECT_MODE = TEST_MODE
-
 mongoose.Promise = global.Promise
 mongoose.envParams = {
   writeConcern: {
@@ -17,7 +14,7 @@ mongoose.envParams = {
 function NosqlShell () {
   mongoose.connection.on('error', console.error.bind(console, 'connection error:'))
   mongoose.connection.once('open', () => {
-    console.log('[TEST MODE] mongodb is connecting ...')
+    console.log(`[TEST MODE] mongodb is connecting ... (${global.NOSQL_CONNECT_MODE})`)
   })
 
   mongoose.connection.once('disconnected', () => {

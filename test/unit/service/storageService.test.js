@@ -7,6 +7,8 @@ var { expect } = require('chai')
 var database = require(config.get('test.mockConfig.database'))(config.root)
 var { storageService } = require(path.join(config.get('src.service'), 'storageService'))
 
+global.NOSQL_CONNECT_MODE = 'test'
+
 function genUserInfo () {
   const givenName = faker.name.firstName()
   const familyName = faker.name.lastName()
