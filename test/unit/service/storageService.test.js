@@ -744,7 +744,12 @@ describe('storageService test', () => {
     // expect(conversation.datetime).to.be.equals(sentTime) // need format transform
   })
 
-  afterEach(() => { /** clear records */ })
+  after(async () => {
+    await (database.nosql.db).dropCollection('conversations')
+    await database.nosql.db.dropCollection('channelinfos')
+    await database.nosql.db.dropCollection('invitations')
+    await database.nosql.db.dropCollection('users')
 
-  after(() => database.nosql.db.disconnect())
+    database.nosql.db.disconnect()
+  })
 })

@@ -43,6 +43,11 @@ NosqlShell.prototype.disconnect = function () {
   mongoose.disconnect()
 }
 
+NosqlShell.prototype.dropCollection = async function (collectionName) {
+  await mongoose.connection.db.dropCollection(collectionName)
+  console.info('drop collection: ', collectionName)
+}
+
 module.exports = function (root) {
   var database = path.join(root, 'infrastructure', 'database')
   var nosql = path.join(database, 'nosql')
