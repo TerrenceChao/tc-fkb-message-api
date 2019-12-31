@@ -14,7 +14,7 @@ jobs:
       # documented at https://circleci.com/docs/2.0/circleci-images/
       - image: circleci/mongo:4.2.0
 
-    working_directory: ~/repo
+    # working_directory: ~/repo
 
     steps:
       - checkout
@@ -33,5 +33,35 @@ jobs:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
 
-      # run tests!
-      - run: npm run test
+      - run: mkdir -p tc-fkb-message-api
+      - run: echo "Trying out workspaces" 1> tc-fkb-message-api/logging
+      - persist_to_workspace:
+        root: tc-fkb-message-api
+        paths:
+          - logging
+
+  test:
+    docker:
+      # specify the version you desire here
+      - image: circleci/node:10.16.3
+    steps:
+      - checkout
+      - run: echo "run test"
+      - attach_workspace:
+          at: tc-fkb-message-api
+
+      - run: |
+          if [[ $(cat tc-fkb-message-api/logging) == "Trying out workspaces" ]]; then
+            echo "It worked!";
+          else
+            echo "Nope!"; exit 1
+          fi
+    
+workflows:
+  version: 2
+  build-test:
+    jobs:
+      - build
+      - two:
+        required:
+          - build
