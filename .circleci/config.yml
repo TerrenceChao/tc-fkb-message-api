@@ -4,7 +4,7 @@
 #
 version: 2
 jobs:
-  build:
+  build-test:
     docker:
       # specify the version you desire here
       - image: circleci/node:10.16.3
@@ -14,10 +14,19 @@ jobs:
       # documented at https://circleci.com/docs/2.0/circleci-images/
       - image: circleci/mongo:4.2.0
 
-    working_directory: ~/repo
+      - image: circleci/redis:5.0-alpine3.11
+
+    working_directory: ~/tc-fkb-message-api
+
+    environment:
+      NODE_ENV: development
 
     steps:
       - checkout
+      - run: 
+          name: "Setup Custom Environment Variables"
+          command: |
+            echo 'export NODE_ENV="development"' >> $BASH_ENV
 
       # Download and cache dependencies
       - restore_cache:
@@ -26,38 +35,53 @@ jobs:
           # fallback to using the latest cache if no exact match is found
           # - v1-dependencies-{{ checksum "package-lock.json" }}
 
-      - run: npm install
+      - run:
+          name: Check Redis Status
+          command: |
+            sudo apt-get install redis-server &&
+            sudo service redis-server start &&
+            redis-cli info stats &&
+            redis-cli ping
+      - run: 
+          name: Npm Install
+          command: |
+            sudo npm install -g &&
+            sudo npm install chai --save-dev &&
+            sudo npm install mocha -g
 
       - save_cache:
         paths:
           - node_modules
         key: v1-dependencies-{{ checksum "package.json" }}
 
-      - persist_to_workspace:
-        root: ~/repo
-        paths: .
+      - run: 
+          name: Check And Test
+          command: |
+            pwd &&
+            ls -l &&
+            ls -l node_modules &&
+            mocha test/**/*.test.js
 
-  test:
+  deploy:
     docker:
       # specify the version you desire here
       - image: circleci/node:10.16.3
 
-      # Specify service dependencies here if necessary
-      # CircleCI maintains a library of pre-built images
-      # documented at https://circleci.com/docs/2.0/circleci-images/
-      - image: circleci/mongo:4.2.0
+    working_directory: ~/tc-fkb-message-api
 
-    working_directory: ~/repo
+    environment:
+      NODE_ENV: production
 
     steps:
-      - run: npm run test
-      - run: echo 'jobs.test is completed.'
-
+      - run: pwd
+      - run: ls -l
+      - run: echo "Deployment... Done."
+    
 workflows:
   version: 2
-  build-and-test:
+  build-test-deploy:
     jobs:
-      - build:
-      - test:
-        requires:
-          - build:
+      - build-test
+      - deploy:
+          requires:
+            - build-test
