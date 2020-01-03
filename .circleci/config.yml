@@ -66,6 +66,12 @@ jobs:
     docker:
       # specify the version you desire here
       - image: circleci/node:10.16.3
+
+    working_directory: ~/tc-fkb-message-api
+
+    environment:
+      NODE_ENV: production
+
     steps:
       - run: pwd
       - run: ls -l
