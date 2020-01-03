@@ -35,11 +35,6 @@ jobs:
             # fallback to using the latest cache if no exact match is found
             - v1-dependencies-
 
-      - save_cache:
-          paths:
-            - node_modules
-          key: v1-dependencies-{{ checksum "package.json" }}
-
       - run:
           name: Check Redis Status
           command: |
@@ -53,6 +48,12 @@ jobs:
             sudo npm install -g &&
             sudo npm install chai --save-dev &&
             sudo npm install mocha -g
+
+      - save_cache:
+          paths:
+            - node_modules
+          key: v1-dependencies-{{ checksum "package.json" }}
+
       - run: 
           name: Check And Test
           command: |
