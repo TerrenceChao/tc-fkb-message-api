@@ -28,13 +28,24 @@ jobs:
             # fallback to using the latest cache if no exact match is found
             - v1-dependencies-
 
+      - run: pwd
+
       - run:
           name: Check Redis Status
-          command: redis-cli ping
-      - run: pwd
+          command: |
+            sudo apt-get install redis-server &&
+            sudo systemctl enable redis-server.service &&
+            sudo systemctl restart redis-server.service &&
+            redis-cli info &&
+            redis-cli info stats &&
+            redis-cli info server &&
+            redis-cli ping
       - run: sudo npm install -g
-      - run: sudo npm install chai --save-dev
-      - run: sudo npm install mocha --save-dev    # - run: sudo npm install mocha chai sinon mocha-junit-reporter -g
+      - run: 
+          name: Npm Install Testing Module
+          command: |
+            sudo npm install chai --save-dev &&
+            sudo npm install mocha --save-dev    # - run: sudo npm install mocha chai sinon mocha-junit-reporter -g
       - run: sudo npm run test
 
       - save_cache:
