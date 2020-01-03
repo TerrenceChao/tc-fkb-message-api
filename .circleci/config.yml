@@ -28,6 +28,9 @@ jobs:
             # fallback to using the latest cache if no exact match is found
             - v1-dependencies-
 
+      - run:
+          name: Check Redis Status
+          command: redis-cli ping
       - run: pwd
       - run: sudo npm install -g
       - run: sudo npm install chai --save-dev
