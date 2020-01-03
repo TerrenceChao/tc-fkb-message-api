@@ -29,8 +29,7 @@ jobs:
       - run: pwd
       - run: sudo npm install -g
       - run: sudo npm install chai --save-dev
-      - run: sudo npm install mocha --save-dev
-      # - run: sudo npm install mocha chai sinon mocha-junit-reporter -g
+      - run: sudo npm install mocha --save-dev    # - run: sudo npm install mocha chai sinon mocha-junit-reporter -g
       - run: sudo npm run test
 
       - save_cache:
