@@ -4,7 +4,7 @@
 #
 version: 2
 jobs:
-  build:
+  build-test:
     docker:
       # specify the version you desire here
       - image: circleci/node:10.16.3
@@ -61,20 +61,20 @@ jobs:
             ls -l node_modules &&
             mocha test/**/*.test.js
 
-  test:
+  deploy:
     docker:
       # specify the version you desire here
       - image: circleci/node:10.16.3
     steps:
       - run: pwd
       - run: ls -l
-      - run: echo "Done."
+      - run: echo "Deployment... Done."
     
 workflows:
   version: 2
-  build-test:
+  build-test-deploy:
     jobs:
-      - build
-      - test:
+      - build-test
+      - deploy:
           requires:
-            - build
+            - build-test
