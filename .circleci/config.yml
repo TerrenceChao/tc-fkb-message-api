@@ -16,10 +16,17 @@ jobs:
 
       - image: circleci/redis:5.0-alpine3.11
 
-    working_directory: ~/repo
+    working_directory: ~/tc-fkb-message-api
+
+    environment:
+      NODE_ENV: development
 
     steps:
       - checkout
+      - run: 
+          name: "Setup Custom Environment Variables"
+          command: |
+            echo 'export NODE_ENV="development"' >> $BASH_ENV
 
       # Download and cache dependencies
       - restore_cache:
@@ -28,29 +35,28 @@ jobs:
             # fallback to using the latest cache if no exact match is found
             - v1-dependencies-
 
-      - run: pwd
+      - save_cache:
+          paths:
+            - node_modules
+          key: v1-dependencies-{{ checksum "package.json" }}
 
       - run:
           name: Check Redis Status
           command: |
             sudo apt-get install redis-server &&
             sudo service redis-server start &&
-            redis-cli info &&
             redis-cli info stats &&
-            redis-cli info server &&
             redis-cli ping
       - run: sudo npm install -g
       - run: 
-          name: Npm Install Testing Module
+          name: Npm Install Testing Packages
           command: |
             sudo npm install chai --save-dev &&
-            sudo npm install mocha --save-dev    # - run: sudo npm install mocha chai sinon mocha-junit-reporter -g
-      - run: sudo npm run test
-
-      - save_cache:
-          paths:
-            - node_modules
-          key: v1-dependencies-{{ checksum "package.json" }}
+            sudo npm install mocha -g
+      - run: pwd
+      - run: ls -l
+      - run: ls -l node_modules
+      - run: mocha test/**/*.test.js
 
   test:
     docker:

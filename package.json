@@ -39,7 +39,7 @@
     "eslint-config-airbnb-base": "~13.1.0",
     "eslint-plugin-import": "~2.14.0",
     "faker": "^4.1.0",
-    "mocha": "~5.2.0",
+    "mocha": "~6.2.2",
     "mock-socket": "~7.0.0",
     "nodemon": "~1.17.3",
     "sinon": "~4.0.0",
