@@ -33,6 +33,7 @@ jobs:
       - run:
           name: Check Redis Status
           command: |
+            sudo apt-get install systemctl &&
             sudo apt-get install redis-server &&
             sudo service redis-server start &&
             redis-cli info &&
