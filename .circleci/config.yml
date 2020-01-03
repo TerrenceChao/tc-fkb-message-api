@@ -47,16 +47,19 @@ jobs:
             sudo service redis-server start &&
             redis-cli info stats &&
             redis-cli ping
-      - run: sudo npm install -g
       - run: 
-          name: Npm Install Testing Packages
+          name: Npm Install
           command: |
+            sudo npm install -g &&
             sudo npm install chai --save-dev &&
             sudo npm install mocha -g
-      - run: pwd
-      - run: ls -l
-      - run: ls -l node_modules
-      - run: mocha test/**/*.test.js
+      - run: 
+          name: Check And Test
+          command: |
+            pwd &&
+            ls -l &&
+            ls -l node_modules &&
+            mocha test/**/*.test.js
 
   test:
     docker:
