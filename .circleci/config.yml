@@ -26,12 +26,32 @@ jobs:
             # fallback to using the latest cache if no exact match is found
             - v1-dependencies-
 
-      - run: npm install
+      - run: pwd
+      - run: sudo npm install -g
+      - run: sudo npm install chai --save-dev
+      - run: sudo npm install mocha --save-dev
+      # - run: sudo npm install mocha chai sinon mocha-junit-reporter -g
+      - run: sudo npm run test
 
       - save_cache:
           paths:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
 
-      # run tests!
-      - run: npm run test
+  test:
+    docker:
+      # specify the version you desire here
+      - image: circleci/node:10.16.3
+    steps:
+      - run: pwd
+      - run: ls -l
+      - run: echo "Done."
+    
+workflows:
+  version: 2
+  build-test:
+    jobs:
+      - build
+      - test:
+          requires:
+            - build
